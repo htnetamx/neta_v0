@@ -398,5 +398,11 @@ namespace Nop.Services.Orders
         Task<IList<RecurringPaymentHistory>> GetRecurringPaymentHistoryAsync(RecurringPayment recurringPayment);
 
         #endregion
+
+
+
+        Task<decimal> GetCurrentStockAsync(int storeId, int productId, DateTime? start, DateTime? end);
+
+
     }
 }

@@ -22,6 +22,7 @@ using Nop.Services.Directory;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
+using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Shipping.Date;
@@ -53,7 +54,7 @@ namespace Nop.Web.Factories
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILocalizationService _localizationService;
         private readonly IManufacturerService _manufacturerService;
-
+        private readonly IOrderService _orderService;
         private readonly IPermissionService _permissionService;
         private readonly IPictureService _pictureService;
         private readonly IPriceCalculationService _priceCalculationService;
@@ -95,6 +96,7 @@ namespace Nop.Web.Factories
             IGenericAttributeService genericAttributeService,
             ILocalizationService localizationService,
             IManufacturerService manufacturerService,
+            IOrderService orderService,
             IPermissionService permissionService,
             IPictureService pictureService,
             IPriceCalculationService priceCalculationService,
@@ -132,6 +134,7 @@ namespace Nop.Web.Factories
             _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
             _manufacturerService = manufacturerService;
+            _orderService = orderService;
             _permissionService = permissionService;
             _pictureService = pictureService;
             _priceCalculationService = priceCalculationService;
@@ -1217,6 +1220,33 @@ namespace Nop.Web.Factories
                     SeName = await _urlRecordService.GetSeNameAsync(product),
                     Sku = product.Sku,
                     ProductType = product.ProductType,
+                    Details = new ProductDetailsModel {
+                        Id = product.Id,
+                        Name = await _localizationService.GetLocalizedAsync(product, x => x.Name),
+                        ShortDescription = await _localizationService.GetLocalizedAsync(product, x => x.ShortDescription),
+                        FullDescription = await _localizationService.GetLocalizedAsync(product, x => x.FullDescription),
+                        MetaKeywords = await _localizationService.GetLocalizedAsync(product, x => x.MetaKeywords),
+                        MetaDescription = await _localizationService.GetLocalizedAsync(product, x => x.MetaDescription),
+                        MetaTitle = await _localizationService.GetLocalizedAsync(product, x => x.MetaTitle),
+                        SeName = await _urlRecordService.GetSeNameAsync(product),
+                        ProductType = product.ProductType,
+                        ShowSku = _catalogSettings.ShowSkuOnProductDetailsPage,
+                        Sku = product.Sku,
+                        ShowManufacturerPartNumber = _catalogSettings.ShowManufacturerPartNumber,
+                        FreeShippingNotificationEnabled = _catalogSettings.ShowFreeShippingNotification,
+                        ManufacturerPartNumber = product.ManufacturerPartNumber,
+                        ShowGtin = _catalogSettings.ShowGtin,
+                        Gtin = product.Gtin,
+                        ManageInventoryMethod = product.ManageInventoryMethod,
+                        StockAvailability = await _productService.FormatStockMessageAsync(product, string.Empty),
+                        HasSampleDownload = product.IsDownload && product.HasSampleDownload,
+                        DisplayDiscontinuedMessage = !product.Published && _catalogSettings.DisplayDiscontinuedMessageForUnpublishedProducts,
+                        AvailableEndDate = product.AvailableEndDateTimeUtc,
+                        VisibleIndividually = product.VisibleIndividually,
+                        StockQuantity = product.StockQuantity,
+                        CurrentStockQuantity = await _orderService.GetCurrentStockAsync((await _storeContext.GetCurrentStoreAsync()).Id, product.Id, product.AvailableStartDateTimeUtc, product.AvailableEndDateTimeUtc),
+                        AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations
+                    },
                     MarkAsNew = product.MarkAsNew &&
                         (!product.MarkAsNewStartDateTimeUtc.HasValue || product.MarkAsNewStartDateTimeUtc.Value < DateTime.UtcNow) &&
                         (!product.MarkAsNewEndDateTimeUtc.HasValue || product.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
@@ -1347,7 +1377,7 @@ namespace Nop.Web.Factories
                 AvailableEndDate = product.AvailableEndDateTimeUtc,
                 VisibleIndividually = product.VisibleIndividually,
                 StockQuantity = product.StockQuantity,
-                CurrentStockQuantity = 0,
+                CurrentStockQuantity = await _orderService.GetCurrentStockAsync((await _storeContext.GetCurrentStoreAsync()).Id, product.Id, product.AvailableStartDateTimeUtc, product.AvailableEndDateTimeUtc),
                 AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations
             };
 

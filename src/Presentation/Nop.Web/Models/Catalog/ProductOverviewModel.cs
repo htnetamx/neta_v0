@@ -24,6 +24,8 @@ namespace Nop.Web.Models.Catalog
 
         public ProductType ProductType { get; set; }
 
+        public ProductDetailsModel Details { get; set; }
+
         public bool MarkAsNew { get; set; }
 
         //price

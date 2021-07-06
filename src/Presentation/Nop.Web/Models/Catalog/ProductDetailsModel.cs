@@ -117,7 +117,7 @@ namespace Nop.Web.Models.Catalog
 
         public bool AllowAddingOnlyExistingAttributeCombinations { get; set; }
         public int StockQuantity { get; set; }
-        public int CurrentStockQuantity { get; set; }
+        public decimal CurrentStockQuantity { get; set; }
 
         #region Nested Classes
 
