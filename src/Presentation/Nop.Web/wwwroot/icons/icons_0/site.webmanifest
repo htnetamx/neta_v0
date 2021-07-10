@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Neta Mx",
+    "short_name": "NET",
     "icons": [
         {
             "src": "/icons/icons_0/android-chrome-36x36.png?v=4.40",
@@ -39,5 +39,7 @@
         }
     ],
     "theme_color": "#ffffff",
-    "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/"
 }

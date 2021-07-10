@@ -35,6 +35,7 @@ namespace Nop.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureApplicationServices(_configuration, _webHostEnvironment);
+            services.AddProgressiveWebApp();
         }
 
         /// <summary>
