@@ -16,7 +16,7 @@
             </div>
             <progress max="@Model.StockQuantity+@Model.CurrentStockQuantity" value="@Model.CurrentStockQuantity/(@Model.StockQuantity+@Model.CurrentStockQuantity)*100" style="width: 100%; height: 25px"></progress>
             <div class="stock">
-                <span class="label" style="font-weight: bold">Faltan @Model.StockQuantity productos para conseguir el descuento de grupo</span>
+                <span class="label" style="font-weight: bold">Faltan @Model.StockQuantity unidades para precio mayorista!</span>
             </div>
         </div>
         <div id="legendCtrl-@Model.Id">
@@ -57,7 +57,7 @@
         }
 
         var countdown = days + "d, " + hours + "h, " + minutes + "m, " + seconds + "s";
-        $("#stock-availabilityenddate-value-" + id).text(countdown + " faltan para el cierre de la compra");
+        $("#stock-availabilityenddate-value-" + id).text(countdown + " para que la promoción cierre");
     }
     $(document).ready(function () {
         $("#counterCtrl-@Model.Id").hide();

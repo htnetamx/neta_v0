@@ -971,7 +971,7 @@ label, label + * {
 }
 
 #topcartlink a {
-  background: url('../images/shopping-bag.png') left center no-repeat;
+  /*background: url('../images/shopping-bag.png') left center no-repeat;*/
   padding: 0 0 0 20px;
 }
 

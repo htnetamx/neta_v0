@@ -13,7 +13,8 @@
 }
 <div class="page shopping-cart-page">
     <div class="page-title">
-        <h1>@T("ShoppingCart")</h1>
+        @*<h1>@T("ShoppingCart")</h1>*@
+        <h1>$ @Model.Items.Sum(item => Convert.ToDecimal(item.Quantity) * Convert.ToDecimal(item.UnitPrice.Replace("$", ""))).ToString("N2")</h1>
     </div>
     <div class="page-body">
         @await Component.InvokeAsync("OrderSummary", new { overriddenModel = Model})

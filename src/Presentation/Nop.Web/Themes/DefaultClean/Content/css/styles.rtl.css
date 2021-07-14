@@ -973,7 +973,7 @@ label, label + * {
 }
 
 #topcartlink a {
-  background: url('../images/shopping-bag.png') right center no-repeat;
+  /*background: url('../images/shopping-bag.png') right center no-repeat;*/
   padding: 0 20px 0 0;
 }
 
