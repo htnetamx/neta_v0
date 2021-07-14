@@ -170,7 +170,7 @@
                                         }
                                         else
                                         {
-                                            <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="text" value="@(item.Quantity)" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" />
+                                            <input type="number" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" value="@(item.Quantity)" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" onchange="$('#updatecart1').click()" />
                                         }
                                     }
                                     else
@@ -226,17 +226,17 @@
                 @if (Model.IsEditable)
                 {
                     <div class="common-buttons">
-                        <button type="submit" name="updatecart" class="button-2 update-cart-button">@T("ShoppingCart.UpdateCart")</button>
+                        <button type="submit" style="display: none" id="updatecart1" name="updatecart" class="button-2 update-cart-button">@T("ShoppingCart.UpdateCart")</button>
 
                         <button type="submit" name="continueshopping" class="button-2 continue-shopping-button">@T("ShoppingCart.ContinueShopping")</button>
-                        @await Component.InvokeAsync("ShoppingCartEstimateShipping")
+                        @*@await Component.InvokeAsync("ShoppingCartEstimateShipping")*@
                     </div>
                 }
                 @if (Model.IsEditable)
                 {
-                    @await Html.PartialAsync("_CheckoutAttributes", Model)
+                    @*@await Html.PartialAsync("_CheckoutAttributes", Model)*@
                 }
-                @await Component.InvokeAsync("SelectedCheckoutAttributes")
+                @*@await Component.InvokeAsync("SelectedCheckoutAttributes")*@
             </div>
             <div class="cart-footer">
                 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
@@ -244,9 +244,9 @@
                 {
                     <div class="cart-collaterals">
                         <div class="deals">
-                            @await Html.PartialAsync("_DiscountBox", Model.DiscountBox)
-                            @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
-                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
+                            @*@await Html.PartialAsync("_DiscountBox", Model.DiscountBox)
+                            @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)*@
+                            @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })*@
                         </div>
                     </div>
                 }

@@ -69,6 +69,7 @@ namespace Nop.Web.Factories
         private readonly IStaticCacheManager _staticCacheManager;
         private readonly IStoreContext _storeContext;
         private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
+        private readonly IShoppingCartService _shoppingCartService;
         private readonly ITaxService _taxService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IVendorService _vendorService;
@@ -111,6 +112,7 @@ namespace Nop.Web.Factories
             IStaticCacheManager staticCacheManager,
             IStoreContext storeContext,
             IShoppingCartModelFactory shoppingCartModelFactory,
+            IShoppingCartService shoppingCartService,
             ITaxService taxService,
             IUrlRecordService urlRecordService,
             IVendorService vendorService,
@@ -149,6 +151,7 @@ namespace Nop.Web.Factories
             _staticCacheManager = staticCacheManager;
             _storeContext = storeContext;
             _shoppingCartModelFactory = shoppingCartModelFactory;
+            _shoppingCartService = shoppingCartService;
             _taxService = taxService;
             _urlRecordService = urlRecordService;
             _vendorService = vendorService;
@@ -1245,6 +1248,7 @@ namespace Nop.Web.Factories
                         VisibleIndividually = product.VisibleIndividually,
                         StockQuantity = product.StockQuantity,
                         CurrentStockQuantity = await _orderService.GetCurrentStockAsync((await _storeContext.GetCurrentStoreAsync()).Id, product.Id, product.AvailableStartDateTimeUtc, product.AvailableEndDateTimeUtc),
+                        CurrentProductQuantity = (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id,null,null)).Any() ? (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id, null, null)).First().Quantity : 0,
                         AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations
                     },
                     MarkAsNew = product.MarkAsNew &&
@@ -1378,6 +1382,7 @@ namespace Nop.Web.Factories
                 VisibleIndividually = product.VisibleIndividually,
                 StockQuantity = product.StockQuantity,
                 CurrentStockQuantity = await _orderService.GetCurrentStockAsync((await _storeContext.GetCurrentStoreAsync()).Id, product.Id, product.AvailableStartDateTimeUtc, product.AvailableEndDateTimeUtc),
+                CurrentProductQuantity = (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id, null, null)).Any() ? (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id, null, null)).First().Quantity : 0,
                 AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations
             };
 

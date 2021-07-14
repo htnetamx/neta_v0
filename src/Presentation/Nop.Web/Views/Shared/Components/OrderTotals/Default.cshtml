@@ -28,7 +28,8 @@
                         <label>@T("ShoppingCart.Totals.Shipping"):</label>
                         @if (Model.RequiresShipping && !string.IsNullOrEmpty(Model.SelectedShippingMethod))
                         {
-                            <span class="selected-shipping-method">@T("ShoppingCart.Totals.Shipping.Method", Model.SelectedShippingMethod)</span>
+                            @*<span class="selected-shipping-method">@T("ShoppingCart.Totals.Shipping.Method", Model.SelectedShippingMethod)</span>*@
+                            <span class="selected-shipping-method">Sin Cargo</span>
                         }
                     </td>
                     <td class="cart-total-right">
@@ -36,11 +37,12 @@
                         {
                             if (!string.IsNullOrEmpty(Model.Shipping))
                             {
-                            <span class="value-summary">@Model.Shipping</span>
+                                <span class="value-summary">@Model.Shipping</span>
                             }
                             else
                             {
-                            <span>@T("ShoppingCart.Totals.CalculatedDuringCheckout")</span>
+                                @*<span>@T("ShoppingCart.Totals.CalculatedDuringCheckout")</span>*@
+                                <span class="selected-shipping-method">Sin Cargo</span>
                             }
                         }
                         else
@@ -77,14 +79,14 @@
             }
             @if (Model.DisplayTax)
             {
-                <tr class="tax-value">
+                @*<tr class="tax-value">
                     <td class="cart-total-left">
                         <label>@T("ShoppingCart.Totals.Tax"):</label>
                     </td>
                     <td class="cart-total-right">
                         <span class="value-summary">@Model.Tax</span>
                     </td>
-                </tr>
+                </tr>*@
             }
             @if (!string.IsNullOrEmpty(Model.OrderTotalDiscount))
             {
@@ -134,14 +136,15 @@
                     <label>@T("ShoppingCart.Totals.OrderTotal"):</label>
                 </td>
                 <td class="cart-total-right">
-                    @if (!string.IsNullOrEmpty(Model.OrderTotal))
+                    <span class="value-summary">@Model.SubTotal</span>
+                    @*@if (!string.IsNullOrEmpty(Model.OrderTotal))
                     {
                         <span class="value-summary"><strong>@Model.OrderTotal</strong></span>
                     }
                     else
                     {
                         <span>@T("ShoppingCart.Totals.CalculatedDuringCheckout")</span>
-                    }
+                    }*@
                 </td>
             </tr>
             @if (Model.WillEarnRewardPoints > 0)

@@ -383,8 +383,11 @@ namespace Nop.Web.Factories
             //performance optimization (use "HasShoppingCartItems" property)
             if (customer.HasShoppingCartItems)
             {
-                model.ShoppingCartItems = (await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id))
-                    .Sum(item => item.Quantity);
+                //model.ShoppingCartItems = (await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id))
+                //    .Sum(item => item.Quantity);
+
+                model.ShoppingCartItems = (int)(await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id))
+                    .Sum((item) => Convert.ToDecimal(item.Quantity) * _productService.GetProductByIdAsync(item.ProductId).Result.Price);
 
                 model.WishlistItems = (await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist, (await _storeContext.GetCurrentStoreAsync()).Id))
                     .Sum(item => item.Quantity);

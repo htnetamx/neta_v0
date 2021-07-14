@@ -1036,7 +1036,7 @@ namespace Nop.Services.Orders
                         o.PaidDateUtc >= start && o.PaidDateUtc <= end
                         select orderItem;
 
-            var total = await query.SumAwaitAsync(async p => p.Quantity);
+            var total = await query.SumAwaitAsync(p => new ValueTask<decimal>(p.Quantity));
 
             return total;
         }

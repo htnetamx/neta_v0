@@ -293,11 +293,18 @@ namespace Nop.Web.Controllers
         {
             if (updatecartitem == null)
             {
-                //add to the cart
-                addToCartWarnings.AddRange(await _shoppingCartService.AddToCartAsync(await _workContext.GetCurrentCustomerAsync(),
-                    product, cartType, (await _storeContext.GetCurrentStoreAsync()).Id,
-                    attributes, customerEnteredPriceConverted,
-                    rentalStartDate, rentalEndDate, quantity, true));
+                try
+                {
+                    //add to the cart
+                    addToCartWarnings.AddRange(await _shoppingCartService.AddToCartAsync(await _workContext.GetCurrentCustomerAsync(),
+                        product, cartType, (await _storeContext.GetCurrentStoreAsync()).Id,
+                        attributes, customerEnteredPriceConverted,
+                        rentalStartDate, rentalEndDate, quantity, true));
+                }
+                catch (Exception ex)
+                {
+                    string mm = ex.Message;
+                }
             }
             else
             {
@@ -395,7 +402,7 @@ namespace Nop.Web.Controllers
 
                         var updateTopCartSectionHtml = string.Format(
                             await _localizationService.GetResourceAsync("ShoppingCart.HeaderQuantity"),
-                            shoppingCarts.Sum(item => item.Quantity));
+                            shoppingCarts.Sum(item => item.Quantity * _productService.GetProductByIdAsync(item.ProductId).Result.Price));
 
                         var updateFlyoutCartSectionHtml = _shoppingCartSettings.MiniShoppingCartEnabled
                             ? await RenderViewComponentToStringAsync("FlyoutShoppingCart")
@@ -682,7 +689,7 @@ namespace Nop.Web.Controllers
                         var shoppingCarts = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
                         var updatetopcartsectionhtml = string.Format(await _localizationService.GetResourceAsync("ShoppingCart.HeaderQuantity"),
-                            shoppingCarts.Sum(item => item.Quantity));
+                            shoppingCarts.Sum(item => Convert.ToDecimal(item.Quantity) * Convert.ToDecimal(_productService.GetProductByIdAsync(item.ProductId).Result.Price)));
 
                         var updateflyoutcartsectionhtml = _shoppingCartSettings.MiniShoppingCartEnabled
                             ? await RenderViewComponentToStringAsync("FlyoutShoppingCart")

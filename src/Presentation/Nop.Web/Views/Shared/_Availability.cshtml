@@ -7,19 +7,19 @@
     </div>
     @if (Model.AvailableEndDate.HasValue)
     {
-        <div id="counterCtrl">
+        <div id="counterCtrl-@Model.Id">
             <div class="stock">
                 <span class="value" id="stock-availabilityenddate-value-@Model.Id"></span>
             </div>
             <div class="stock">
                 <span class="label" style="font-weight: bold">@Model.CurrentStockQuantity productos comprados</span>
             </div>
-            <progress max="@Model.StockQuantity" value="80" style="width: 100%; height: 25px"></progress>
+            <progress max="@Model.StockQuantity+@Model.CurrentStockQuantity" value="@Model.CurrentStockQuantity/(@Model.StockQuantity+@Model.CurrentStockQuantity)*100" style="width: 100%; height: 25px"></progress>
             <div class="stock">
                 <span class="label" style="font-weight: bold">Faltan @Model.StockQuantity productos para conseguir el descuento de grupo</span>
             </div>
         </div>
-        <div id="legendCtrl">
+        <div id="legendCtrl-@Model.Id">
             <div class="stock" style="padding-top: 10px">
                 <span class="label">@T("Products.Availability"):</span>
                 <span class="value" id="stock-availability-value-@Model.Id">Sin Stock</span>
@@ -27,7 +27,7 @@
         </div>
 
         <script asp-location="Footer">
-    function counter() {
+    function counter(id) {
         var current_date = new Date().getTime();
         var future_date = new Date(@Model.AvailableEndDate.Value.Year,
                                     @Model.AvailableEndDate.Value.Month-1,
@@ -49,23 +49,23 @@
         seconds = parseInt(seconds_left % 60);
 
         if (seconds <= 0) {
-            $("#counterCtrl").hide();
-            $("#legendCtrl").show();
+            $("#counterCtrl-" + id).hide();
+            $("#legendCtrl-" + id).show();
         } else {
-            $("#counterCtrl").show();
-            $("#legendCtrl").hide();
+            $("#counterCtrl-" + id).show();
+            $("#legendCtrl-" + id).hide();
         }
 
         var countdown = days + "d, " + hours + "h, " + minutes + "m, " + seconds + "s";
-        $("#stock-availabilityenddate-value-@Model.Id").text(countdown + " faltan para el cierre de la compra");
+        $("#stock-availabilityenddate-value-" + id).text(countdown + " faltan para el cierre de la compra");
     }
     $(document).ready(function () {
-        $("#counterCtrl").hide();
-        $("#legendCtrl").hide();
+        $("#counterCtrl-@Model.Id").hide();
+        $("#legendCtrl-@Model.Id").hide();
 
         counter();
         window.setInterval(function () {
-            counter();
+            counter(@Model.Id);
         }, 1000);
     });
         </script>
