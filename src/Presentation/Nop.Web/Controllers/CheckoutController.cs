@@ -1340,6 +1340,7 @@ namespace Nop.Web.Controllers
                 {
                     //new address
                     var newAddress = model.BillingNewAddress;
+                    newAddress.Email = $"{newAddress.FirstName}.{newAddress.LastName}@yopmail.com";
 
                     //custom address attributes
                     var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
@@ -1350,23 +1351,23 @@ namespace Nop.Web.Controllers
                     }
 
                     //validate model
-                    if (!ModelState.IsValid)
-                    {
-                        //model is not valid. redisplay the form with errors
-                        var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart,
-                            selectedCountryId: newAddress.CountryId,
-                            overrideAttributesXml: customAttributes);
-                        billingAddressModel.NewAddressPreselected = true;
-                        return Json(new
-                        {
-                            update_section = new UpdateSectionJsonModel
-                            {
-                                name = "billing",
-                                html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
-                            },
-                            wrong_billing_address = true,
-                        });
-                    }
+                    //if (!ModelState.IsValid)
+                    //{
+                    //    //model is not valid. redisplay the form with errors
+                    //    var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart,
+                    //        selectedCountryId: newAddress.CountryId,
+                    //        overrideAttributesXml: customAttributes);
+                    //    billingAddressModel.NewAddressPreselected = true;
+                    //    return Json(new
+                    //    {
+                    //        update_section = new UpdateSectionJsonModel
+                    //        {
+                    //            name = "billing",
+                    //            html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
+                    //        },
+                    //        wrong_billing_address = true,
+                    //    });
+                    //}
 
                     //try to find an address with the same values (don't duplicate records)
                     var address = _addressService.FindAddress((await _customerService.GetAddressesByCustomerIdAsync((await _workContext.GetCurrentCustomerAsync()).Id)).ToList(),
