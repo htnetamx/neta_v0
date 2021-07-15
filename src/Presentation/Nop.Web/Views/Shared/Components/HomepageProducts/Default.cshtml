@@ -6,7 +6,20 @@
             <strong>@T("Homepage.Products")</strong>
         </div>
         <div class="item-grid">
-            @foreach (var item in Model)
+            @foreach (var item in Model.Where(v => v.MarkAsNew))
+            {
+                <div class="item-box">
+                    @await Html.PartialAsync("_ProductBox", item)
+                </div>
+            }
+        </div>
+    </div>
+    <div class="product-grid home-page-product-grid">
+        <div class="title">
+            <strong>@T("Homepage.Products")</strong>
+        </div>
+        <div class="item-grid">
+            @foreach (var item in Model.Where(v => !v.MarkAsNew))
             {
                 <div class="item-box">
                     @await Html.PartialAsync("_ProductBox", item)

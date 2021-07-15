@@ -42,13 +42,17 @@
         }
         @if (Model.ShoppingCartEnabled)
         {
-            <li id="topcartlink" style="background-color: gray; color: white">
-                <a href="@Url.RouteUrl("ShoppingCart")">
-                    @*<span class="cart-label">@T("ShoppingCart")</span>*@
-                    <span class="cart-label">Cierra tu pedido!</span>
-                    <span class="cart-qty">@T("ShoppingCart.HeaderQuantity", "$ " + Model.ShoppingCartItems.ToString("N2") + " Total")</span>
-                </a>
-            </li>
+            string absoluteurl = Context.Request.Path;
+            if (!absoluteurl.Contains("cart") && !absoluteurl.Contains("checkout"))
+            {
+                <li id="topcartlink" style="background-color: gray; color: white">
+                    <a href="@Url.RouteUrl("ShoppingCart")">
+                        @*<span class="cart-label">@T("ShoppingCart")</span>*@
+                        <span class="cart-label">Cierra tu pedido!</span>
+                        <span class="cart-qty">@T("ShoppingCart.HeaderQuantity", "$ " + Model.ShoppingCartItems.ToString("N2") + " Total")</span>
+                    </a>
+                </li>
+            }
         }
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksAfter })
     </ul>

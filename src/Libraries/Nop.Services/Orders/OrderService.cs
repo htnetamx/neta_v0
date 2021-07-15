@@ -1020,25 +1020,34 @@ namespace Nop.Services.Orders
             await _recurringPaymentHistoryRepository.InsertAsync(recurringPaymentHistory);
         }
 
-        public async Task<decimal> GetCurrentStockAsync(int storeId, int productId, DateTime? start, DateTime? end)
+        public virtual async Task<decimal> GetCurrentStockAsync(int storeId, int productId, DateTime? start, DateTime? end)
         {
-            if (productId == 0)
-                return 0;
-            if (!start.HasValue || !end.HasValue)
-                return 0;
-            if (end.Value <= DateTime.UtcNow)
-                return 0;
+            try
+            {
+                if (productId == 0)
+                    return 0;
+                if (!start.HasValue || !end.HasValue)
+                    return 0;
+                if (end.Value <= DateTime.UtcNow)
+                    return 0;
 
-            var query = from orderItem in _orderItemRepository.Table
-                        join o in _orderRepository.Table on orderItem.OrderId equals o.Id
-                        join p in _productRepository.Table on orderItem.ProductId equals p.Id
-                        where productId == p.Id && o.StoreId == storeId &&
-                        o.PaidDateUtc >= start && o.PaidDateUtc <= end
-                        select orderItem;
+                var query = from orderItem in _orderItemRepository.Table
+                            join o in _orderRepository.Table on orderItem.OrderId equals o.Id
+                            join p in _productRepository.Table on orderItem.ProductId equals p.Id
+                            where productId == p.Id && o.StoreId == storeId &&
+                            o.CreatedOnUtc >= start && o.CreatedOnUtc <= end
+                            select orderItem;
 
-            var total = await query.SumAwaitAsync(p => new ValueTask<decimal>(p.Quantity));
+                var items = await query.ToListAsync();
+                var total = items.Sum(p => p.Quantity);
 
-            return total;
+                return total;
+            }
+            catch (Exception ex)
+            {
+                string ee = ex.Message;
+                return 0;
+            }
         }
 
         #endregion
