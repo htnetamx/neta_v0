@@ -569,7 +569,7 @@ namespace Nop.Web.Factories
         /// A task that represents the asynchronous operation
         /// The task result contains the checkout completed model
         /// </returns>
-        public virtual Task<CheckoutCompletedModel> PrepareCheckoutCompletedModelAsync(Order order)
+        public virtual async Task<CheckoutCompletedModel> PrepareCheckoutCompletedModelAsync(Order order)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
@@ -578,10 +578,12 @@ namespace Nop.Web.Factories
             {
                 OrderId = order.Id,
                 OnePageCheckoutEnabled = _orderSettings.OnePageCheckoutEnabled,
-                CustomOrderNumber = order.CustomOrderNumber
+                CustomOrderNumber = order.CustomOrderNumber,
+                StoreName = await _localizationService.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(), x => x.Name),
+                UrlStoreName = (await _storeContext.GetCurrentStoreAsync()).Url
             };
 
-            return Task.FromResult(model);
+            return model;
         }
 
         /// <summary>

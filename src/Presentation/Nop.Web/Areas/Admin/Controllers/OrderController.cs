@@ -11,6 +11,7 @@ using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
+using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -24,6 +25,7 @@ using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Security;
 using Nop.Services.Shipping;
+using Nop.Services.Stores;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Orders;
@@ -36,8 +38,10 @@ namespace Nop.Web.Areas.Admin.Controllers
 {
     public partial class OrderController : BaseAdminController
     {
-        #region Fields
+        private const string UPLOADS_TEMP_PATH = "~/App_Data/TempInvoices";
+        private const string DOWNLOADS_TEMP_PATH = "~/App_Data/TempInvoicesDownload";
 
+        #region Fields
         private readonly IAddressAttributeParser _addressAttributeParser;
         private readonly IAddressService _addressService;
         private readonly ICustomerActivityService _customerActivityService;
@@ -46,6 +50,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IDownloadService _downloadService;
         private readonly IEncryptionService _encryptionService;
         private readonly IExportManager _exportManager;
+        private readonly INopFileProvider _fileProvider;
         private readonly IGiftCardService _giftCardService;
         private readonly ILocalizationService _localizationService;
         private readonly INotificationService _notificationService;
@@ -63,6 +68,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IShipmentService _shipmentService;
         private readonly IShippingService _shippingService;
         private readonly IShoppingCartService _shoppingCartService;
+        private readonly IStoreService _storeService;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly OrderSettings _orderSettings;
@@ -79,6 +85,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IDownloadService downloadService,
             IEncryptionService encryptionService,
             IExportManager exportManager,
+            INopFileProvider fileProvider,
             IGiftCardService giftCardService,
             ILocalizationService localizationService,
             INotificationService notificationService,
@@ -96,6 +103,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IShipmentService shipmentService,
             IShippingService shippingService,
             IShoppingCartService shoppingCartService,
+            IStoreService storeService,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
             OrderSettings orderSettings)
@@ -108,6 +116,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _downloadService = downloadService;
             _encryptionService = encryptionService;
             _exportManager = exportManager;
+            _fileProvider = fileProvider;
             _giftCardService = giftCardService;
             _localizationService = localizationService;
             _notificationService = notificationService;
@@ -125,6 +134,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _shipmentService = shipmentService;
             _shippingService = shippingService;
             _shoppingCartService = shoppingCartService;
+            _storeService = storeService;
             _workContext = workContext;
             _workflowMessageService = workflowMessageService;
             _orderSettings = orderSettings;
@@ -985,19 +995,48 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             try
             {
-                byte[] bytes;
-                await using (var stream = new MemoryStream())
+                var tempDirectory = _fileProvider.MapPath(UPLOADS_TEMP_PATH);
+                _fileProvider.CreateDirectory(tempDirectory);
+                var tempDirectoryDownload = _fileProvider.MapPath(DOWNLOADS_TEMP_PATH);
+                _fileProvider.CreateDirectory(tempDirectoryDownload);                
+
+                var storeList = orders.Select(v => v.StoreId).Distinct();
+                foreach(var store in storeList)
                 {
-                    await _pdfService.PrintOrdersToPdfAsync(stream, orders, _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
-                    bytes = stream.ToArray();
+                    var storeData = await _storeService.GetStoreByIdAsync(store);
+                    await using (var stream = new MemoryStream())
+                    {
+                        await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v=>v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
+                        SaveStreamAsFile(tempDirectory, stream, $"{storeData.Name}-orders.pdf");
+                    }
                 }
 
-                return File(bytes, MimeTypes.ApplicationPdf, "orders.pdf");
+                var zipFileName = $"invoices{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.zip";
+                var zipFileDownload = System.IO.Path.Combine(tempDirectoryDownload, zipFileName);
+                System.IO.Compression.ZipFile.CreateFromDirectory(tempDirectory, zipFileDownload);
+
+                var bytes = System.IO.File.ReadAllBytes(zipFileDownload);
+                return File(bytes, "application/zip", zipFileName);
             }
             catch (Exception exc)
             {
                 await _notificationService.ErrorNotificationAsync(exc);
                 return RedirectToAction("List");
+            }
+        }
+
+        public void SaveStreamAsFile(string filePath, MemoryStream inputStream, string fileName)
+        {
+            DirectoryInfo info = new DirectoryInfo(filePath);
+            if (!info.Exists)
+            {
+                info.Create();
+            }
+
+            string path = Path.Combine(filePath, fileName);
+            using (FileStream outputFileStream = new FileStream(path, FileMode.Create))
+            {
+                inputStream.WriteTo(outputFileStream);
             }
         }
 

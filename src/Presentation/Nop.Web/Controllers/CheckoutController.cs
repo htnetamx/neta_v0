@@ -1373,6 +1373,7 @@ namespace Nop.Web.Controllers
                     }
 
                     newAddress.Email = $"{newAddress.FirstName.Replace(" ", ".")}@yopmail.com";
+                    newAddress.Address1 = await _localizationService.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(), x => x.CompanyAddress);
 
                     //try to find an address with the same values (don't duplicate records)
                     var address = _addressService.FindAddress((await _customerService.GetAddressesByCustomerIdAsync((await _workContext.GetCurrentCustomerAsync()).Id)).ToList(),

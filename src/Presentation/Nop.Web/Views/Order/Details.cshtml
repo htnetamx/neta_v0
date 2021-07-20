@@ -62,9 +62,9 @@
                         <li class="name">
                             @Model.BillingAddress.FirstName @Model.BillingAddress.LastName
                         </li>
-                        <li class="email">
+                        @*<li class="email">
                             @T("Order.Email"): @Model.BillingAddress.Email
-                        </li>
+                        </li>*@
                         @if (Model.BillingAddress.PhoneEnabled)
                         {
                             <li class="phone">
@@ -83,6 +83,9 @@
                                 @Model.BillingAddress.Company
                             </li>
                         }
+                    <li class="address1">
+                        @Model.BillingAddress.Address1
+                    </li>
                         @if (Model.BillingAddress.StreetAddressEnabled)
                         {
                             <li class="address1">
@@ -95,18 +98,18 @@
                                 @Model.BillingAddress.Address2
                             </li>
                         }
-                        @if (Model.BillingAddress.CityEnabled && !string.IsNullOrEmpty(Model.BillingAddress.City)|| 
-                            Model.BillingAddress.CountyEnabled && !string.IsNullOrEmpty(Model.BillingAddress.County) || 
-                            Model.BillingAddress.StateProvinceEnabled && !string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName) || 
-                            Model.BillingAddress.ZipPostalCodeEnabled && !string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
+                        @if (Model.BillingAddress.CityEnabled && !string.IsNullOrEmpty(Model.BillingAddress.City) ||
+                           Model.BillingAddress.CountyEnabled && !string.IsNullOrEmpty(Model.BillingAddress.County) ||
+                           Model.BillingAddress.StateProvinceEnabled && !string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName) ||
+                           Model.BillingAddress.ZipPostalCodeEnabled && !string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
                         {
                             <li class="city-state-zip">
                                 @if (Model.BillingAddress.CityEnabled && !string.IsNullOrEmpty(Model.BillingAddress.City))
                                 {
                                     @Model.BillingAddress.City
-                                    @if (Model.BillingAddress.CountyEnabled && !string.IsNullOrEmpty(Model.BillingAddress.County) || 
-                                        Model.BillingAddress.StateProvinceEnabled && !string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName) || 
-                                        Model.BillingAddress.ZipPostalCodeEnabled && !string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
+                                    @if (Model.BillingAddress.CountyEnabled && !string.IsNullOrEmpty(Model.BillingAddress.County) ||
+                                       Model.BillingAddress.StateProvinceEnabled && !string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName) ||
+                                       Model.BillingAddress.ZipPostalCodeEnabled && !string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
                                     {
                                         <text>,</text>
                                     }
@@ -114,8 +117,8 @@
                                 @if (Model.BillingAddress.CountyEnabled && !string.IsNullOrEmpty(Model.BillingAddress.County))
                                 {
                                     @Model.BillingAddress.County
-                                    @if (Model.BillingAddress.StateProvinceEnabled && !string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName) || 
-                                        Model.BillingAddress.ZipPostalCodeEnabled && !string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
+                                    @if (Model.BillingAddress.StateProvinceEnabled && !string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName) ||
+                                       Model.BillingAddress.ZipPostalCodeEnabled && !string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
                                     {
                                         <text>,</text>
                                     }

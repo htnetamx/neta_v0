@@ -11,7 +11,7 @@
 <div class="page checkout-page order-completed-page">
     @if (!Model.OnePageCheckoutEnabled)
     {
-        @await Component.InvokeAsync("CheckoutProgress",  new { step = CheckoutProgressStep.Complete })
+        @await Component.InvokeAsync("CheckoutProgress", new { step = CheckoutProgressStep.Complete })
     }
     <div class="page-title">
         <h1>@T("Checkout.ThankYou")</h1>
@@ -30,6 +30,26 @@
                     <a href="@Url.RouteUrl("OrderDetails", new { orderID = Model.OrderId })">@T("Checkout.PlacedOrderDetails")</a>
                 </div>
             </div>
+
+            <div class="title">
+                @if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    <strong>Puedes pasar a buscar tu pedido por @Model.StoreName, a partir del día @DateTime.Now.AddDays(2).ToString("dd/MM/yyyy") después de las 5pm</strong>
+                }
+                else
+                {
+                    <strong>Puedes pasar a buscar tu pedido por @Model.StoreName, a partir del día @DateTime.Now.AddDays(1).ToString("dd/MM/yyyy") después de las 5pm</strong>
+                }
+            </div>
+
+            <div class="button" style="text-align: center">
+                <a target="_blank" href='https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 @Model.UrlStoreName'>
+                    <img src="https://th.bing.com/th/id/R.8995629f32e61f752b51e6dad8e5dfbd?rik=XNycNx25kOXE3A&riu=http%3a%2f%2fwww.sitedosconcursos.com%2fwp-content%2fuploads%2f2015%2f10%2fbotao-whatsapp.png&ehk=8ati5tWV2aXdb0Bd7lltuBG97P3DcWYJUVkyvhhFxGc%3d&risl=&pid=ImgRaw" height="132" />
+                </a>
+            </div>
+
+            <br />
+
             <div class="buttons">
                 <button type="button" class="button-1 order-completed-continue-button" onclick="setLocation('@Url.RouteUrl("Homepage")')">@T("Checkout.ThankYou.Continue")</button>
             </div>
