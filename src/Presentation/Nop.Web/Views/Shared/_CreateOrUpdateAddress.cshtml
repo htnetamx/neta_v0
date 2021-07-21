@@ -9,17 +9,17 @@
         <span asp-validation-for="FirstName"></span>
     </div>
     @*<div class="inputs">
-        <label asp-for="LastName" asp-postfix=":"></label>
-        <input asp-for="LastName" />
-        <nop-required />
-        <span asp-validation-for="LastName"></span>
-    </div>*@
+            <label asp-for="LastName" asp-postfix=":"></label>
+            <input asp-for="LastName" />
+            <nop-required />
+            <span asp-validation-for="LastName"></span>
+        </div>*@
     @*<div class="inputs">
-        <label asp-for="Email" asp-postfix=":"></label>
-        <input asp-for="Email" />
-        <nop-required />
-        <span asp-validation-for="Email"></span>
-    </div>*@
+            <label asp-for="Email" asp-postfix=":"></label>
+            <input asp-for="Email" />
+            <nop-required />
+            <span asp-validation-for="Email"></span>
+        </div>*@
     @if (Model.CompanyEnabled)
     {
         <div class="inputs">
@@ -141,6 +141,14 @@
             <span asp-validation-for="FaxNumber"></span>
         </div>
     }
+    <div class="inputs">
+        <label>¿Es Para mi?</label>
+        <select asp-for="ActionId" asp-items="Model.AvailableActions" onchange="if (this.value === 'No') { $('#actionName').show(); } else { $('#actionName').hide(); }"></select>
+    </div>
+    <div id="actionName" class="inputs" style="display: none">
+        <label>¿Para quién es?</label>
+        <input asp-for="ActionName" />
+    </div>
     @if (Model.CustomAddressAttributes.Count > 0)
     {
         @await Html.PartialAsync("_AddressAttributes", Model.CustomAddressAttributes)

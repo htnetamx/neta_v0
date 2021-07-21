@@ -13,6 +13,10 @@ namespace Nop.Web.Models.Common
             AvailableCountries = new List<SelectListItem>();
             AvailableStates = new List<SelectListItem>();
             CustomAddressAttributes = new List<AddressAttributeModel>();
+
+            AvailableActions = new List<SelectListItem>();
+            AvailableActions.Add(new SelectListItem{ Value="Si", Text="Sí" });
+            AvailableActions.Add(new SelectListItem { Value = "No", Text = "No" });
         }
 
         [NopResourceDisplayName("Address.Fields.FirstName")]
@@ -80,6 +84,11 @@ namespace Nop.Web.Models.Common
         
         public IList<SelectListItem> AvailableCountries { get; set; }
         public IList<SelectListItem> AvailableStates { get; set; }
+
+        public IList<SelectListItem> AvailableActions { get; set; }
+        
+        public string ActionId { get; set; }
+        public string ActionName { get; set; }
 
         public string FormattedCustomAddressAttributes { get; set; }
         public IList<AddressAttributeModel> CustomAddressAttributes { get; set; }
