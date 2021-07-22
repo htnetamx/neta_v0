@@ -63,6 +63,7 @@
     @await Component.InvokeAsync("BlogRssHeaderLink")
     @*Insert favicon and app icons head code*@
     @await Component.InvokeAsync("Favicon")
+    <link rel="manifest" href="/manifest.json" />
     @if (displayMiniProfiler)
     {
         <mini-profiler />
@@ -75,5 +76,7 @@
     @Html.NopCssFiles(ResourceLocation.Footer)
     @Html.NopScripts(ResourceLocation.Footer)
     @Html.NopInlineScripts(ResourceLocation.Footer)
+
+    <script>'serviceWorker'in navigator&&navigator.serviceWorker.register('/serviceworker.js', { scope: '/' })</script>
 </body>
 </html>
