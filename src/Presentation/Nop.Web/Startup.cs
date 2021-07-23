@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nop.Web.Framework.Infrastructure.Extensions;
+using Nop.Web.Infrastructure;
 using WebEssentials.AspNetCore.Pwa;
 
 namespace Nop.Web
@@ -45,7 +46,7 @@ namespace Nop.Web
         /// <param name="application">Builder for configuring an application's request pipeline</param>
         public void Configure(IApplicationBuilder application)
         {
-            application.ConfigureRequestPipeline();
+            application.UseMiddleware<NetaMiddleware>().ConfigureRequestPipeline();
             application.StartEngine();
         }
     }
