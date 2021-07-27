@@ -1008,6 +1008,9 @@ namespace Nop.Web.Areas.Admin.Controllers
                     {
                         await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v=>v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                         SaveStreamAsFile(tempDirectory, stream, $"{storeData.Name}-orders.pdf");
+
+                        await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
+                        SaveStreamAsFile(tempDirectory, stream, $"{storeData.Name}-invoice.pdf");
                     }
                 }
 

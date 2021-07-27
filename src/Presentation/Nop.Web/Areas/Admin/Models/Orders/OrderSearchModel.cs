@@ -34,12 +34,12 @@ namespace Nop.Web.Areas.Admin.Models.Orders
         #region Properties
 
         [NopResourceDisplayName("Admin.Orders.List.StartDate")]
-        [UIHint("DateNullable")]
-        public DateTime? StartDate { get; set; }
+        [UIHint("DateTimeNullable")]
+        public DateTime? StartDate { get; set; } = DateTime.UtcNow.Date.AddDays(-1);
 
         [NopResourceDisplayName("Admin.Orders.List.EndDate")]
-        [UIHint("DateNullable")]
-        public DateTime? EndDate { get; set; }
+        [UIHint("DateTimeNullable")]
+        public DateTime? EndDate { get; set; } = DateTime.UtcNow.Date.AddDays(-1);
 
         [NopResourceDisplayName("Admin.Orders.List.OrderStatus")]
         public IList<int> OrderStatusIds { get; set; }

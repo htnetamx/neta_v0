@@ -850,6 +850,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var product = model.ToEntity<Product>();
                 product.CreatedOnUtc = DateTime.UtcNow;
                 product.UpdatedOnUtc = DateTime.UtcNow;
+
+                //Se usa en el calculo de cantidades en Promociones
+                product.MaxNumberOfDownloads = product.StockQuantity;                
+                //No tenemos envio, ya que se pasa a buscar por pickup
+                product.IsShipEnabled = false;
+
                 await _productService.InsertProductAsync(product);
 
                 //search engine name
@@ -968,6 +974,12 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 //product
                 product = model.ToEntity(product);
+
+                //Se usa en el calculo de cantidades en Promociones
+                if (product.StockQuantity > product.MaxNumberOfDownloads)
+                    product.MaxNumberOfDownloads = product.StockQuantity;
+                //No tenemos envio, ya que se pasa a buscar por pickup
+                product.IsShipEnabled = false;
 
                 product.UpdatedOnUtc = DateTime.UtcNow;
                 await _productService.UpdateProductAsync(product);

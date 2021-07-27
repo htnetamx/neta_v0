@@ -1,41 +1,44 @@
 ﻿@model ProductDetailsModel
 @if (!string.IsNullOrWhiteSpace(Model.StockAvailability) || Model.DisplayBackInStockSubscription)
 {
-    var total = Model.StockQuantity + Model.CurrentStockQuantity;
-    var curPerc = Model.CurrentStockQuantity / (Model.StockQuantity + Model.CurrentStockQuantity) * 100;
-<div class="availability">
-    <div class="stock">
-        <span class="value">@Model.CurrentStoreName</span>
-    </div>
-    @if (Model.AvailableEndDate.HasValue)
+    try
     {
-<div id="counterCtrl-@Model.Id">
-    <div class="stock">
-        <span class="value" id="stock-availabilityenddate-value-@Model.Id"></span>
-    </div>
-    <div class="stock">
-        <span class="label" style="font-weight: bold">@Model.CurrentStockQuantity productos comprados</span>
-    </div>
-    <progress max=100 value="@curPerc" style="width: 100%; height: 25px"></progress>
-    <div class="stock">
-        @if (Model.StockQuantity <= 0)
-        {
-        <span class="label" style="font-weight: bold">Ya se llegó al precio mayorista!</span>
-        }
-        else
-        {
-            <span class="label" style="font-weight: bold">Faltan @Model.StockQuantity unidades para precio mayorista!</span>
-        }
-    </div>
-</div>
-        <div id="legendCtrl-@Model.Id">
-            <div class="stock" style="padding-top: 10px">
-                <span class="label">@T("Products.Availability"):</span>
-                <span class="value" id="stock-availability-value-@Model.Id">Sin Stock</span>
+        var total = Model.StockQuantity;
+        var curPerc = Model.CurrentStockQuantity / (Model.StockQuantity) * 100;
+        var falta= Model.StockQuantity - Model.CurrentStockQuantity;
+        <div class="availability">
+            <div class="stock">
+                <span class="value">@Model.CurrentStoreName</span>
             </div>
-        </div>
+            @if (Model.AvailableEndDate.HasValue)
+            {
+                <div id="counterCtrl-@Model.Id">
+                    <div class="stock">
+                        <span class="value" id="stock-availabilityenddate-value-@Model.Id"></span>
+                    </div>
+                    <div class="stock">
+                        <span class="label" style="font-weight: bold">@Model.CurrentStockQuantity productos comprados</span>
+                    </div>
+                    <progress max=100 value="@curPerc" style="width: 100%; height: 25px"></progress>
+                    <div class="stock">
+                        @if (falta <= 0)
+                        {
+                            <span class="label" style="font-weight: bold">Ya se llegó al precio mayorista!</span>
+                        }
+                        else
+                        {
+                            <span class="label" style="font-weight: bold">Faltan @falta unidades para precio mayorista!</span>
+                        }
+                    </div>
+                </div>
+                <div id="legendCtrl-@Model.Id">
+                    <div class="stock" style="padding-top: 10px">
+                        <span class="label">@T("Products.Availability"):</span>
+                        <span class="value" id="stock-availability-value-@Model.Id">Sin Stock</span>
+                    </div>
+                </div>
 
-        <script asp-location="Footer">
+                <script asp-location="Footer">
     function counter(id) {
         var current_date = new Date().getTime();
         var future_date = new Date(@Model.AvailableEndDate.Value.Year,
@@ -77,16 +80,21 @@
             counter(@Model.Id);
         }, 1000);
     });
-        </script>
-    }
-    else
-    {
-        <div class="stock" style="padding-top: 10px">
-            <span class="label">@T("Products.Availability"):</span>
-            <span class="value" id="stock-availability-value-@Model.Id">@Model.StockAvailability</span>
+                </script>
+            }
+            else
+            {
+                <div class="stock" style="padding-top: 10px">
+                    <span class="label">@T("Products.Availability"):</span>
+                    <span class="value" id="stock-availability-value-@Model.Id">@Model.StockAvailability</span>
+                </div>
+            }
+            @await Html.PartialAsync("_BackInStockSubscription", Model)
+
         </div>
     }
-    @await Html.PartialAsync("_BackInStockSubscription", Model)
-
-</div>
+    catch (Exception ex)
+    {
+        <div>@ex.Message</div>
+    }
 }

@@ -1246,7 +1246,7 @@ namespace Nop.Web.Factories
                         DisplayDiscontinuedMessage = !product.Published && _catalogSettings.DisplayDiscontinuedMessageForUnpublishedProducts,
                         AvailableEndDate = product.AvailableEndDateTimeUtc,
                         VisibleIndividually = product.VisibleIndividually,
-                        StockQuantity = product.StockQuantity,
+                        StockQuantity = product.MaxNumberOfDownloads, //product.StockQuantity,
                         CurrentStockQuantity = await _orderService.GetCurrentStockAsync((await _storeContext.GetCurrentStoreAsync()).Id, product.Id, product.AvailableStartDateTimeUtc, product.AvailableEndDateTimeUtc),
                         CurrentProductQuantity = (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id,null,null)).Any() ? (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id, null, null)).First().Quantity : 0,
                         AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations
@@ -1380,7 +1380,7 @@ namespace Nop.Web.Factories
                 DisplayDiscontinuedMessage = !product.Published && _catalogSettings.DisplayDiscontinuedMessageForUnpublishedProducts,
                 AvailableEndDate = product.AvailableEndDateTimeUtc,
                 VisibleIndividually = product.VisibleIndividually,
-                StockQuantity = product.StockQuantity,
+                StockQuantity = product.MaxNumberOfDownloads,
                 CurrentStockQuantity = await _orderService.GetCurrentStockAsync((await _storeContext.GetCurrentStoreAsync()).Id, product.Id, product.AvailableStartDateTimeUtc, product.AvailableEndDateTimeUtc),
                 CurrentProductQuantity = (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id, null, null)).Any() ? (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id, null, null)).First().Quantity : 0,
                 AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations
