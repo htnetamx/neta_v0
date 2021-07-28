@@ -48,7 +48,7 @@ namespace Nop.Web.Extensions
             destination.Id = model.Id;
             destination.FirstName = model.FirstName;
             destination.LastName = model.LastName;
-            destination.Email = string.IsNullOrWhiteSpace(model.Email) ? string.Concat(model.FirstName,".",model.LastName,"@yopmail.com") : model.Email;
+            destination.Email = string.IsNullOrWhiteSpace(model.Email) ? string.Concat($"{model.FirstName.Replace(" ", ".").Replace("á", "a").Replace("é", "e").Replace("í", "i").Replace("ó", "o").Replace("ú", "u") }@yopmail.com","@yopmail.com") : model.Email;
             destination.Company = model.Company;
             destination.CountryId = model.CountryId == 0 ? null : model.CountryId;
             destination.StateProvinceId = model.StateProvinceId == 0 ? null : model.StateProvinceId;

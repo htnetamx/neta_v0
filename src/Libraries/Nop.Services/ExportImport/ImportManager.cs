@@ -1571,6 +1571,12 @@ namespace Nop.Services.ExportImport
                         case "Height":
                             product.Height = property.DecimalValue;
                             break;
+                        case "AvailableStartDateTimeUtc":
+                            product.AvailableStartDateTimeUtc = property.DateTimeNullable;
+                            break;
+                        case "AvailableEndDateTimeUtc":
+                            product.AvailableEndDateTimeUtc = property.DateTimeNullable;
+                            break;
                         case "IsLimitedToStores":
                             product.LimitedToStores = property.BooleanValue;
                             break;

@@ -1408,6 +1408,8 @@ namespace Nop.Services.ExportImport
                 new PropertyByName<Product>("Length", p => p.Length, await IgnoreExportProductPropertyAsync(p => p.Dimensions)),
                 new PropertyByName<Product>("Width", p => p.Width, await IgnoreExportProductPropertyAsync(p => p.Dimensions)),
                 new PropertyByName<Product>("Height", p => p.Height, await IgnoreExportProductPropertyAsync(p => p.Dimensions)),
+                new PropertyByName<Product>("AvailableStartDateTimeUtc", p => p.AvailableStartDateTimeUtc, await IgnoreExportProductPropertyAsync(p => true)),
+                new PropertyByName<Product>("AvailableEndDateTimeUtc", p => p.AvailableEndDateTimeUtc, await IgnoreExportProductPropertyAsync(p => true)),
                 new PropertyByName<Product>("Categories", GetCategoriesAsync),
                 new PropertyByName<Product>("Manufacturers", GetManufacturersAsync, await IgnoreExportProductPropertyAsync(p => p.Manufacturers)),
                 new PropertyByName<Product>("ProductTags", GetProductTagsAsync, await IgnoreExportProductPropertyAsync(p => p.ProductTags)),

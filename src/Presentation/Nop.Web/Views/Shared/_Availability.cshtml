@@ -44,7 +44,7 @@
         var future_date = new Date(@Model.AvailableEndDate.Value.Year,
                                     @Model.AvailableEndDate.Value.Month-1,
                                     @Model.AvailableEndDate.Value.Day,
-                                    @Model.AvailableEndDate.Value.Hour,
+                                    @Model.AvailableEndDate.Value.Hour-5,
                                     @Model.AvailableEndDate.Value.Minute,
                                     @Model.AvailableEndDate.Value.Second).getTime();
 

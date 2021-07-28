@@ -1372,7 +1372,7 @@ namespace Nop.Web.Controllers
                         }
                     }
 
-                    newAddress.Email = $"{newAddress.FirstName.Replace(" ", ".")}@yopmail.com";
+                    newAddress.Email = $"{newAddress.FirstName.Replace(" ", ".").Replace("á", "a").Replace("é", "e").Replace("í", "i").Replace("ó", "o").Replace("ú", "u") }@yopmail.com";
                     newAddress.Address1 = await _localizationService.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(), x => x.CompanyAddress);
                     newAddress.LastName = model.BillingNewAddress.ActionId == "No" ? "0" : "1";
                     newAddress.FaxNumber = model.BillingNewAddress.ActionName;
