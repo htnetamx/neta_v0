@@ -44,9 +44,7 @@
         var future_date = new Date(@Model.AvailableEndDate.Value.Year,
                                     @Model.AvailableEndDate.Value.Month-1,
                                     @Model.AvailableEndDate.Value.Day,
-                                    @Model.AvailableEndDate.Value.Hour-5,
-                                    @Model.AvailableEndDate.Value.Minute,
-                                    @Model.AvailableEndDate.Value.Second).getTime();
+                                    0,0,0).getTime();
 
         var seconds_left = (future_date - current_date) / 1000;
 
@@ -60,7 +58,7 @@
         minutes = parseInt(seconds_left / 60);
         seconds = parseInt(seconds_left % 60);
 
-        if (seconds <= 0) {
+        if (days + hours + minutes + seconds <= 0) {
             $("#counterCtrl-" + id).hide();
             $("#legendCtrl-" + id).show();
         } else {
