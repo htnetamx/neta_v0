@@ -1049,7 +1049,7 @@ namespace Nop.Services.Common
                 //total
                 string subTotal;
                 var priceInclTaxInCustomerCurrency =
-                    _currencyService.ConvertCurrency(orderItem.Value.Price, 1);
+                    _currencyService.ConvertCurrency(orderItem.Value.Price * orderItem.Value.Quantity, 1);
                 subTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, "PES",
                     lang.Id, true);
 

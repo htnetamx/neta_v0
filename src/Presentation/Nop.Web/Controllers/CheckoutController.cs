@@ -1372,7 +1372,8 @@ namespace Nop.Web.Controllers
                         }
                     }
 
-                    newAddress.Email = $"{newAddress.FirstName.Replace(" ", ".").Replace("á", "a").Replace("é", "e").Replace("í", "i").Replace("ó", "o").Replace("ú", "u") }@yopmail.com";
+                    //newAddress.Email = $"{newAddress.FirstName.Replace(" ", ".").Replace("á", "a").Replace("é", "e").Replace("í", "i").Replace("ó", "o").Replace("ú", "u") }@yopmail.com";
+                    newAddress.Email = "compra@yopmail.com";
                     newAddress.Address1 = await _localizationService.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(), x => x.CompanyAddress);
                     newAddress.LastName = model.BillingNewAddress.ActionId == "No" ? "0" : "1";
                     newAddress.FaxNumber = model.BillingNewAddress.ActionName;
@@ -1812,8 +1813,8 @@ namespace Nop.Web.Controllers
                     throw new Exception("Anonymous checkout is not allowed");
 
                 //prevent 2 orders being placed within an X seconds time frame
-                if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
-                    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
+                //if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
+                //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
                 //place order
                 var processPaymentRequest = HttpContext.Session.Get<ProcessPaymentRequest>("OrderPaymentInfo");

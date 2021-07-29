@@ -239,7 +239,7 @@ namespace Nop.Core
         /// <returns>Store location</returns>
         public virtual string GetStoreLocation(bool? useSsl = null)
         {
-            //useSsl = true;
+            useSsl = true;
             var storeLocation = string.Empty;
 
             //get store host

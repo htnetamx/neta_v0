@@ -42,16 +42,17 @@ namespace Nop.Core
         /// <returns></returns>
         public static string EnsureSubscriberEmailOrThrow(string email)
         {
-            var output = EnsureNotNull(email);
-            output = output.Trim();
-            output = EnsureMaximumLength(output, 255);
+            return email;
+            //var output = EnsureNotNull(email);
+            //output = output.Trim();
+            //output = EnsureMaximumLength(output, 255);
 
-            if (!IsValidEmail(output))
-            {
-                throw new NopException("Email is not valid.");
-            }
+            //if (!IsValidEmail(output))
+            //{
+            //    throw new NopException("Email is not valid.");
+            //}
 
-            return output;
+            //return output;
         }
 
         /// <summary>

@@ -43,8 +43,8 @@
         var current_date = new Date().getTime();
         var future_date = new Date(@Model.AvailableEndDate.Value.Year,
                                     @Model.AvailableEndDate.Value.Month-1,
-                                    @Model.AvailableEndDate.Value.Day,
-                                    0,0,0).getTime();
+                                    @Model.AvailableEndDate.Value.Day-1,
+                                    21,0,0).getTime();
 
         var seconds_left = (future_date - current_date) / 1000;
 

@@ -951,77 +951,84 @@ namespace Nop.Web.Areas.Admin.Factories
         /// </returns>
         public virtual async Task<OrderListModel> PrepareOrderListModelAsync(OrderSearchModel searchModel)
         {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            //get parameters to filter orders
-            var orderStatusIds = (searchModel.OrderStatusIds?.Contains(0) ?? true) ? null : searchModel.OrderStatusIds.ToList();
-            var paymentStatusIds = (searchModel.PaymentStatusIds?.Contains(0) ?? true) ? null : searchModel.PaymentStatusIds.ToList();
-            var shippingStatusIds = (searchModel.ShippingStatusIds?.Contains(0) ?? true) ? null : searchModel.ShippingStatusIds.ToList();
-            if (await _workContext.GetCurrentVendorAsync() != null)
-                searchModel.VendorId = (await _workContext.GetCurrentVendorAsync()).Id;
-            var startDateValue = !searchModel.StartDate.HasValue ? null
-                : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
-            var endDateValue = !searchModel.EndDate.HasValue ? null
-                : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
-            var product = await _productService.GetProductByIdAsync(searchModel.ProductId);
-            var filterByProductId = product != null && (await _workContext.GetCurrentVendorAsync() == null || product.VendorId == (await _workContext.GetCurrentVendorAsync()).Id)
-                ? searchModel.ProductId : 0;
-
-            //get orders
-            var orders = await _orderService.SearchOrdersAsync(storeId: searchModel.StoreId,
-                vendorId: searchModel.VendorId,
-                productId: filterByProductId,
-                warehouseId: searchModel.WarehouseId,
-                paymentMethodSystemName: searchModel.PaymentMethodSystemName,
-                createdFromUtc: startDateValue,
-                createdToUtc: endDateValue,
-                osIds: orderStatusIds,
-                psIds: paymentStatusIds,
-                ssIds: shippingStatusIds,
-                billingPhone: searchModel.BillingPhone,
-                billingEmail: searchModel.BillingEmail,
-                billingLastName: searchModel.BillingLastName,
-                billingCountryId: searchModel.BillingCountryId,
-                orderNotes: searchModel.OrderNotes,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
-
-            //prepare list model
-            var model = await new OrderListModel().PrepareToGridAsync(searchModel, orders, () =>
+            try
             {
-                //fill in model values from the entity
-                return orders.SelectAwait(async order =>
+                if (searchModel == null)
+                    throw new ArgumentNullException(nameof(searchModel));
+
+                //get parameters to filter orders
+                var orderStatusIds = (searchModel.OrderStatusIds?.Contains(0) ?? true) ? null : searchModel.OrderStatusIds.ToList();
+                var paymentStatusIds = (searchModel.PaymentStatusIds?.Contains(0) ?? true) ? null : searchModel.PaymentStatusIds.ToList();
+                var shippingStatusIds = (searchModel.ShippingStatusIds?.Contains(0) ?? true) ? null : searchModel.ShippingStatusIds.ToList();
+                if (await _workContext.GetCurrentVendorAsync() != null)
+                    searchModel.VendorId = (await _workContext.GetCurrentVendorAsync()).Id;
+                var startDateValue = !searchModel.StartDate.HasValue ? null
+                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
+                var endDateValue = !searchModel.EndDate.HasValue ? null
+                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
+                var product = await _productService.GetProductByIdAsync(searchModel.ProductId);
+                var filterByProductId = product != null && (await _workContext.GetCurrentVendorAsync() == null || product.VendorId == (await _workContext.GetCurrentVendorAsync()).Id)
+                    ? searchModel.ProductId : 0;
+
+                //get orders
+                var orders = await _orderService.SearchOrdersAsync(storeId: searchModel.StoreId,
+                    vendorId: searchModel.VendorId,
+                    productId: filterByProductId,
+                    warehouseId: searchModel.WarehouseId,
+                    paymentMethodSystemName: searchModel.PaymentMethodSystemName,
+                    createdFromUtc: startDateValue,
+                    createdToUtc: endDateValue,
+                    osIds: orderStatusIds,
+                    psIds: paymentStatusIds,
+                    ssIds: shippingStatusIds,
+                    billingPhone: searchModel.BillingPhone,
+                    billingEmail: searchModel.BillingEmail,
+                    billingLastName: searchModel.BillingLastName,
+                    billingCountryId: searchModel.BillingCountryId,
+                    orderNotes: searchModel.OrderNotes,
+                    pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
+
+                //prepare list model
+                var model = await new OrderListModel().PrepareToGridAsync(searchModel, orders, () =>
                 {
-                    var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
-
                     //fill in model values from the entity
-                    var orderModel = new OrderModel
+                    return orders.SelectAwait(async order =>
                     {
-                        Id = order.Id,
-                        OrderStatusId = order.OrderStatusId,
-                        PaymentStatusId = order.PaymentStatusId,
-                        ShippingStatusId = order.ShippingStatusId,
-                        CustomerEmail = billingAddress.Email,
-                        CustomerFullName = $"{billingAddress.FirstName} {billingAddress.LastName}",
-                        CustomerId = order.CustomerId,
-                        CustomOrderNumber = order.CustomOrderNumber
-                    };
+                        var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
 
-                    //convert dates to the user time
-                    orderModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(order.CreatedOnUtc, DateTimeKind.Utc);
+                        //fill in model values from the entity
+                        var orderModel = new OrderModel
+                        {
+                            Id = order.Id,
+                            OrderStatusId = order.OrderStatusId,
+                            PaymentStatusId = order.PaymentStatusId,
+                            ShippingStatusId = order.ShippingStatusId,
+                            CustomerEmail = billingAddress.Email,
+                            CustomerFullName = $"{billingAddress.FirstName} {billingAddress.LastName}",
+                            CustomerId = order.CustomerId,
+                            CustomOrderNumber = order.CustomOrderNumber
+                        };
 
-                    //fill in additional values (not existing in the entity)
-                    orderModel.StoreName = (await _storeService.GetStoreByIdAsync(order.StoreId))?.Name ?? "Deleted";
-                    orderModel.OrderStatus = await _localizationService.GetLocalizedEnumAsync(order.OrderStatus);
-                    orderModel.PaymentStatus = await _localizationService.GetLocalizedEnumAsync(order.PaymentStatus);
-                    orderModel.ShippingStatus = await _localizationService.GetLocalizedEnumAsync(order.ShippingStatus);
-                    orderModel.OrderTotal = await _priceFormatter.FormatPriceAsync(order.OrderTotal, true, false);
+                        //convert dates to the user time
+                        orderModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(order.CreatedOnUtc, DateTimeKind.Utc);
 
-                    return orderModel;
+                        //fill in additional values (not existing in the entity)
+                        orderModel.StoreName = (await _storeService.GetStoreByIdAsync(order.StoreId))?.Name ?? "Deleted";
+                        orderModel.OrderStatus = await _localizationService.GetLocalizedEnumAsync(order.OrderStatus);
+                        orderModel.PaymentStatus = await _localizationService.GetLocalizedEnumAsync(order.PaymentStatus);
+                        orderModel.ShippingStatus = await _localizationService.GetLocalizedEnumAsync(order.ShippingStatus);
+                        orderModel.OrderTotal = await _priceFormatter.FormatPriceAsync(order.OrderTotal, true, false);
+
+                        return orderModel;
+                    });
                 });
-            });
 
-            return model;
+                return model;
+            }
+            catch (Exception ex)
+            {
+                return new OrderListModel();
+            }
         }
 
         /// <summary>
