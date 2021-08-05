@@ -145,6 +145,9 @@ namespace Nop.Web.Factories
 
             model.DisplayPickupPointsOnMap = _shippingSettings.DisplayPickupPointsOnMap;
             model.GoogleMapsApiKey = _shippingSettings.GoogleMapsApiKey;
+
+            model.CurrentStoreName = (await _storeContext.GetCurrentStoreAsync()).Name;
+
             var pickupPointProviders = await _pickupPluginManager.LoadActivePluginsAsync(await _workContext.GetCurrentCustomerAsync(), (await _storeContext.GetCurrentStoreAsync()).Id);
             if (pickupPointProviders.Any())
             {

@@ -48,6 +48,9 @@ namespace Nop.Services.Discounts
             string couponCode = null, string discountName = null, bool showHidden = false,
             DateTime? startDateUtc = null, DateTime? endDateUtc = null);
 
+        Task<IList<Discount>> GetAllDiscountsAsync1(int storeId,
+            DateTime? startDateUtc = null, DateTime? endDateUtc = null);
+
         /// <summary>
         /// Inserts a discount
         /// </summary>

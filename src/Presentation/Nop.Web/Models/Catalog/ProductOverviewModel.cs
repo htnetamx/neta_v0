@@ -28,6 +28,8 @@ namespace Nop.Web.Models.Catalog
 
         public bool MarkAsNew { get; set; }
 
+        public int DisplayOrder { get; set; }
+
         //price
         public ProductPriceModel ProductPrice { get; set; }
         //picture
@@ -37,6 +39,8 @@ namespace Nop.Web.Models.Catalog
         public ProductSpecificationModel ProductSpecificationModel { get; set; }
         //price
         public ProductReviewOverviewModel ReviewOverviewModel { get; set; }
+
+        public bool MarkAsLoyalty { get; set; }
 
         #region Nested Classes
 

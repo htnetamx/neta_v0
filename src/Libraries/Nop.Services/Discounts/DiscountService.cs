@@ -220,6 +220,30 @@ namespace Nop.Services.Discounts
             return discounts.ToList();
         }
 
+        public virtual async Task<IList<Discount>> GetAllDiscountsAsync1(int storeId,
+            DateTime? startDateUtc = null, DateTime? endDateUtc = null)
+        {
+            //we load all discounts, and filter them using "discountType" parameter later (in memory)
+            //we do it because we know that this method is invoked several times per HTTP request with distinct "discountType" parameter
+            //that's why let's access the database only once
+            var discounts = (await _discountRepository.GetAllAsync(query =>
+            {
+                    query = query.Where(discount => discount.AdminComment == storeId.ToString());
+
+                return query;
+            })).AsQueryable();
+
+            //filter by dates
+            if (startDateUtc.HasValue)
+                discounts = discounts.Where(discount =>
+                    !discount.StartDateUtc.HasValue || discount.StartDateUtc <= startDateUtc.Value);
+            if (endDateUtc.HasValue)
+                discounts = discounts.Where(discount =>
+                    !discount.EndDateUtc.HasValue || discount.EndDateUtc >= endDateUtc.Value);
+
+            return discounts.ToList();
+        }
+
         /// <summary>
         /// Gets discounts applied to entity
         /// </summary>
@@ -672,7 +696,7 @@ namespace Nop.Services.Discounts
                 //ignore deleted orders
                 query = from duh in query
                     join order in _orderRepository.Table on duh.OrderId equals order.Id
-                    where !order.Deleted
+                    where !order.Deleted && order.CreatedOnUtc.Date == DateTime.UtcNow.Date
                     select duh;
 
                 //order

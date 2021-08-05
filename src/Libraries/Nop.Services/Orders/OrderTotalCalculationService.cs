@@ -800,15 +800,18 @@ namespace Nop.Services.Orders
             //sub totals
             var subTotalExclTaxWithoutDiscount = decimal.Zero;
             var subTotalInclTaxWithoutDiscount = decimal.Zero;
+            var acumDiscountItems = decimal.Zero;
             foreach (var shoppingCartItem in cart)
             {
                 var sciSubTotal = (await _shoppingCartService.GetSubTotalAsync(shoppingCartItem, true)).subTotal;
                 var product = await _productService.GetProductByIdAsync(shoppingCartItem.ProductId);
+                var sciDiscount = (await _shoppingCartService.GetSubTotalAsync(shoppingCartItem, true)).discountAmount;
 
                 var (sciExclTax, taxRate) = await _taxService.GetProductPriceAsync(product, sciSubTotal, false, customer);
                 var (sciInclTax, _) = await _taxService.GetProductPriceAsync(product, sciSubTotal, true, customer);
                 subTotalExclTaxWithoutDiscount += sciExclTax;
                 subTotalInclTaxWithoutDiscount += sciInclTax;
+                acumDiscountItems += sciDiscount;
 
                 //tax rates
                 var sciTax = sciInclTax - sciExclTax;
@@ -927,7 +930,7 @@ namespace Nop.Services.Orders
             if (_shoppingCartSettings.RoundPricesDuringCalculation)
                 subTotalWithDiscount = await _priceCalculationService.RoundPriceAsync(subTotalWithDiscount);
 
-            return (discountAmount, appliedDiscounts, subTotalWithoutDiscount, subTotalWithDiscount, taxRates);
+            return (discountAmount + acumDiscountItems, appliedDiscounts, subTotalWithoutDiscount, subTotalWithDiscount, taxRates);
         }
 
         /// <summary>

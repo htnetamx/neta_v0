@@ -998,7 +998,13 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var tempDirectory = _fileProvider.MapPath(UPLOADS_TEMP_PATH);
                 _fileProvider.CreateDirectory(tempDirectory);
                 var tempDirectoryDownload = _fileProvider.MapPath(DOWNLOADS_TEMP_PATH);
-                _fileProvider.CreateDirectory(tempDirectoryDownload);                
+                _fileProvider.CreateDirectory(tempDirectoryDownload);
+
+                System.IO.DirectoryInfo di = new DirectoryInfo(tempDirectory);
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
 
                 var storeList = orders.Select(v => v.StoreId).Distinct();
                 foreach(var store in storeList)

@@ -45,10 +45,10 @@
             string absoluteurl = Context.Request.Path;
             if (!absoluteurl.Contains("cart") && !absoluteurl.Contains("checkout"))
             {
-                <li id="topcartlink" style="background-color: gray; color: white">
+                <li id="topcartlink" style="background-color: yellow; color: black">
                     <a href="@Url.RouteUrl("ShoppingCart")">
                         @*<span class="cart-label">@T("ShoppingCart")</span>*@
-                        <span class="cart-label">Haz click aquí para cerrar tu pedido!</span>
+                        <span class="cart-label"><strong>Haz click aqui para darnos nombre y teléfono y cierras el pedido!</strong></span>
                         <span class="cart-qty">@T("ShoppingCart.HeaderQuantity", "$ " + Model.ShoppingCartItems.ToString("N2") + " Total")</span>
                     </a>
                 </li>

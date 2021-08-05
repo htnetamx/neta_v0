@@ -1206,7 +1206,7 @@ namespace Nop.Web.Factories
         public virtual async Task<IEnumerable<ProductOverviewModel>> PrepareProductOverviewModelsAsync(IEnumerable<Product> products,
             bool preparePriceModel = true, bool preparePictureModel = true,
             int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
-            bool forceRedirectionAfterAddingToCart = false)
+            bool forceRedirectionAfterAddingToCart = false, IList<Core.Domain.Discounts.Discount> discounts = null)
         {
             if (products == null)
                 throw new ArgumentNullException(nameof(products));
@@ -1251,10 +1251,17 @@ namespace Nop.Web.Factories
                         CurrentProductQuantity = (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id,null,null)).Any() ? (await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, 0, product.Id, null, null)).First().Quantity : 0,
                         AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations
                     },
+                    DisplayOrder = product.DisplayOrder,
+                    MarkAsLoyalty = discounts != null ? discounts.Any() : false,
                     MarkAsNew = product.MarkAsNew &&
                         (!product.MarkAsNewStartDateTimeUtc.HasValue || product.MarkAsNewStartDateTimeUtc.Value < DateTime.UtcNow) &&
                         (!product.MarkAsNewEndDateTimeUtc.HasValue || product.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
                 };
+
+                var prodDisc = await _productService.GetAllDiscountsAppliedToProductAsync(product.Id);
+                var anyDisc = prodDisc.Any(v => discounts.Any(d => d.Id == v.DiscountId));
+
+                model.MarkAsLoyalty = anyDisc;
 
                 //price
                 if (preparePriceModel)

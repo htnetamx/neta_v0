@@ -1349,6 +1349,31 @@ namespace Nop.Web.Controllers
                         ModelState.AddModelError("", error);
                     }
 
+                    if (!string.IsNullOrWhiteSpace(newAddress.PhoneNumber))
+                    {
+                        if (newAddress.PhoneNumber.Trim().Length < 10)
+                        {
+                            ModelState.AddModelError("", "Nro de teléfono inválido. Debe ingresar los 10 digitos completos");
+                            if (!ModelState.IsValid)
+                            {
+                                //model is not valid. redisplay the form with errors
+                                var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart,
+                                    selectedCountryId: newAddress.CountryId,
+                                    overrideAttributesXml: customAttributes);
+                                billingAddressModel.NewAddressPreselected = true;
+                                return Json(new
+                                {
+                                    update_section = new UpdateSectionJsonModel
+                                    {
+                                        name = "billing",
+                                        html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
+                                    },
+                                    wrong_billing_address = true,
+                                });
+                            }
+                        }
+                    }
+
                     //validate model
                     if (string.IsNullOrWhiteSpace(newAddress.FirstName) ||
                         string.IsNullOrWhiteSpace(newAddress.PhoneNumber))

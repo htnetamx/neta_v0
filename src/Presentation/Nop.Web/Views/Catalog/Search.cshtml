@@ -1,6 +1,7 @@
 ﻿@model Nop.Web.Models.Catalog.SearchModel
 @{
-    Layout = "_ColumnsTwo";
+    //Layout = "_ColumnsTwo";
+    Layout = "_ColumnsOne";
 
     //title
     Html.AddTitleParts(T("PageTitle.Search").Text);
@@ -23,9 +24,9 @@
     }
 </script>
 
-@section CatalogFilters {
+@*@section CatalogFilters {
     @await Html.PartialAsync("_CatalogFilters", Model.CatalogProductsModel)
-}
+}*@
 
 <div class="page search-page">
     <div class="page-title">

@@ -137,15 +137,15 @@
                     <label>@T("ShoppingCart.Totals.OrderTotal"):</label>
                 </td>
                 <td class="cart-total-right">
-                    <span class="value-summary">@Model.SubTotal</span>
-                    @*@if (!string.IsNullOrEmpty(Model.OrderTotal))
+                    @*<span class="value-summary">@Model.SubTotal</span>*@
+                    @if (!string.IsNullOrEmpty(Model.OrderTotal))
                     {
                         <span class="value-summary"><strong>@Model.OrderTotal</strong></span>
                     }
                     else
                     {
                         <span>@T("ShoppingCart.Totals.CalculatedDuringCheckout")</span>
-                    }*@
+                    }
                 </td>
             </tr>
             @if (Model.WillEarnRewardPoints > 0)
