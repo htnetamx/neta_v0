@@ -11,10 +11,10 @@
     if (ViewBag.RoyaltyMessage != null) {
 <div class="product-grid home-page-product-grid">
     <div class="title">
-        <strong>Loyalty Program!!</strong>
+        <strong>5% de descuento parejo para nuestros clientes los más neta!</strong>
     </div>
     <div class="item-grid">
-        <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
+        <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
     </div>
 </div>
     } else {
@@ -22,8 +22,10 @@
     {
 <div class="product-grid home-page-product-grid">
     <div class="title">
-        <strong>Loyalty Program!!</strong>
+        <strong>Super promoción del día para nuestros clientes los más neta!</strong>
     </div>
+    <h2>Acumula $300 pesos o mas de compras en la semana y entra a la super promo diaria! No te quedes sin este beneficio</h2>
+    <h2>El Downy está en $12.50 con tu código!</h2>
     <div class="item-grid">
         @foreach (var item in Model.Where(v => v.MarkAsLoyalty))
                 {
