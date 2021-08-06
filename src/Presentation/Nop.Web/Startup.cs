@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nop.Web.Framework.Infrastructure.Extensions;
 using Nop.Web.Infrastructure;
-using WebEssentials.AspNetCore.Pwa;
 
 namespace Nop.Web
 {
@@ -37,7 +36,6 @@ namespace Nop.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureApplicationServices(_configuration, _webHostEnvironment);
-            //services.AddProgressiveWebApp(new PwaOptions { RegisterServiceWorker = true });
         }
 
         /// <summary>
