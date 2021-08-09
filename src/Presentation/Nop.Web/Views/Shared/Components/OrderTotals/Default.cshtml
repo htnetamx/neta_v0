@@ -7,6 +7,7 @@
                     <label>@T("ShoppingCart.Totals.SubTotal"):</label>
                 </td>
                 <td class="cart-total-right">
+                    @*<span class="value-summary">@(Convert.ToDecimal(Model.SubTotal) + (string.IsNullOrEmpty(Model.SubTotalDiscount) ? 0 : Convert.ToDecimal(Model.SubTotalDiscount) * (-1)))</span>*@
                     <span class="value-summary">@Model.SubTotal</span>
                 </td>
             </tr>

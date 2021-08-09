@@ -532,6 +532,13 @@ namespace Nop.Services.Discounts
             //invalid by default
             var result = new DiscountValidationResult();
 
+            var currentStore = (await _storeContext.GetCurrentStoreAsync()).Id;
+            if(discount.AdminComment != currentStore.ToString())
+            {
+                result.Errors = new List<string> { "El cupón no pertenece a esta Tienda." };
+                return result;
+            }
+
             //check coupon code
             if (discount.RequiresCouponCode)
             {
