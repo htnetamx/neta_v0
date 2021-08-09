@@ -1,4 +1,16 @@
 ﻿@model OrderTotalsModel
+@{ 
+    decimal total = 0;
+    if (string.IsNullOrWhiteSpace(Model.SubTotalDiscount))
+    {
+        total = Convert.ToDecimal(Model.SubTotal.Replace("$", ""));
+    } else
+    {
+        total = Convert.ToDecimal(Model.SubTotal.Replace("$","")) + (Convert.ToDecimal(Model.SubTotalDiscount.Replace("$", "")) * (-1));
+    }
+
+    Model.SubTotal = total.ToString();
+}
 <div class="total-info">
     <table class="cart-total">
         <tbody>
