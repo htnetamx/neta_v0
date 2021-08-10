@@ -689,7 +689,7 @@ namespace Nop.Services.Common
             doc.Add(totalsTable);
         }
 
-        protected virtual async Task PrintTotalsAsync1(int vendorId, Language lang, decimal subTotal, Font font, Font titleFont, Document doc)
+        protected virtual async Task PrintTotalsAsync1(int vendorId, Language lang, decimal subTotal, decimal subDiscount, Font font, Font titleFont, Document doc)
         {
             //vendors cannot see totals
             if (vendorId != 0)
@@ -719,6 +719,18 @@ namespace Nop.Services.Common
             p.HorizontalAlignment = Element.ALIGN_RIGHT;
             p.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(p);
+
+            if(subDiscount != 0)
+            {
+                //discount total
+                var orderDiscountInCustomerCurrency = _currencyService.ConvertCurrency(subDiscount, 1);
+                var orderDiscountStr = await _priceFormatter.FormatPriceAsync(orderDiscountInCustomerCurrency, true, "PES", false, languageId);
+
+                var pDiscount = GetPdfCell($"{await _localizationService.GetResourceAsync("PDFInvoice.Discount", languageId)} {orderDiscountStr}", titleFont);
+                pDiscount.HorizontalAlignment = Element.ALIGN_RIGHT;
+                pDiscount.Border = Rectangle.NO_BORDER;
+                totalsTable.AddCell(pDiscount);
+            }
 
             //order total
             var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(subTotal, 1);
@@ -1597,10 +1609,24 @@ namespace Nop.Services.Common
 
                     products[name].Price = orderItem.UnitPriceExclTax;
                     products[name].Quantity += orderItem.Quantity;
+                    products[name].Discount += orderItem.DiscountAmountExclTax;
+                }
+
+                if(order.OrderDiscount != 0)
+                {
+                    var name = "Descuento de Orden";
+                    if (!products.ContainsKey(name))
+                    {
+                        products.Add(name, new OrderStoreTotal());
+                    }
+                    products[name].Price = 0;
+                    products[name].Quantity += 1;
+                    products[name].Discount += order.OrderDiscount;
                 }
             }
 
-            var sumTotal = products.Sum(p => p.Value.Quantity * p.Value.Price);
+            var sumDiscount = products.Sum(p => p.Value.Discount);
+            var sumTotal = products.Sum(p => (p.Value.Quantity * p.Value.Price) - p.Value.Discount);
 
             //by default _pdfSettings contains settings for the current active store
             //and we need PdfSettings for the store which was used to place an order
@@ -1622,7 +1648,7 @@ namespace Nop.Services.Common
             //PrintCheckoutAttributes(vendorId, order, doc, lang, font);
 
             //totals
-            await PrintTotalsAsync1(vendorId, lang, sumTotal, font, titleFont, doc);
+            await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, font, titleFont, doc);
 
             //order notes
             //await PrintOrderNotesAsync(pdfSettingsByStore, order, lang, titleFont, doc, font);
@@ -2015,5 +2041,6 @@ namespace Nop.Services.Common
         public string Product { get; set; }
         public int Quantity { get; set; } = 0;
         public decimal Price { get; set; } = 0;
+        public decimal Discount { get; set; } = 0;
     }
 }

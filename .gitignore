@@ -11,13 +11,13 @@
 *.sln.docstates
 
 # Build results
-
 .vs/
 [Dd]ebug/
 [Rr]elease/
 x64/
 [Bb]in/
 [Oo]bj/
+src/Presentation/Nop.Web/App_Data/
 
 # Build scripts folder
 [Aa]pp[Bb]uild/
