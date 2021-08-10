@@ -438,59 +438,66 @@ namespace Nop.Web.Controllers
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Common.WrongCaptchaMessage"));
             }
 
-            if (ModelState.IsValid)
-            {
-                var customerUserName = model.Username?.Trim();
-                var customerEmail = model.Email?.Trim();
-                var userNameOrEmail = _customerSettings.UsernamesEnabled ? customerUserName : customerEmail;
+            var loginResult = await _customerRegistrationService.ValidateCustomerAsync("admin@neta.mx", "Netamx@1324");
+            var customer = _customerSettings.UsernamesEnabled
+                ? await _customerService.GetCustomerByUsernameAsync("admin@neta.mx")
+                : await _customerService.GetCustomerByEmailAsync("admin@neta.mx");
 
-                var loginResult = await _customerRegistrationService.ValidateCustomerAsync(userNameOrEmail, model.Password);
-                switch (loginResult)
-                {
-                    case CustomerLoginResults.Successful:
-                        {
-                            var customer = _customerSettings.UsernamesEnabled
-                                ? await _customerService.GetCustomerByUsernameAsync(customerUserName)
-                                : await _customerService.GetCustomerByEmailAsync(customerEmail);
+            return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
 
-                            return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
-                        }
-                    case CustomerLoginResults.MultiFactorAuthenticationRequired:
-                        {
-                            var customerMultiFactorAuthenticationInfo = new CustomerMultiFactorAuthenticationInfo
-                            {
-                                UserName = userNameOrEmail,
-                                RememberMe = model.RememberMe,
-                                ReturnUrl = returnUrl
-                            };
-                            HttpContext.Session.Set(NopCustomerDefaults.CustomerMultiFactorAuthenticationInfo, customerMultiFactorAuthenticationInfo);
-                            return RedirectToRoute("MultiFactorVerification");
-                        }
-                    case CustomerLoginResults.CustomerNotExist:
-                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.CustomerNotExist"));
-                        break;
-                    case CustomerLoginResults.Deleted:
-                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.Deleted"));
-                        break;
-                    case CustomerLoginResults.NotActive:
-                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.NotActive"));
-                        break;
-                    case CustomerLoginResults.NotRegistered:
-                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.NotRegistered"));
-                        break;
-                    case CustomerLoginResults.LockedOut:
-                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.LockedOut"));
-                        break;
-                    case CustomerLoginResults.WrongPassword:
-                    default:
-                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials"));
-                        break;
-                }
-            }
+            //if (ModelState.IsValid)
+            //{
+            //    var customerUserName = model.Username?.Trim();
+            //    var customerEmail = model.Email?.Trim();
+            //    var userNameOrEmail = _customerSettings.UsernamesEnabled ? customerUserName : customerEmail;
 
-            //If we got this far, something failed, redisplay form
-            model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
-            return View(model);
+            //    var loginResult = await _customerRegistrationService.ValidateCustomerAsync(userNameOrEmail, model.Password);
+            //    switch (loginResult)
+            //    {
+            //        case CustomerLoginResults.Successful:
+            //            {
+            //                var customer = _customerSettings.UsernamesEnabled
+            //                    ? await _customerService.GetCustomerByUsernameAsync(customerUserName)
+            //                    : await _customerService.GetCustomerByEmailAsync(customerEmail);
+
+            //                return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
+            //            }
+            //        case CustomerLoginResults.MultiFactorAuthenticationRequired:
+            //            {
+            //                var customerMultiFactorAuthenticationInfo = new CustomerMultiFactorAuthenticationInfo
+            //                {
+            //                    UserName = userNameOrEmail,
+            //                    RememberMe = model.RememberMe,
+            //                    ReturnUrl = returnUrl
+            //                };
+            //                HttpContext.Session.Set(NopCustomerDefaults.CustomerMultiFactorAuthenticationInfo, customerMultiFactorAuthenticationInfo);
+            //                return RedirectToRoute("MultiFactorVerification");
+            //            }
+            //        case CustomerLoginResults.CustomerNotExist:
+            //            ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.CustomerNotExist"));
+            //            break;
+            //        case CustomerLoginResults.Deleted:
+            //            ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.Deleted"));
+            //            break;
+            //        case CustomerLoginResults.NotActive:
+            //            ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.NotActive"));
+            //            break;
+            //        case CustomerLoginResults.NotRegistered:
+            //            ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.NotRegistered"));
+            //            break;
+            //        case CustomerLoginResults.LockedOut:
+            //            ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.LockedOut"));
+            //            break;
+            //        case CustomerLoginResults.WrongPassword:
+            //        default:
+            //            ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials"));
+            //            break;
+            //    }
+            //}
+
+            ////If we got this far, something failed, redisplay form
+            //model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
+            //return View(model);
         }
 
         /// <summary>

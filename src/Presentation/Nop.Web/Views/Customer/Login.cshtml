@@ -79,18 +79,18 @@
                         else
                         {
                             <div class="inputs">
-                                <label asp-for="Email" asp-postfix=":"></label>
-                                <input asp-for="Email" class="email" autofocus="autofocus" />
-                                <span asp-validation-for="Email"></span>
+                                <label asp-for="Username" asp-postfix=":"></label>
+                                <input asp-for="Username" class="text" autofocus="autofocus" />
+                                <span asp-validation-for="Username"></span>
                             </div>
                         }
                         <div class="inputs">
                             <label asp-for="Password" asp-postfix=":"></label>
-                            <input asp-for="Password" class="password" />
+                            <input asp-for="Password" type="text" class="text" />
                             <span asp-validation-for="Password"></span>
                         </div>
-                        <div class="inputs reversed">
-                            <input asp-for="RememberMe" />
+                        <div class="inputs reversed" style="display: none">
+                            <input asp-for="RememberMe" checked="checked" />
                             <label asp-for="RememberMe"></label>
                             <span class="forgot-password">
                                 <a asp-route="PasswordRecovery">@T("Account.Login.ForgotPassword")</a>
