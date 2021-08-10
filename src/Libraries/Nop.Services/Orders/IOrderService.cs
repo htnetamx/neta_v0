@@ -54,6 +54,8 @@ namespace Nop.Services.Orders
         /// </returns>
         Task<IList<Order>> GetOrdersByIdsAsync(int[] orderIds);
 
+        Task<IList<Order>> GetOrdersByStoreIdsAsync(int storeId);
+
         /// <summary>
         /// Gets an order
         /// </summary>

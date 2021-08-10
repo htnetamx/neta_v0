@@ -1050,6 +1050,13 @@ namespace Nop.Services.Orders
             }
         }
 
+        public async Task<IList<Order>> GetOrdersByStoreIdsAsync(int storeId)
+        {
+            return await (from o in _orderRepository.Table
+                         where o.StoreId == storeId
+                         select o).ToListAsync();
+        }
+
         #endregion
 
         #endregion

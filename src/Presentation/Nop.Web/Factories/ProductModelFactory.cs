@@ -1259,9 +1259,14 @@ namespace Nop.Web.Factories
                 };
 
                 var prodDisc = await _productService.GetAllDiscountsAppliedToProductAsync(product.Id);
-                var anyDisc = prodDisc.Any(v => discounts.Any(d => d.Id == v.DiscountId));
-
-                model.MarkAsLoyalty = anyDisc;
+                if(prodDisc != null)
+                {
+                    if(discounts != null)
+                    {
+                        var anyDisc = prodDisc.Any(v => discounts.Any(d => d.Id == v.DiscountId));
+                        model.MarkAsLoyalty = anyDisc;
+                    }
+                }
 
                 //price
                 if (preparePriceModel)

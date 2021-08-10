@@ -1,66 +1,73 @@
 ﻿@model IList<ProductOverviewModel>
 
-@inject Nop.Core.IWorkContext workContext
-
-@*<div>
-    Usuario Activo: @workContext.GetCurrentCustomerAsync().Result.Username
-</div>*@
-
-@if (Model.Count > 0)
-{
-    if (ViewBag.RoyaltyMessage != null) {
-<div class="product-grid home-page-product-grid">
-    <div class="title">
-        <strong>5% de descuento parejo para nuestros clientes los más neta!</strong>
+    @*<hr />
+    <br />
+    <br />
+    <div style="text-align: center">
+        <a class="button-1 search-box-button" href="/products/new">NUEVOS PRODUCTOS</a>
+        <a class="button-1 search-box-button" href="/products/curiosities">CURIOSIDADES NETA</a>
     </div>
-    <div class="item-grid">
-        <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
-    </div>
-</div>
-    } else {
-    if (Model.Where(v => v.MarkAsLoyalty).Any())
+    <br />
+    <br />
+    <hr />*@
+    @if (Model.Count > 0)
     {
-<div class="product-grid home-page-product-grid">
-    <div class="title">
-        <strong>Super promoción del día para nuestros clientes los más neta!</strong>
-    </div>
-    <h2>Acumula $300 pesos o mas de compras en la semana y entra a la super promo diaria! No te quedes sin este beneficio</h2>
-    <h2>La Sal está en $5.75 con tu código!</h2>
-    <div class="item-grid">
-        @foreach (var item in Model.Where(v => v.MarkAsLoyalty))
+        if (ViewBag.RoyaltyMessage != null)
+        {
+            <div class="product-grid home-page-product-grid">
+                <div class="title">
+                    <strong>5% de descuento parejo para nuestros clientes los más neta!</strong>
+                </div>
+                <div class="item-grid">
+                    <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
+                </div>
+            </div>
+        }
+        else
+        {
+            if (Model.Where(v => v.MarkAsLoyalty).Any())
+            {
+                <div class="product-grid home-page-product-grid">
+                    <div class="title">
+                        <strong>Super promoción del día para nuestros clientes los más neta!</strong>
+                    </div>
+                    <h2>Acumula $300 pesos o mas de compras en la semana y entra a la super promo diaria! No te quedes sin este beneficio</h2>
+                    <h2>El jabón zote está en $8 con tu código!</h2>
+                    <div class="item-grid">
+                        @foreach (var item in Model.Where(v => v.MarkAsLoyalty))
+                        {
+                            <div class="item-box">
+                                @await Html.PartialAsync("_ProductBox", item)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        <div class="product-grid home-page-product-grid">
+            <div class="title">
+                <strong>@T("Homepage.Products")</strong>
+            </div>
+            <div class="item-grid">
+                @foreach (var item in Model.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
                 {
-        <div class="item-box">
-            @await Html.PartialAsync("_ProductBox", item)
-        </div>
+                    <div class="item-box">
+                        @await Html.PartialAsync("_ProductBox", item)
+                    </div>
                 }
-    </div>
-</div>
+            </div>
+        </div>
+        <div class="product-grid home-page-product-grid">
+            <div class="title">
+                <strong>Nuestra oferta de precios bajos!</strong>
+            </div>
+            <div class="item-grid">
+                @foreach (var item in Model.Where(v => !v.MarkAsNew).OrderBy(v => v.DisplayOrder))
+                {
+                    <div class="item-box">
+                        @await Html.PartialAsync("_ProductBox", item)
+                    </div>
+                }
+            </div>
+        </div>
     }
-}
-<div class="product-grid home-page-product-grid">
-    <div class="title">
-        <strong>@T("Homepage.Products")</strong>
-    </div>
-    <div class="item-grid">
-        @foreach (var item in Model.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
-            {
-        <div class="item-box">
-            @await Html.PartialAsync("_ProductBox", item)
-        </div>
-            }
-    </div>
-</div>
-<div class="product-grid home-page-product-grid">
-    <div class="title">
-        <strong>Nuestra oferta de precios bajos!</strong>
-    </div>
-    <div class="item-grid">
-        @foreach (var item in Model.Where(v => !v.MarkAsNew).OrderBy(v => v.DisplayOrder))
-            {
-        <div class="item-box">
-            @await Html.PartialAsync("_ProductBox", item)
-        </div>
-            }
-    </div>
-</div>
-}

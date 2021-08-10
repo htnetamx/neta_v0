@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nop.Services.Orders;
 using Nop.Services.Tasks;
 
 namespace Nop.Services.Stores
@@ -12,14 +13,16 @@ namespace Nop.Services.Stores
         #region Fields
 
         private readonly IStoreService _storeService;
+        private readonly IOrderService _orderService;
 
         #endregion
 
         #region Ctor
 
-        public StoreUpdatePhaseTask(IStoreService storeService)
+        public StoreUpdatePhaseTask(IStoreService storeService, IOrderService orderService)
         {
             _storeService = storeService;
+            _orderService = orderService;
         }
 
         #endregion
@@ -31,15 +34,23 @@ namespace Nop.Services.Stores
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            var stores = (await _storeService.GetAllStoresAsync()).Where(s => s.DisplayOrder != 3);
+            if (DateTime.UtcNow.Hour != 5)
+                return;
+
+            var stores = (await _storeService.GetAllStoresAsync())
+                .Where(s => s.DisplayOrder != 3);
             foreach(var store in stores)
             {
-                if (store.DisplayOrder == 1)
-                    store.DisplayOrder = 2;
-                else if (store.DisplayOrder == 2)
-                    store.DisplayOrder = 3;
+                var orderExists = (await _orderService.GetOrdersByStoreIdsAsync(store.Id)).Any();
+                if (orderExists)
+                {
+                    if (store.DisplayOrder == 1)
+                        store.DisplayOrder = 2;
+                    else if (store.DisplayOrder == 2)
+                        store.DisplayOrder = 3;
 
-                await _storeService.UpdateStoreAsync(store);
+                    await _storeService.UpdateStoreAsync(store);
+                }
             }
         }
 
