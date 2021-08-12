@@ -732,8 +732,18 @@ namespace Nop.Services.Common
                 totalsTable.AddCell(pDiscount);
             }
 
+            //discount total
+            var comission = subTotal * 10 / 100;
+            var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
+            var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
+
+            var pComission = GetPdfCell($"Descuento Neta (10%): {orderComissionStr}", titleFont);
+            pComission.HorizontalAlignment = Element.ALIGN_RIGHT;
+            pComission.Border = Rectangle.NO_BORDER;
+            totalsTable.AddCell(pComission);
+
             //order total
-            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(subTotal, 1);
+            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(subTotal- comission, 1);
             var orderTotalStr = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, "PES", false, languageId);
 
             var pTotal = GetPdfCell($"{await _localizationService.GetResourceAsync("PDFInvoice.OrderTotal", languageId)} {orderTotalStr}", titleFont);

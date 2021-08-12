@@ -1326,7 +1326,6 @@ namespace Nop.Web.Controllers
                     throw new Exception("Anonymous checkout is not allowed");
 
                 int.TryParse(form["billing_address_id"], out var billingAddressId);
-
                 if (billingAddressId > 0)
                 {
                     //existing address

@@ -965,7 +965,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 var startDateValue = !searchModel.StartDate.HasValue ? null
                     : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
                 var endDateValue = !searchModel.EndDate.HasValue ? null
-                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
+                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
                 var product = await _productService.GetProductByIdAsync(searchModel.ProductId);
                 var filterByProductId = product != null && (await _workContext.GetCurrentVendorAsync() == null || product.VendorId == (await _workContext.GetCurrentVendorAsync()).Id)
                     ? searchModel.ProductId : 0;

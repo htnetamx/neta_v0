@@ -2,7 +2,8 @@
 @using Nop.Core.Infrastructure
 @{ 
     var service = EngineContext.Current.Resolve<Nop.Services.Common.IAddressService>();
-    var name = service.GetAddressByIdAsync(workContext.GetCurrentCustomerAsync().Result.BillingAddressId ?? 0).Result?.FirstName;
+    var billingAddress = workContext.GetCurrentCustomerAsync().Result.BillingAddressId;
+    var name = service.GetAddressByIdAsync(billingAddress ?? 0).Result?.FirstName;
     if (string.IsNullOrWhiteSpace(name))
     {
         name = "Sin Nombre";
@@ -71,7 +72,6 @@
             </div>
         }*@
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressMiddle })
-
     @if (string.IsNullOrWhiteSpace(workContext.GetCurrentCustomerAsync().Result.Username))
     {
         <div class="section new-billing-address" id="billing-new-address-form">
@@ -92,6 +92,7 @@
                 <p>Hola de nuevo! @name</p>
             </div>
         </div>
+        <input type="hidden" id="billing_address_id" name="billing_address_id" value="@billingAddress" />
     }
 
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressBottom })
