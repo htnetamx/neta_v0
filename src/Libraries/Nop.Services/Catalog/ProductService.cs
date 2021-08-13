@@ -702,7 +702,36 @@ namespace Nop.Services.Catalog
                     .OrderBy(ProductSortingEnum.CreatedOn);
             });
         }
+        /// <summary>
+        /// Gets products which marked as new
+        /// </summary>
+        /// <param name="storeId">Store identifier; 0 if you want to get all records</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the list of new products
+        /// </returns>
+        /// 
+        public virtual async Task<IList<Product>> GetProducts48hAsync(int storeId = 0)
+        {
+            return await _productRepository.GetAllAsync(async query =>
+            {
+                //apply store mapping constraints
+                query = await _storeMappingService.ApplyStoreMapping(query, storeId);
 
+                //apply ACL constraints
+                var customer = await _workContext.GetCurrentCustomerAsync();
+                query = await _aclService.ApplyAcl(query, customer);
+                var dias = 2;
+                query = from p in query
+                        where p.CreatedOnUtc >= DateTime.Now.ToUniversalTime().AddDays(-dias)
+                        && p.Published 
+                        && !p.Deleted
+                        select p;
+
+                return query.Take(_catalogSettings.NewProductsNumber)
+                    .OrderBy(ProductSortingEnum.CreatedOn);
+            });
+        }
         /// <summary>
         /// Get number of product (published and visible) in certain category
         /// </summary>
