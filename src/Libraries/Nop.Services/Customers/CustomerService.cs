@@ -614,6 +614,20 @@ namespace Nop.Services.Customers
             return customer;
         }
 
+        public virtual async Task<Customer> GetCustomerByTelephoneAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return null;
+
+            var query = from c in _customerRepository.Table
+                        orderby c.Id
+                        where c.Username == username
+                        select c;
+            var customer = await query.FirstOrDefaultAsync();
+
+            return customer;
+        }
+
         /// <summary>
         /// Insert a guest customer
         /// </summary>

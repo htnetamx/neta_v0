@@ -13,13 +13,23 @@
 
     //register URL with return URL (if specified)
     var registerUrl = Url.RouteUrl("Register", new { returnUrl = this.Context.Request.Query["returnUrl"] }, webHelper.GetCurrentRequestProtocol());
+
+    Random random = new Random();
+    var codeRandom = random.Next(1000, 9000);
 }
 <div class="page login-page">
     <div class="page-title">
         <h1>@T("Account.Login.Welcome")</h1>
     </div>
     @await Html.PartialAsync("_ExternalAuthentication.Errors")
-    <div class="page-body">
+<div class="page-body">
+
+    @{
+    string absoluteurl = Context.Request.Path; 
+    string qs = Context.Request.QueryString.ToString();
+    }
+    @if (absoluteurl.Contains("admin") || qs.Contains("admin"))
+    {
         <div class="customer-blocks">
             @if (Model.RegistrationType == UserRegistrationType.Disabled)
             {
@@ -79,23 +89,21 @@
                         else
                         {
                             <div class="inputs">
-                                <label asp-for="Username" asp-postfix=":"></label>
-                                <input asp-for="Username" class="text" autofocus="autofocus" />
-                                <span asp-validation-for="Username"></span>
+                                <label asp-for="Email" asp-postfix=":"></label>
+                                <input asp-for="Email" type="email" class="text" autofocus="autofocus" />
+                                <span asp-validation-for="Email"></span>
                             </div>
                         }
                         <div class="inputs">
                             <label asp-for="Password" asp-postfix=":"></label>
-                            <input asp-for="Password" type="text" class="text" />
+                            <input asp-for="Password" type="password" class="text" />
                             <span asp-validation-for="Password"></span>
                         </div>
-                        <div class="inputs reversed" style="display: none">
+                        <div class="inputs reversed">
                             <input asp-for="RememberMe" checked="checked" />
                             <label asp-for="RememberMe"></label>
-                            <span class="forgot-password">
-                                <a asp-route="PasswordRecovery">@T("Account.Login.ForgotPassword")</a>
-                            </span>
                         </div>
+                        <input type="hidden" name="backoffice" value="backoffice" />
                         @if (Model.DisplayCaptcha)
                         {
                             <nop-captcha />
@@ -111,5 +119,122 @@
             @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
         </div>
         @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })
-    </div>
+    }
+    else
+    {
+        <div class="customer-blocks">
+            @if (Model.RegistrationType == UserRegistrationType.Disabled)
+            {
+                <div class="new-wrapper">
+                    <div class="title">
+                        @T("Account.Register")
+                    </div>
+                    <div class="text">
+                        @T("Account.Register.Result.Disabled")
+                    </div>
+                </div>
+            }
+            else if (Model.CheckoutAsGuest)
+            {
+                <div class="new-wrapper checkout-as-guest-or-register-block">
+                    <div class="title">
+                        <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
+                    </div>
+                    <div class="text">
+                        @await Component.InvokeAsync("TopicBlock", new { systemName = "CheckoutAsGuestOrRegister" })
+                    </div>
+                    <div class="buttons">
+                        <button type="button" class="button-1 checkout-as-guest-button" onclick="location.href='@Url.RouteUrl("Checkout")'">@T("Account.Login.CheckoutAsGuest")</button>
+                        <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="new-wrapper register-block">
+                    <div class="title">
+                        <strong>@T("Account.Login.NewCustomer")</strong>
+                    </div>
+                    <div class="text">
+                        @T("Account.Login.NewCustomerText")
+                    </div>
+                    <div class="buttons">
+                        <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                    </div>
+                </div>
+            }
+            <div class="returning-wrapper fieldset">
+                <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+                    <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
+                    <div class="title">
+                        <strong>@T("Account.Login.ReturningCustomer")</strong>
+                    </div>
+                    <div class="form-fields">
+                        @if (Model.UsernamesEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="Username" asp-postfix=":"></label>
+                                <input asp-for="Username" class="username" autofocus="autofocus" />
+                                <span asp-validation-for="Username"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="inputs">
+                                <label>Nombre:</label>
+                                <input asp-for="Username" type="text" class="text" autofocus="autofocus" />
+                                <span asp-validation-for="Username"></span>
+                            </div>
+                        }
+                        <div class="inputs">
+                            <label>Teléfono:</label>
+                            <input asp-for="Password" type="text" class="text" />
+                            <span asp-validation-for="Password"></span>
+                        </div>
+                        <div class="inputs" id="codeVerifContainer" style="display: none">
+                            <label>Código:</label>
+                            <input id="codeVerif" name="codeVerif" type="text" class="text" />
+                            <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
+                        </div>
+                        <div class="inputs reversed" style="display: none">
+                            <input asp-for="RememberMe" checked="checked" />
+                            <label asp-for="RememberMe"></label>
+                            <span class="forgot-password">
+                                <a asp-route="PasswordRecovery">@T("Account.Login.ForgotPassword")</a>
+                            </span>
+                        </div>
+                        @if (Model.DisplayCaptcha)
+                        {
+                            <nop-captcha />
+                        }
+                    </div>
+                    <div class="buttons">
+                        <button id="btnCodeVerif" type="button" class="button-1 login-button">VERIFICAR TELEFONO</button>
+                        <button id="btnLogin" style="display: none" type="submit" class="button-1 login-button">@T("Account.Login.LoginButton")</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="external-authentication">
+            @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
+        </div>
+        @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })
+    }
+</div>
+
+    <script asp-location="Footer">
+
+        $(document).ready(function () {
+            $("#btnCodeVerif").click(() => {
+                $("#btnLogin").show();
+                $("#codeVerifContainer").show();
+                $("#btnCodeVerif").hide();
+
+                alert("Emulando envio de Código --> Código envido " + @codeRandom);
+
+            });
+        });
+
+    </script>
+
 </div>

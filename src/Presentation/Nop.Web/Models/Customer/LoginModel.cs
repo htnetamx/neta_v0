@@ -10,22 +10,19 @@ namespace Nop.Web.Models.Customer
     {
         public bool CheckoutAsGuest { get; set; }
 
-        [DataType(DataType.Text)]
-        //[NopResourceDisplayName("Account.Login.Fields.Email")]
-        [DisplayName("Nombre Completo")]
+        [DataType(DataType.EmailAddress)]
+        [NopResourceDisplayName("Account.Login.Fields.Email")]
         public string Email { get; set; }
 
         public bool UsernamesEnabled { get; set; }
 
         public UserRegistrationType RegistrationType { get; set; }
 
-        //[NopResourceDisplayName("Account.Login.Fields.Username")]
-        [DisplayName("Nombre Completo")]
+        [NopResourceDisplayName("Account.Login.Fields.Username")]
         public string Username { get; set; }
 
         [DataType(DataType.Text)]
-        //[NopResourceDisplayName("Account.Login.Fields.Password")]
-        [DisplayName("Teléfono")]
+        [NopResourceDisplayName("Account.Login.Fields.Password")]
         public string Password { get; set; }
 
         [NopResourceDisplayName("Account.Login.Fields.RememberMe")]

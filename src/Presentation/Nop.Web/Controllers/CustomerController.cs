@@ -430,7 +430,7 @@ namespace Nop.Web.Controllers
         [CheckAccessClosedStore(true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public virtual async Task<IActionResult> Login(LoginModel model, string returnUrl, bool captchaValid)
+        public virtual async Task<IActionResult> Login(LoginModel model, IFormCollection form, string returnUrl, bool captchaValid)
         {
             //validate CAPTCHA
             if (_captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage && !captchaValid)
@@ -438,11 +438,38 @@ namespace Nop.Web.Controllers
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Common.WrongCaptchaMessage"));
             }
 
-            var loginResult = await _customerRegistrationService.ValidateCustomerAsync("admin@neta.mx", "Netamx@1324");
-            var customer = _customerSettings.UsernamesEnabled
-                ? await _customerService.GetCustomerByUsernameAsync("admin@neta.mx")
-                : await _customerService.GetCustomerByEmailAsync("admin@neta.mx");
+            if(!string.IsNullOrWhiteSpace(form["backoffice"]))
+            {
+                var loginResult1 = await _customerRegistrationService.ValidateCustomerAsync(model.Email, model.Password);
+                var customer1 = _customerSettings.UsernamesEnabled
+                    ? await _customerService.GetCustomerByUsernameAsync(model.Username)
+                    : await _customerService.GetCustomerByEmailAsync(model.Email);
 
+                return await _customerRegistrationService.SignInCustomerAsync(customer1, returnUrl, model.RememberMe);
+            }
+
+            if (form["code_generated"] != form["codeVerif"])
+            {
+                ModelState.AddModelError("", "El código de verificación es incorrecto.");
+                model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
+                return View(model);
+            }
+
+            var loginResult = await _customerRegistrationService.ValidateCustomerAsync1(model.Password);
+            if (loginResult == CustomerLoginResults.CustomerNotExist)
+            {
+                var newCustomer = await _workContext.GetCurrentCustomerAsync();
+                newCustomer.Username = model.Password;
+                newCustomer.Email = model.Password;
+                await _customerRegistrationService.RegisterCustomerAsync1(new CustomerRegistrationRequest(newCustomer,
+                    model.Password,
+                    model.Password,
+                    model.Username,
+                    PasswordFormat.Clear,
+                    (await _storeContext.GetCurrentStoreAsync()).Id,
+                    true));
+            }
+            var customer = await _customerService.GetCustomerByTelephoneAsync(model.Password);
             return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
 
             //if (ModelState.IsValid)
