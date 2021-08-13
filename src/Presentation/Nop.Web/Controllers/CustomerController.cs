@@ -455,21 +455,21 @@ namespace Nop.Web.Controllers
                 return View(model);
             }
 
-            var loginResult = await _customerRegistrationService.ValidateCustomerAsync("admin@yourstore.com", "adminadmin");
+            var loginResult = await _customerRegistrationService.ValidateCustomerAsync1(model.Password);
             if (loginResult == CustomerLoginResults.CustomerNotExist)
             {
-                await _customerRegistrationService.RegisterCustomerAsync(new CustomerRegistrationRequest(null,
-                    "Email",
-                    "Email",
-                    "Password",
+                var newCustomer = await _workContext.GetCurrentCustomerAsync();
+                newCustomer.Username = model.Password;
+                newCustomer.Email = model.Password;
+                await _customerRegistrationService.RegisterCustomerAsync1(new CustomerRegistrationRequest(newCustomer,
+                    model.Password,
+                    model.Password,
+                    model.Username,
                     PasswordFormat.Clear,
                     (await _storeContext.GetCurrentStoreAsync()).Id,
                     true));
             }
-            var customer = _customerSettings.UsernamesEnabled
-                ? await _customerService.GetCustomerByUsernameAsync("admin@yourstore.com")
-                : await _customerService.GetCustomerByEmailAsync("admin@yourstore.com");
-
+            var customer = await _customerService.GetCustomerByTelephoneAsync(model.Password);
             return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
 
             //if (ModelState.IsValid)

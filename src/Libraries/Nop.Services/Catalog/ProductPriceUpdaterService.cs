@@ -34,6 +34,11 @@ namespace Nop.Services.Catalog
                 .Where(p => p.MarkAsNew && p.AvailableEndDateTimeUtc.Value.Date <= DateTime.UtcNow.Date);
             foreach (var product in products)
             {
+                product.MarkAsNew = false;
+                product.AvailableStartDateTimeUtc = null;
+                product.AvailableEndDateTimeUtc = null;
+                product.MarkAsNewStartDateTimeUtc = null;
+                product.MarkAsNewEndDateTimeUtc = null;
                 if (product.OldPrice != product.Price)
                 {
                     product.Price = product.OldPrice;

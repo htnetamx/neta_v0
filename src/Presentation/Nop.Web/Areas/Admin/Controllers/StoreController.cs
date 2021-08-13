@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
+using Nop.Core.Caching;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Stores;
 using Nop.Services.Common;
@@ -34,6 +35,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IStoreService _storeService;
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly IWorkContext _workContext;
+        private readonly IStaticCacheManager _staticCacheManager;
 
         #endregion
 
@@ -48,7 +50,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             IStoreModelFactory storeModelFactory,
             IStoreService storeService,
             IGenericAttributeService genericAttributeService,
-            IWorkContext workContext)
+            IWorkContext workContext,
+            IStaticCacheManager staticCacheManager)
         {
             _customerActivityService = customerActivityService;
             _localizationService = localizationService;
@@ -60,6 +63,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _storeService = storeService;
             _genericAttributeService = genericAttributeService;
             _workContext = workContext;
+            _staticCacheManager = staticCacheManager;
 
         }
 
@@ -140,6 +144,9 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //locales
                 await UpdateAttributeLocalesAsync(store, model);
 
+                //clear cache after execute trigger
+                await _staticCacheManager.ClearAsync();
+
                 _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Stores.Added"));
 
                 return continueEditing ? RedirectToAction("Edit", new { id = store.Id }) : RedirectToAction("List");
@@ -207,6 +214,9 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 //locales
                 await UpdateAttributeLocalesAsync(store, model);
+
+                //clear cache after execute trigger
+                await _staticCacheManager.ClearAsync();
 
                 _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Stores.Updated"));
 

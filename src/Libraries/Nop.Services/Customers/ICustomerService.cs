@@ -177,6 +177,8 @@ namespace Nop.Services.Customers
         /// </returns>
         Task<Customer> GetCustomerByUsernameAsync(string username);
 
+        Task<Customer> GetCustomerByTelephoneAsync(string username);
+
         /// <summary>
         /// Insert a guest customer
         /// </summary>

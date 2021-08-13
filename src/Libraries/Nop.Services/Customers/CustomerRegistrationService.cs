@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
+using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Events;
 using Nop.Services.Authentication;
@@ -42,6 +43,7 @@ namespace Nop.Services.Customers
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly RewardPointsSettings _rewardPointsSettings;
+        private readonly IAddressService _addressService;
 
         #endregion
 
@@ -64,7 +66,8 @@ namespace Nop.Services.Customers
             IStoreService storeService,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
-            RewardPointsSettings rewardPointsSettings)
+            RewardPointsSettings rewardPointsSettings,
+            IAddressService addressService)
         {
             _customerSettings = customerSettings;
             _authenticationService = authenticationService;
@@ -84,6 +87,7 @@ namespace Nop.Services.Customers
             _workContext = workContext;
             _workflowMessageService = workflowMessageService;
             _rewardPointsSettings = rewardPointsSettings;
+            _addressService = addressService;
         }
 
         #endregion
@@ -177,6 +181,33 @@ namespace Nop.Services.Customers
                 return CustomerLoginResults.MultiFactorAuthenticationRequired;
             if (!string.IsNullOrEmpty(selectedProvider))
                 _notificationService.WarningNotification(await _localizationService.GetResourceAsync("MultiFactorAuthentication.Notification.SelectedMethodIsNotActive"));
+
+            //update login details
+            customer.FailedLoginAttempts = 0;
+            customer.CannotLoginUntilDateUtc = null;
+            customer.RequireReLogin = false;
+            customer.LastLoginDateUtc = DateTime.UtcNow;
+            await _customerService.UpdateCustomerAsync(customer);
+
+            return CustomerLoginResults.Successful;
+        }
+
+        public virtual async Task<CustomerLoginResults> ValidateCustomerAsync1(string telefono)
+        {
+            var customer = await _customerService.GetCustomerByTelephoneAsync(telefono);
+
+            if (customer == null)
+                return CustomerLoginResults.CustomerNotExist;
+            if (customer.Deleted)
+                return CustomerLoginResults.Deleted;
+            if (!customer.Active)
+                return CustomerLoginResults.NotActive;
+            //only registered can login
+            if (!await _customerService.IsRegisteredAsync(customer))
+                return CustomerLoginResults.NotRegistered;
+            //check whether a customer is locked out
+            if (customer.CannotLoginUntilDateUtc.HasValue && customer.CannotLoginUntilDateUtc.Value > DateTime.UtcNow)
+                return CustomerLoginResults.LockedOut;
 
             //update login details
             customer.FailedLoginAttempts = 0;
@@ -313,6 +344,74 @@ namespace Nop.Services.Customers
             }
 
             await _customerService.UpdateCustomerAsync(request.Customer);
+
+            return result;
+        }
+
+        public virtual async Task<CustomerRegistrationResult> RegisterCustomerAsync1(CustomerRegistrationRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            if (request.Customer == null)
+                throw new ArgumentException("Can't load current customer");
+
+            var result = new CustomerRegistrationResult();
+            if (await _customerService.IsRegisteredAsync(request.Customer))
+            {
+                result.AddError("Current customer is already registered");
+                return result;
+            }
+
+            //at this point request is valid
+            request.Customer.Username = request.Username;
+            request.Customer.Email = request.Email;
+
+            var customerPassword = new CustomerPassword
+            {
+                CustomerId = request.Customer.Id,
+                PasswordFormat = request.PasswordFormat,
+                CreatedOnUtc = DateTime.UtcNow
+            };
+            customerPassword.Password = request.Password;
+            await _customerService.InsertCustomerPasswordAsync(customerPassword);
+
+            request.Customer.Active = request.IsApproved;
+
+            //add to 'Registered' role
+            var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
+            if (registeredRole == null)
+                throw new NopException("'Registered' role could not be loaded");
+
+            await _customerService.AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerId = request.Customer.Id, CustomerRoleId = registeredRole.Id });
+
+            //remove from 'Guests' role            
+            if (await _customerService.IsGuestAsync(request.Customer))
+            {
+                var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
+                await _customerService.RemoveCustomerRoleMappingAsync(request.Customer, guestRole);
+            }
+
+            //add reward points for customer registration (if enabled)
+            if (_rewardPointsSettings.Enabled && _rewardPointsSettings.PointsForRegistration > 0)
+            {
+                var endDate = _rewardPointsSettings.RegistrationPointsValidity > 0
+                    ? (DateTime?)DateTime.UtcNow.AddDays(_rewardPointsSettings.RegistrationPointsValidity.Value) : null;
+                await _rewardPointService.AddRewardPointsHistoryEntryAsync(request.Customer, _rewardPointsSettings.PointsForRegistration,
+                    request.StoreId, await _localizationService.GetResourceAsync("RewardPoints.Message.EarnedForRegistration"), endDate: endDate);
+            }
+            var billAddr = new Address
+            {
+                FirstName = request.Password,
+                PhoneNumber = request.Username,
+                Address1 = (await _storeContext.GetCurrentStoreAsync()).CompanyAddress
+            };
+            await _addressService.InsertAddressAsync(billAddr);
+
+            request.Customer.BillingAddressId = billAddr.Id;
+            await _customerService.UpdateCustomerAsync(request.Customer);
+
+            await _customerService.InsertCustomerAddressAsync(request.Customer, billAddr);
 
             return result;
         }

@@ -20,6 +20,8 @@ namespace Nop.Services.Customers
         /// </returns>
         Task<CustomerLoginResults> ValidateCustomerAsync(string usernameOrEmail, string password);
 
+        Task<CustomerLoginResults> ValidateCustomerAsync1(string telefono);
+
         /// <summary>
         /// Register customer
         /// </summary>
@@ -29,6 +31,8 @@ namespace Nop.Services.Customers
         /// The task result contains the result
         /// </returns>
         Task<CustomerRegistrationResult> RegisterCustomerAsync(CustomerRegistrationRequest request);
+
+        Task<CustomerRegistrationResult> RegisterCustomerAsync1(CustomerRegistrationRequest request);
 
         /// <summary>
         /// Change password
