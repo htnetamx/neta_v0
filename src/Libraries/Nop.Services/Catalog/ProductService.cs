@@ -715,12 +715,12 @@ namespace Nop.Services.Catalog
         {
             return await _productRepository.GetAllAsync(async query =>
             {
-                //apply store mapping constraints
-                //query = await _storeMappingService.ApplyStoreMapping(query, storeId);
+               //apply store mapping constraints
+               query = await _storeMappingService.ApplyStoreMapping(query, storeId);
 
-                //apply ACL constraints
-                // var customer = await _workContext.GetCurrentCustomerAsync();
-                //query = await _aclService.ApplyAcl(query, customer);
+               //apply ACL constraints
+               var customer = await _workContext.GetCurrentCustomerAsync();
+               query = await _aclService.ApplyAcl(query, customer);
                var dias = 2;
                var myDate = DateTime.UtcNow.AddDays(-dias);
                 query = from p in query
