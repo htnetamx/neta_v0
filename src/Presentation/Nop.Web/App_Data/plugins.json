@@ -42,6 +42,10 @@
     {
       "SystemName": "Payments.OpenPay",
       "Version": "1.0"
+    },
+    {
+      "SystemName": "Payments.CashOnDelivery",
+      "Version": "1.44"
     }
   ],
   "PluginNamesToUninstall": [],

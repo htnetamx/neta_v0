@@ -703,8 +703,11 @@ namespace Nop.Services.Discounts
                 //ignore deleted orders
                 query = from duh in query
                     join order in _orderRepository.Table on duh.OrderId equals order.Id
-                    where !order.Deleted && order.CreatedOnUtc.Date == DateTime.UtcNow.Date
+                    where !order.Deleted
                     select duh;
+
+                query = query.Where(historyRecord => 
+                    historyRecord.CreatedOnUtc.Date == DateTime.UtcNow.Date);
 
                 //order
                 query = query.OrderByDescending(historyRecord => historyRecord.CreatedOnUtc)

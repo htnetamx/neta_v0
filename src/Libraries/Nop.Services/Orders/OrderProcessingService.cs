@@ -1600,7 +1600,7 @@ namespace Nop.Services.Orders
                         await CreateFirstRecurringPaymentAsync(processPaymentRequest, order);
 
                     //notifications
-                    await SendNotificationsAndSaveNotesAsync(order);
+                    //await SendNotificationsAndSaveNotesAsync(order);
 
                     //reset checkout data
                     await _customerService.ResetCheckoutDataAsync(details.Customer, processPaymentRequest.StoreId, clearCouponCodes: true, clearCheckoutAttributes: true);
