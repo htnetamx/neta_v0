@@ -723,13 +723,47 @@ namespace Nop.Services.Catalog
                query = await _aclService.ApplyAcl(query, customer);
                var dias = 2;
                var myDate = DateTime.UtcNow.AddDays(-dias);
-                query = from p in query
+               query = from p in query
                         where p.Published
                         && !p.Deleted
                         && p.CreatedOnUtc >= myDate
-                select p;
-                return query.Take(_catalogSettings.NewProductsNumber)
-                    .OrderBy(ProductSortingEnum.CreatedOn);
+                        select p;
+                return query.OrderBy(ProductSortingEnum.CreatedOn);
+            });
+        }
+        /// <summary>
+        /// Gets products which are part of the curiosities category
+        /// </summary>
+        /// <param name="storeId">Store identifier; 0 if you want to get all records</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the list of new products
+        /// </returns>
+        /// 
+        public virtual async Task<IList<Product>> GetProductCuriosities(int categoryId = 0, int storeId = 0)
+        {
+            return await _productRepository.GetAllAsync(async query =>
+            {
+
+            query = _productRepository.Table.Where(p => p.Published && !p.Deleted);
+
+            //apply store mapping constraints
+            query = await _storeMappingService.ApplyStoreMapping(query, storeId);
+
+            //apply ACL constraints
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+            query = await _aclService.ApplyAcl(query, customerRoleIds);
+
+            //category filtering
+            if (categoryId != 0)
+            {
+                query = from p in query
+                        join pc in _productCategoryRepository.Table on p.Id equals pc.ProductId
+                        where categoryId==pc.CategoryId
+                        select p;
+            }
+                return query.OrderBy(ProductSortingEnum.CreatedOn);
             });
         }
         /// <summary>
