@@ -94,6 +94,18 @@ namespace Nop.Services.Catalog
         /// </returns>
         /// 
 
+        Task<IList<Product>> GetProductCuriosities(int categoryId = 0, int storeId = 0);
+
+        /// <summary>
+        /// Gets product
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the product
+        /// </returns>
+        /// 
+
         Task<Product> GetProductByIdAsync(int productId);
 
         /// <summary>

@@ -332,11 +332,17 @@ namespace Nop.Web.Controllers
 
         public virtual async Task<IActionResult> NewProducts()
         {
-            if (!_catalogSettings.NewProductsEnabled)
-                return Content("");
-
             var storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
             var products = await _productService.GetProducts48hAsync(storeId);
+            var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products)).ToList();
+
+            return View(model);
+        }
+
+        public virtual async Task<IActionResult> CuriosityProducts()
+        {
+            var storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+            var products = await _productService.GetProductCuriosities(99,storeId);
             var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products)).ToList();
 
             return View(model);
