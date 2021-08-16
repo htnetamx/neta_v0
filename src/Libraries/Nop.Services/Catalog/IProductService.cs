@@ -80,6 +80,20 @@ namespace Nop.Services.Catalog
         /// A task that represents the asynchronous operation
         /// The task result contains the product
         /// </returns>
+        /// 
+
+        Task<IList<Product>> GetProducts48hAsync(int storeId = 0);
+
+        /// <summary>
+        /// Gets product
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the product
+        /// </returns>
+        /// 
+
         Task<Product> GetProductByIdAsync(int productId);
 
         /// <summary>
