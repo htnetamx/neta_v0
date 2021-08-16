@@ -336,7 +336,7 @@ namespace Nop.Web.Controllers
                 return Content("");
 
             var storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
-            var products = await _productService.GetProductsMarkedAsNewAsync(storeId);
+            var products = await _productService.GetProducts48hAsync(storeId);
             var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products)).ToList();
 
             return View(model);
