@@ -6,8 +6,11 @@
 @await Html.PartialAsync("_JavaScriptDisabledWarning")
 @await Html.PartialAsync("_OldInternetExplorerWarning")
 <div class="master-wrapper-page">
-    @await Component.InvokeAsync("AdminHeaderLinks")
-    @await Html.PartialAsync("_Header")
+    <div id="upper-page" style="display: flex; flex-direction: column; position: fixed; z-index: 99; background-color: white; width: 100vw; top: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: black">
+        @await Component.InvokeAsync("AdminHeaderLinks")
+
+        @await Html.PartialAsync("_Header")
+    </div>
     <script asp-location="Footer">
         var localized_data = {
             AjaxCartFailure: "@T("AjaxCart.Failure")"
@@ -15,20 +18,40 @@
         AjaxCart.init(false, '.header-links .cart-qty', '.header-links .wishlist-qty', '#flyout-cart', localized_data);
     </script>
     @*<div class="header-menu">
-        @await Component.InvokeAsync("TopMenu")
-    </div>*@
-    <div class="master-wrapper-content">
+            @await Component.InvokeAsync("TopMenu")
+        </div>*@
+    <div id="master-wrapper-cont" class="master-wrapper-content">
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentBefore })
 
         @if (IsSectionDefined("Breadcrumb"))
         {
-            @RenderSection("Breadcrumb") 
+            @RenderSection("Breadcrumb")
         }
         <div class="master-column-wrapper">
             @RenderBody()
         </div>
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentAfter })
     </div>
+    <script>
+        window.onresize = setResize;
+        setResize();
+        function setResize() {  
+            if (window.innerWidth > 600) {
+                document.getElementById("logo-img").style.width = "10vw"
+                document.getElementById("shopping-cart-label").style.fontSize = "2vw"
+                document.getElementById("shopping-cart-qty").style.fontSize = "2vw"
+                document.getElementById("shopping-cart-qty").style.lineHeight = "7vh"
+            }
+            else {
+                document.getElementById("logo-img").style.width = "30vw"
+                document.getElementById("shopping-cart-label").style.fontSize = "3vw"
+                document.getElementById("shopping-cart-qty").style.fontSize = "3vw"
+                document.getElementById("shopping-cart-qty").style.lineHeight = "3vh"
+            }
+            var clientHeight = document.getElementById("upper-page").clientHeight;
+            document.getElementById("master-wrapper-cont").style.top = (parseInt((clientHeight / window.innerHeight) * 100, 10) + 2) + "vh";
+        }
+        </script>
     @await Component.InvokeAsync("Footer")
 </div>
 @await Component.InvokeAsync("EuCookieLaw")
