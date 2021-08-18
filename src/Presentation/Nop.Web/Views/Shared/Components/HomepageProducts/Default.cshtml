@@ -1,4 +1,5 @@
 ﻿@model IList<ProductOverviewModel>
+@inject Nop.Core.IStoreContext storeContext
     <div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh">
         <a class="button-1 search-box-button" href="/newproducts">NUEVOS PRODUCTOS</a>
         <a class="button-1 search-box-button" href="/curiosities">CURIOSIDADES NETA</a>
@@ -9,12 +10,21 @@
     {
         if (ViewBag.RoyaltyMessage != null)
         {
+            var store = storeContext.GetCurrentStore();
+            if (store.Id == 49)
+            {
+                ViewBag.RoyaltyMessage = "2.5%";
+            }
+            else
+            {
+                ViewBag.RoyaltyMessage = "5%";
+            }
             <div class="product-grid home-page-product-grid">
                 <div class="title">
-                    <strong>5% de descuento parejo para nuestros clientes los más neta!</strong>
+                    <strong>@ViewBag.RoyaltyMessage de descuento parejo para nuestros clientes los más neta!</strong>
                 </div>
                 <div class="item-grid">
-                    <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
+                    <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un @ViewBag.RoyaltyMessage de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
                 </div>
             </div>
         }
