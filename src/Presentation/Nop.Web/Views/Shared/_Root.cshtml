@@ -33,9 +33,62 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentAfter })
     </div>
     <script>
+        try {
+            document.getElementById("MenosProd").addEventListener("click", mostrarMenos);
+            document.getElementById("MasProd").addEventListener("click", mostrarMas);
+            var hijos = Object.assign({}, document.getElementById('product_list').children);
+        } catch (error) {
+            console.error(error);
+           
+        }
         window.onresize = setResize;
         setResize();
-        function setResize() {  
+        mostrarInicial()
+        function mostrarMas() {
+            var newCont = parseInt(document.getElementById('paginacion-home').textContent, 10) + parseInt(document.getElementById('paginacion-home-step').textContent, 10)
+            if (newCont <= Object.keys(hijos).length) {
+                document.getElementById('product_list').innerHTML = "";
+                document.getElementById('paginacion-home').textContent = newCont
+                updateProductList();
+                if (newCont == Object.keys(hijos).length) {
+                    document.getElementById("MasProd").style.display = "None";
+                }
+                else {
+                    document.getElementById("MenosProd").style.display = "Block";
+                }
+            }
+        }
+        function mostrarMenos() {
+            var newCont = parseInt(document.getElementById('paginacion-home').textContent, 10) - parseInt(document.getElementById('paginacion-home-step').textContent, 10)
+            var lim_inferior = parseInt(document.getElementById('paginacion-home-inicial').textContent, 10);
+            if (newCont >= lim_inferior) {
+                document.getElementById('product_list').innerHTML = "";
+                document.getElementById('paginacion-home').textContent = newCont
+                updateProductList();
+                if (newCont == lim_inferior) {
+                    document.getElementById("MenosProd").style.display = "None";
+                }
+                else {
+                    document.getElementById("MasProd").style.display = "Block";
+                }
+            }
+        }
+        function mostrarInicial() {
+            document.getElementById('paginacion-home').textContent = document.getElementById('paginacion-home-inicial').textContent;
+            document.getElementById("MasProd").style.display = "Block";
+            document.getElementById("MenosProd").style.display = "None";
+            document.getElementById('product_list').innerHTML = "";
+            updateProductList();
+        }
+        function updateProductList() {  
+            for (i = 0; i < parseInt(document.getElementById('paginacion-home').textContent, 10); i++) {
+                var z = document.createElement('div');
+                z.innerHTML = hijos[i].innerHTML;
+                z.classList.add('item-box')
+                document.getElementById('product_list').appendChild(z);
+            }
+        }
+        function setResize() {
             if (window.innerWidth > 600) {
                 document.getElementById("logo-img").style.width = "10vw"
                 document.getElementById("shopping-cart-label").style.fontSize = "2vw"
@@ -51,7 +104,7 @@
             var clientHeight = document.getElementById("upper-page").clientHeight;
             document.getElementById("master-wrapper-cont").style.top = (parseInt((clientHeight / window.innerHeight) * 100, 10) + 2) + "vh";
         }
-        </script>
+    </script>
     @await Component.InvokeAsync("Footer")
 </div>
 @await Component.InvokeAsync("EuCookieLaw")
