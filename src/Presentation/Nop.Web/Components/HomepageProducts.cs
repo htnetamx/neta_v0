@@ -9,6 +9,7 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
+using Nop.Web.Models;
 
 namespace Nop.Web.Components
 {
@@ -21,6 +22,7 @@ namespace Nop.Web.Components
         private readonly IStoreMappingService _storeMappingService;
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
+        private readonly ICatalogModelFactory _catalogModelFactory;
 
         public HomepageProductsViewComponent(IAclService aclService,
             IProductModelFactory productModelFactory,
@@ -28,7 +30,8 @@ namespace Nop.Web.Components
             IProductService productService,
             IStoreMappingService storeMappingService,
             IStoreContext storeContext,
-            IWorkContext workContext)
+            IWorkContext workContext,
+            ICatalogModelFactory catalogModelFactory)
         {
             _aclService = aclService;
             _discountService = discountService;
@@ -37,6 +40,7 @@ namespace Nop.Web.Components
             _storeMappingService = storeMappingService;
             _storeContext = storeContext;
             _workContext = workContext;
+             _catalogModelFactory= catalogModelFactory;
         }
 
         /// <returns>A task that represents the asynchronous operation</returns>
@@ -67,10 +71,17 @@ namespace Nop.Web.Components
             {
                 ViewBag.RoyaltyMessage = "Royalty Program a Nivel de Orden";
             }
-
-            var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true, productThumbPictureSize, discounts: discProducts)).ToList();
-
-            return View(model.OrderBy(v => v.DisplayOrder).ToList());
+            var model2 = new Models.Catalog.SearchModel();
+            model2.CatalogProductsModel.AllowProductViewModeChanging =false;
+            model2.CatalogProductsModel.AllowProductSorting = true;
+            model2.CatalogProductsModel.AllowCustomersToSelectPageSize = true;
+            var cat = new Models.Catalog.CatalogProductsCommand();
+            await _catalogModelFactory.PrepareSortingOptionsAsync(model2.CatalogProductsModel, cat);
+            await _catalogModelFactory.PreparePageSizeOptionsAsync(model2.CatalogProductsModel, cat,true,"3,6,10,20",10);
+            var modelList = (await _productModelFactory.PrepareProductOverviewModelsAsync1(products, true, true, productThumbPictureSize, discounts: discProducts,command: cat));
+            model2.CatalogProductsModel.Products = (await _productModelFactory.PrepareProductOverviewModelsAsync(modelList)).ToList();
+            model2.CatalogProductsModel.LoadPagedList(modelList);
+            return View(model2);
         }
-    }
+    }   
 }

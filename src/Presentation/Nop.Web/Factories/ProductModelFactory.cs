@@ -1295,6 +1295,34 @@ namespace Nop.Web.Factories
             return models;
         }
 
+
+        public virtual async Task<IPagedList<Product>> PrepareProductOverviewModelsAsync1(IEnumerable<Product> products1,
+            bool preparePriceModel = true, bool preparePictureModel = true,
+            int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
+            bool forceRedirectionAfterAddingToCart = false, IList<Core.Domain.Discounts.Discount> discounts = null,
+            CatalogProductsCommand command=null)
+        {
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+
+            var model = new CatalogProductsModel
+            {
+                UseAjaxLoading = _catalogSettings.UseAjaxCatalogProductsLoading
+            };
+
+
+            ////sorting
+            //await PrepareSortingOptionsAsync(model, command);
+            ////view mode
+            //await PrepareViewModesAsync(model, command);
+            ////page size
+            //await PreparePageSizeOptionsAsync(model, command, _catalogSettings.SearchPageAllowCustomersToSelectPageSize,
+            //    _catalogSettings.SearchPagePageSizeOptions, _catalogSettings.SearchPageProductsPerPage);
+
+            IPagedList<Product> products = new PagedList<Product>(products1.ToList(), 0, 1);
+            return products;
+        }
+
         /// <summary>
         /// Prepare the product combination models
         /// </summary>

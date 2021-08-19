@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Web.Models.Catalog;
@@ -40,6 +41,11 @@ namespace Nop.Web.Factories
             int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
             bool forceRedirectionAfterAddingToCart = false, IList<Core.Domain.Discounts.Discount> discounts = null);
 
+        Task<IPagedList<Product>> PrepareProductOverviewModelsAsync1(IEnumerable<Product> products1,
+            bool preparePriceModel = true, bool preparePictureModel = true,
+            int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
+            bool forceRedirectionAfterAddingToCart = false, IList<Core.Domain.Discounts.Discount> discounts = null,
+            CatalogProductsCommand command = null);
         /// <summary>
         /// Prepare the product combination models
         /// </summary>
