@@ -1263,6 +1263,11 @@ namespace Nop.Web.Controllers
 
             var anonymousPermissed = _orderSettings.AnonymousCheckoutAllowed
                                      && _customerSettings.UserRegistrationType == UserRegistrationType.Disabled;
+            var currentStore = await _storeContext.GetCurrentStoreAsync();
+            var storesEnabled = "2";
+            if (storesEnabled.Contains(currentStore.Id.ToString())){
+                anonymousPermissed = false;
+            }
 
             if (anonymousPermissed || !await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync()))
                 return RedirectToRoute("Checkout");

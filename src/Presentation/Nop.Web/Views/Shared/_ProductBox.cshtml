@@ -55,7 +55,14 @@
         <div class="description">
             @Html.Raw(Model.ShortDescription)
         </div>
-        @await Html.PartialAsync("_Availability", Model.Details)
+        @try
+        {
+            @await Html.PartialAsync("_Availability", Model.Details)
+        }
+        catch (Exception exc)
+        {
+            <div>@exc.Message</div>
+        }
         <div class="add-info">
             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoBefore, additionalData = Model })
             <div class="prices">

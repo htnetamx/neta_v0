@@ -13,7 +13,7 @@
     <div class="page-title">
         <h1>@T("Checkout.ConfirmYourOrder")</h1>
     </div>
-    <div class="page-body checkout-data">
+    <div class="page-body checkout-data" style="padding-top: 90px">
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.CheckoutConfirmTop })
         <div class="section confirm-order">
             <form asp-route="CheckoutConfirm" method="post" id="confirm-order-form">

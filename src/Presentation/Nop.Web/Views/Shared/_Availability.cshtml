@@ -1,5 +1,5 @@
 ﻿@model ProductDetailsModel
-@if (!string.IsNullOrWhiteSpace(Model.StockAvailability) || Model.DisplayBackInStockSubscription)
+@if (!string.IsNullOrWhiteSpace(Model.StockAvailability))
 {
     try
     {
@@ -43,14 +43,13 @@
         var current_date = new Date().getTime();
         var future_date = new Date(@Model.AvailableEndDate.Value.Year,
                                     @Model.AvailableEndDate.Value.Month-1,
-                                    @Model.AvailableEndDate.Value.Day-1,
+                                    @Model.AvailableEndDate.Value.Day,
                                     21,0,0).getTime();
 
         var seconds_left = (future_date - current_date) / 1000;
 
         days = parseInt(seconds_left / 86400);
         seconds_left = seconds_left % 86400;
-        console.log(days, seconds_left)
 
         hours = parseInt(seconds_left / 3600);
         seconds_left = seconds_left % 3600;
@@ -58,7 +57,8 @@
         minutes = parseInt(seconds_left / 60);
         seconds = parseInt(seconds_left % 60);
 
-        if (days + hours + minutes + seconds <= 0) {
+        var totalTime = days + hours + minutes + seconds;
+        if (totalTime <= 0) {
             $("#counterCtrl-" + id).hide();
             $("#legendCtrl-" + id).show();
         } else {
@@ -73,7 +73,7 @@
         $("#counterCtrl-@Model.Id").hide();
         $("#legendCtrl-@Model.Id").hide();
 
-        counter();
+        counter(@Model.Id);
         window.setInterval(function () {
             counter(@Model.Id);
         }, 1000);
