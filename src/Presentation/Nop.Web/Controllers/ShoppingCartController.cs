@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
 using Nop.Core.Caching;
+using Nop.Core.Configuration;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
@@ -1263,8 +1264,11 @@ namespace Nop.Web.Controllers
 
             var anonymousPermissed = _orderSettings.AnonymousCheckoutAllowed
                                      && _customerSettings.UserRegistrationType == UserRegistrationType.Disabled;
+
+            var appSettings = EngineContext.Current.Resolve<AppSettings>();
+
             var currentStore = await _storeContext.GetCurrentStoreAsync();
-            var storesEnabled = "2";
+            var storesEnabled = appSettings.CommonConfig.StoreInWhatsappVerifyFlow;
             if (storesEnabled.Contains(currentStore.Id.ToString())){
                 anonymousPermissed = false;
             }

@@ -30,17 +30,17 @@
         }
         @if (absoluteurl.Contains("admin") || qs.Contains("admin"))
         {
-            <div class="customer-blocks">
+            <div class="customer-blocks" style="padding-top: 90px">
                 @if (Model.RegistrationType == UserRegistrationType.Disabled)
                 {
-                    <div class="new-wrapper">
+                    @*<div class="new-wrapper">
                         <div class="title">
                             @T("Account.Register")
                         </div>
                         <div class="text">
                             @T("Account.Register.Result.Disabled")
                         </div>
-                    </div>
+                    </div>*@
                 }
                 else if (Model.CheckoutAsGuest)
                 {
@@ -59,7 +59,7 @@
                 }
                 else
                 {
-                    <div class="new-wrapper register-block">
+                    @*<div class="new-wrapper register-block">
                         <div class="title">
                             <strong>@T("Account.Login.NewCustomer")</strong>
                         </div>
@@ -69,7 +69,7 @@
                         <div class="buttons">
                             <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
                         </div>
-                    </div>
+                    </div>*@
                 }
                 <div class="returning-wrapper fieldset">
                     <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
@@ -122,17 +122,17 @@
         }
         else
         {
-            <div class="customer-blocks">
+            <div class="customer-blocks" style="padding-top: 90px">
                 @if (Model.RegistrationType == UserRegistrationType.Disabled)
                 {
-                    <div class="new-wrapper">
+                    @*<div class="new-wrapper">
                         <div class="title">
                             @T("Account.Register")
                         </div>
                         <div class="text">
                             @T("Account.Register.Result.Disabled")
                         </div>
-                    </div>
+                    </div>*@
                 }
                 else if (Model.CheckoutAsGuest)
                 {
@@ -151,7 +151,7 @@
                 }
                 else
                 {
-                    <div class="new-wrapper register-block">
+                    @*<div class="new-wrapper register-block">
                         <div class="title">
                             <strong>@T("Account.Login.NewCustomer")</strong>
                         </div>
@@ -161,7 +161,7 @@
                         <div class="buttons">
                             <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
                         </div>
-                    </div>
+                    </div>*@
                 }
                 <div class="returning-wrapper fieldset">
                     <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
