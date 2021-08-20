@@ -538,6 +538,20 @@ namespace Nop.Services.Catalog
             return products.OrderBy(v => v.DisplayOrder).ToList();
         }
 
+        public virtual async Task<IList<Product>> GetAllProductsAsync()
+        {
+            var products = await _productRepository.GetAllAsync(query =>
+            {
+                return from p in query
+                       orderby p.DisplayOrder, p.Id
+                       where p.Published &&
+                             !p.Deleted
+                       select p;
+            }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductsHomepageCacheKey));
+
+            return products.OrderBy(v => v.DisplayOrder).ToList();
+        }
+
         /// <summary>
         /// Gets product
         /// </summary>

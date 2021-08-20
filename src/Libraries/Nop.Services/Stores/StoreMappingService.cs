@@ -139,6 +139,16 @@ namespace Nop.Services.Stores
             return storeMappings;
         }
 
+        public virtual async Task<IList<StoreMapping>> GetFullStoreMappingsAsync()
+        {
+            var result = await _storeMappingRepository.GetAllAsync(query =>
+            {
+                return from sm in _storeMappingRepository.Table select sm;
+            }, cache => default);
+
+            return result;
+        }
+
         /// <summary>
         /// Inserts a store mapping record
         /// </summary>
