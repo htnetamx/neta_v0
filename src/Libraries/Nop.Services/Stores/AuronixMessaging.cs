@@ -35,8 +35,8 @@ namespace Nop.Services.Stores
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-
-            //var productos = (await _productService.GetAllProductsAsync()).OrderByDescending(p => (p.OldPrice - p.Price)).Take(1);
+            if ((DateTime.UtcNow.AddHours(-5)).DayOfWeek==DayOfWeek.Sunday)
+                return;
             
             var stores = (await _storeService.GetAllStoresAsync())
                 .Where(s => s.DisplayOrder >0 && s.DisplayOrder<3);
@@ -55,7 +55,13 @@ namespace Nop.Services.Stores
             var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:promo_hoy";
             foreach (var info in query)
             {
-                Send(info.CompanyPhoneNumber, template_Link_Viralizacion, info.ProductName, info.ProductOldPrice, info.ProductPrice, info.CompanyURL);
+                if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
+                {
+                    if (info.CompanyURL == "Hteijiz.com" || info.CompanyURL == "Aposada.com" || info.CompanyURL == "DCorona.com")
+                    {
+                        Send(info.CompanyPhoneNumber, template_Link_Viralizacion, info.ProductName, info.ProductOldPrice, info.ProductPrice, info.CompanyURL);
+                    }
+                }
             }
         }
    
