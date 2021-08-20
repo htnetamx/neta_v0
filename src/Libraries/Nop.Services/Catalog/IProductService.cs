@@ -94,7 +94,7 @@ namespace Nop.Services.Catalog
         /// </returns>
         /// 
 
-        Task<IList<Product>> GetProductCuriosities(int categoryId = 0, int storeId = 0);
+        Task<IList<Product>> GetProductCategoryByName(string categoryName = "", int storeId = 0);
 
         /// <summary>
         /// Gets product

@@ -19,7 +19,6 @@ using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Services.Shipping.Date;
 using Nop.Services.Stores;
-
 namespace Nop.Services.Catalog
 {
     /// <summary>
@@ -42,6 +41,7 @@ namespace Nop.Services.Catalog
         protected readonly IRepository<DiscountProductMapping> _discountProductMappingRepository;
         protected readonly IRepository<LocalizedProperty> _localizedPropertyRepository;
         protected readonly IRepository<Product> _productRepository;
+        protected readonly IRepository<Category> _categoryRepository;
         protected readonly IRepository<ProductAttributeCombination> _productAttributeCombinationRepository;
         protected readonly IRepository<ProductAttributeMapping> _productAttributeMappingRepository;
         protected readonly IRepository<ProductCategory> _productCategoryRepository;
@@ -62,6 +62,7 @@ namespace Nop.Services.Catalog
         protected readonly IStoreMappingService _storeMappingService;
         protected readonly IStoreService _storeService;
         protected readonly IWorkContext _workContext;
+        protected readonly ICategoryService _categoryservice;
         protected readonly LocalizationSettings _localizationSettings;
 
         #endregion
@@ -81,6 +82,7 @@ namespace Nop.Services.Catalog
             IRepository<DiscountProductMapping> discountProductMappingRepository,
             IRepository<LocalizedProperty> localizedPropertyRepository,
             IRepository<Product> productRepository,
+            IRepository<Category> categoryRepository,
             IRepository<ProductAttributeCombination> productAttributeCombinationRepository,
             IRepository<ProductAttributeMapping> productAttributeMappingRepository,
             IRepository<ProductCategory> productCategoryRepository,
@@ -101,7 +103,8 @@ namespace Nop.Services.Catalog
             IStoreService storeService,
             IStoreMappingService storeMappingService,
             IWorkContext workContext,
-            LocalizationSettings localizationSettings)
+            LocalizationSettings localizationSettings,
+            ICategoryService categoryservice)
         {
             _catalogSettings = catalogSettings;
             _commonSettings = commonSettings;
@@ -116,6 +119,7 @@ namespace Nop.Services.Catalog
             _discountProductMappingRepository = discountProductMappingRepository;
             _localizedPropertyRepository = localizedPropertyRepository;
             _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
             _productAttributeCombinationRepository = productAttributeCombinationRepository;
             _productAttributeMappingRepository = productAttributeMappingRepository;
             _productCategoryRepository = productCategoryRepository;
@@ -137,6 +141,7 @@ namespace Nop.Services.Catalog
             _storeService = storeService;
             _workContext = workContext;
             _localizationSettings = localizationSettings;
+            _categoryservice = categoryservice;
         }
 
         #endregion
@@ -754,7 +759,7 @@ namespace Nop.Services.Catalog
         /// The task result contains the list of new products
         /// </returns>
         /// 
-        public virtual async Task<IList<Product>> GetProductCuriosities(int categoryId = 0, int storeId = 0)
+        public virtual async Task<IList<Product>> GetProductCategoryByName(string categoryName = "", int storeId = 0)
         {
             return await _productRepository.GetAllAsync(async query =>
             {
@@ -770,14 +775,16 @@ namespace Nop.Services.Catalog
             query = await _aclService.ApplyAcl(query, customerRoleIds);
 
             //category filtering
-            if (categoryId != 0)
+            if (categoryName != "")
             {
                 query = from p in query
                         join pc in _productCategoryRepository.Table on p.Id equals pc.ProductId
-                        where categoryId==pc.CategoryId
+                        join c in _categoryRepository.Table on pc.CategoryId equals c.Id
+                        where c.Name == categoryName
                         select p;
-            }
-                return query.OrderBy(ProductSortingEnum.CreatedOn);
+                }
+              
+             return query.OrderBy(ProductSortingEnum.CreatedOn);
             });
         }
         /// <summary>
