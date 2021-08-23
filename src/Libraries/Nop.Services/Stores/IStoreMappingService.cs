@@ -40,7 +40,7 @@ namespace Nop.Services.Stores
         /// The task result contains the store mapping records
         /// </returns>
         Task<IList<StoreMapping>> GetStoreMappingsAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported;
-
+        Task<IList<StoreMapping>> GetFullStoreMappingsAsync();
         /// <summary>
         /// Inserts a store mapping record
         /// </summary>

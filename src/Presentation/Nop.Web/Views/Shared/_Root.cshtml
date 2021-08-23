@@ -32,27 +32,31 @@
         </div>
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentAfter })
     </div>
+    @await Component.InvokeAsync("Footer")
     <script>
         window.onresize = setResize;
         setResize();
-        function setResize() {  
+        
+        function setResize() {
             if (window.innerWidth > 600) {
                 document.getElementById("logo-img").style.width = "10vw"
                 document.getElementById("shopping-cart-label").style.fontSize = "2vw"
                 document.getElementById("shopping-cart-qty").style.fontSize = "2vw"
                 document.getElementById("shopping-cart-qty").style.lineHeight = "7vh"
+                document.getElementById("foot-low").style.padding = "1vh 0 1vh 0"
             }
             else {
                 document.getElementById("logo-img").style.width = "30vw"
                 document.getElementById("shopping-cart-label").style.fontSize = "3vw"
                 document.getElementById("shopping-cart-qty").style.fontSize = "3vw"
                 document.getElementById("shopping-cart-qty").style.lineHeight = "3vh"
+                document.getElementById("foot-low").style.padding = "2vh 0 2vh 0"
             }
             var clientHeight = document.getElementById("upper-page").clientHeight;
             document.getElementById("master-wrapper-cont").style.top = (parseInt((clientHeight / window.innerHeight) * 100, 10) + 2) + "vh";
         }
-        </script>
-    @await Component.InvokeAsync("Footer")
+    </script>
+
 </div>
 @await Component.InvokeAsync("EuCookieLaw")
 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.BodyEndHtmlTagBefore })

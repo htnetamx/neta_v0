@@ -35,19 +35,25 @@
     <div class="page-body">
         <div class="search-input">
             <form asp-route="ProductSearch" method="get">
-                <div class="fieldset">
+                <div class="fieldset" style="margin-bottom: 0px;">
                     <div class="form-fields">
                         <div class="basic-search">
                             <div class="inputs">
                                 <label asp-for="q">@T("Search.SearchTerm"):</label>
                                 <input asp-for="q" class="search-text" />
                             </div>
-                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBasic })
-                            <div class="inputs reversed">
-                                <input asp-for="advs" />
-                                <label asp-for="advs">@T("Search.AdvancedSearch")</label>
-                            </div>
+                            <!--
+                        <div class="inputs reversed">
+                            <input asp-for="advs" />
+                            <label asp-for="advs">@T("Search.AdvancedSearch")</label>
                         </div>
+                        -->
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBasic })
+
+                        </div>
+
+                        <!--
+
                         <div class="advanced-search" id="advanced-search-block">
                             @if (Model.AvailableCategories.Count > 0)
                             {
@@ -60,35 +66,40 @@
                                     <label asp-for="isc">@T("Search.IncludeSubCategories")</label>
                                 </div>
                             }
-                            @if (Model.AvailableManufacturers.Count > 0)
-                            {
-                                <div class="inputs">
-                                    <label asp-for="mid">@T("Search.Manufacturer"):</label>
-                                    <select asp-for="mid" asp-items="Model.AvailableManufacturers"></select>
-                                </div>
-                            }
-                            @if (Model.asv && Model.AvailableVendors.Count > 0)
-                            {
-                                <div class="inputs">
-                                    <label asp-for="vid">@T("Search.Vendor"):</label>
-                                    <select asp-for="vid" asp-items="Model.AvailableVendors"></select>
-                                </div>
-                            }
+                        @if (Model.AvailableManufacturers.Count > 0)
+                        {
+                            <div class="inputs">
+                                <label asp-for="mid">@T("Search.Manufacturer"):</label>
+                                <select asp-for="mid" asp-items="Model.AvailableManufacturers"></select>
+                            </div>
+                        }
+                        @if (Model.asv && Model.AvailableVendors.Count > 0)
+                        {
+                            <div class="inputs">
+                                <label asp-for="vid">@T("Search.Vendor"):</label>
+                                <select asp-for="vid" asp-items="Model.AvailableVendors"></select>
+                            </div>
+                        }
                             <div class="inputs reversed">
                                 <input asp-for="sid" />
                                 <label asp-for="sid">@T("Search.SearchInDescriptions")</label>
                             </div>
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageAdvanced })
                         </div>
+                    -->
+
                     </div>
                 </div>
-                <div class="buttons">
-                    <button type="submit" class="button-1 search-button">@T("Search.Button")</button>
-                    <button type="button" class="button-1 search-button" onclick="window.location = '/';">VOLVER A INICIO</button>
-                </div>
+                <div class="buttons" style="display:flex;flex-direction:column;width: 70%;margin-left: 15%;">
+                    <button style="margin: 2vh 0vh " type="submit" class="button-1 search-button">@T("Search.Button")</button>
+                    <button type="button" class="button-1 search-button" onclick="window.location = '/';">Regresa a la página principal</button>
+</div>
             </form>
         </div>
-        @await Html.PartialAsync("_CatalogSelectors", Model.CatalogProductsModel)
+    
+         @*@await Html.PartialAsync("_CatalogSelectors", Model.CatalogProductsModel)*@
+ 
+
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })
         <div class="search-results">
             @{
