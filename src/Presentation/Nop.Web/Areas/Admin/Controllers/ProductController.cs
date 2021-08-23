@@ -852,7 +852,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 product.UpdatedOnUtc = DateTime.UtcNow;
 
                 //Se usa en el calculo de cantidades en Promociones
-                product.MaxNumberOfDownloads = product.StockQuantity;                
+                product.MaxNumberOfDownloads = 20;
                 //No tenemos envio, ya que se pasa a buscar por pickup
                 product.IsShipEnabled = false;
 
@@ -976,8 +976,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 product = model.ToEntity(product);
 
                 //Se usa en el calculo de cantidades en Promociones
-                if (product.StockQuantity > product.MaxNumberOfDownloads)
-                    product.MaxNumberOfDownloads = product.StockQuantity;
+                product.MaxNumberOfDownloads = 20;
                 //No tenemos envio, ya que se pasa a buscar por pickup
                 product.IsShipEnabled = false;
 

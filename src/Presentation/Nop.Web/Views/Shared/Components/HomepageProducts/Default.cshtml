@@ -60,9 +60,12 @@
             <div class="item-grid">
                 @foreach (var item in Model.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
                 {
-                    <div class="item-box">
-                        @await Html.PartialAsync("_ProductBox", item)
-                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.Details.StockAvailability))
+                    {
+                        <div class="item-box">
+                            @await Html.PartialAsync("_ProductBox", item)
+                        </div>
+                    }
                 }
             </div>
         </div>

@@ -10,7 +10,7 @@
             <div class="stock">
                 <span class="value">@Model.CurrentStoreName</span>
             </div>
-            @if (Model.AvailableEndDate.HasValue)
+            @if ((Model.AvailableEndDate ?? DateTime.MinValue) > DateTime.UtcNow)
             {
                 <div id="counterCtrl-@Model.Id">
                     <div class="stock">
@@ -39,32 +39,27 @@
                 </div>
 
                 <script asp-location="Footer">
-    function counter(id) {
-        var current_date = new Date().getTime();
-        var future_date = new Date(@Model.AvailableEndDate.Value.Year,
-                                    @Model.AvailableEndDate.Value.Month-1,
-                                    @Model.AvailableEndDate.Value.Day,
-                                    21,0,0).getTime();
+                    function counter(id, future_date) {
+                        var current_date = new Date().getTime();
+                        var seconds_left = (future_date - current_date) / 1000;
 
-        var seconds_left = (future_date - current_date) / 1000;
+                        days = parseInt(seconds_left / 86400);
+                        seconds_left = seconds_left % 86400;
 
-        days = parseInt(seconds_left / 86400);
-        seconds_left = seconds_left % 86400;
+                        hours = parseInt(seconds_left / 3600);
+                        seconds_left = seconds_left % 3600;
 
-        hours = parseInt(seconds_left / 3600);
-        seconds_left = seconds_left % 3600;
+                        minutes = parseInt(seconds_left / 60);
+                        seconds = parseInt(seconds_left % 60);
 
-        minutes = parseInt(seconds_left / 60);
-        seconds = parseInt(seconds_left % 60);
-
-        var totalTime = days + hours + minutes + seconds;
-        if (totalTime <= 0) {
-            $("#counterCtrl-" + id).hide();
-            $("#legendCtrl-" + id).show();
-        } else {
-            $("#counterCtrl-" + id).show();
-            $("#legendCtrl-" + id).hide();
-        }
+                        var totalTime = days + hours + minutes + seconds;
+                        if (totalTime <= 0) {
+                            $("#counterCtrl-" + id).hide();
+                            $("#legendCtrl-" + id).show();
+                        } else {
+                            $("#counterCtrl-" + id).show();
+                            $("#legendCtrl-" + id).hide();
+                        }
 
         var countdown = days + "d, " + hours + "h, " + minutes + "m, " + seconds + "s";
         $("#stock-availabilityenddate-value-" + id).text(countdown + " para que la promoción cierre");
@@ -73,9 +68,13 @@
         $("#counterCtrl-@Model.Id").hide();
         $("#legendCtrl-@Model.Id").hide();
 
-        counter(@Model.Id);
+        var future_date = new Date(@Model.AvailableEndDate.Value.Year,
+                                    @Model.AvailableEndDate.Value.Month-1,
+                                    @Model.AvailableEndDate.Value.Day-1,21,0,0,0).getTime();
+
+        counter(@Model.Id, future_date);
         window.setInterval(function () {
-            counter(@Model.Id);
+            counter(@Model.Id, future_date);
         }, 1000);
     });
                 </script>
