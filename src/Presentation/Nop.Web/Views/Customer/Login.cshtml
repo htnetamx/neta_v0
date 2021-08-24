@@ -3,6 +3,7 @@
 @using Nop.Core.Domain.Customers
 
 @inject IWebHelper webHelper
+@inject IStoreContext storeConext
 @{
     Layout = "_ColumnsOne";
 
@@ -164,8 +165,9 @@
                     </div>*@
                 }
                 <div class="returning-wrapper fieldset">
-                    <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
-                        <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
+                    <form id="formVerifData" asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+                        @*<div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>*@
+                        <div asp-validation-summary="ModelOnly" class="message-error"></div>
                         <div class="title">
                             <strong>Necesitamos tu datos</strong>
                         </div>
@@ -229,12 +231,24 @@
 
         $(document).ready(function () {
             $("#btnCodeVerif").click(() => {
-                $("#btnLogin").show();
-                $("#codeVerifContainer").show();
-                $("#btnCodeVerif").hide();
-
-                alert("Emulando envio de Código --> Código envido " + @codeRandom);
-
+                $.ajax({
+                    cache: false,
+                    url: "@(storeConext.GetCurrentStore().Url)checkout/PostVerifyMessage/",
+                    data: $("#formVerifData").serialize(),
+                    type: 'POST',
+                    success: function (response) {
+                        $("#btnLogin").show();
+                        $("#codeVerifContainer").show();
+                        $("#btnCodeVerif").hide();
+                    },
+                    error: function (err) {
+                    },
+                    complete: function (jqXHR, textStatus) {
+                        $("#btnLogin").show();
+                        $("#codeVerifContainer").show();
+                        $("#btnCodeVerif").hide();
+                    }
+                });
             });
         });
 
