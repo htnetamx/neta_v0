@@ -1,7 +1,9 @@
 ﻿@model SearchBoxModel
 <div class="topic-block" style="margin:0px;padding: 0px">
     <div class="topic-block-title" style="margin: 0px; padding: 0px; min-height: 0px">
-        <h2>@Model.CurrentStoreName</h2>
+        <a href="@Url.RouteUrl("Homepage")" style="text-decoration:none;">
+            <h2 href="@Url.RouteUrl("Homepage")">@Model.CurrentStoreName</h2>
+        </a>
     </div>
 </div>
 @{
