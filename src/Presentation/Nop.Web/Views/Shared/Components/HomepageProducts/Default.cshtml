@@ -1,28 +1,34 @@
 ﻿@model IList<ProductOverviewModel>
-    <div style="margin-bottom: 5%">
-        <hr />
-        <br />
-            <br />
-                <div style="justify-content: space-around; display:flex">
-                    <a class="button-1 search-box-button" href="/newproducts">NUEVOS PRODUCTOS</a>
-                    <a class="button-1 search-box-button" href="/products/curiosities">CURIOSIDADES NETA</a>
-                </div>
-            <br />
-        <br />
-        <hr />
+@inject Nop.Core.IStoreContext storeContext
+    <div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh">
+        <a style="background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw" href="/newproducts">Haz click aqui para nuevos productos</a>
+        <a style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw "  href="/curiosities">Haz click y descubre curiosidades neta</a>
     </div>
     
     
     @if (Model.Count > 0)
     {
+        var store = storeContext.GetCurrentStore();
+        if (store.Id == 165)
+        {
+            ViewBag.RoyaltyMessage = null;
+                }
         if (ViewBag.RoyaltyMessage != null)
         {
+            if (store.Id == 49)
+            {
+                ViewBag.RoyaltyMessage = "2.5%";
+            }
+            else
+            {
+                ViewBag.RoyaltyMessage = "5%";
+            }
             <div class="product-grid home-page-product-grid">
                 <div class="title">
-                    <strong>5% de descuento parejo para nuestros clientes los más neta!</strong>
+                    <strong>@ViewBag.RoyaltyMessage de descuento parejo para nuestros clientes los más neta!</strong>
                 </div>
                 <div class="item-grid">
-                    <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
+                    <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un @ViewBag.RoyaltyMessage de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
                 </div>
             </div>
         }
@@ -35,7 +41,7 @@
                         <strong>Super promoción del día para nuestros clientes los más neta!</strong>
                     </div>
                     <h2>Acumula $300 pesos o mas de compras en la semana y entra a la super promo diaria! No te quedes sin este beneficio</h2>
-                    <h2>Las servilletas pétalo están a $20 con tu código!</h2>
+                    <h2>El electrolit coco suero está a $8 con tu código!</h2>
                     <div class="item-grid">
                         @foreach (var item in Model.Where(v => v.MarkAsLoyalty))
                         {
@@ -54,9 +60,12 @@
             <div class="item-grid">
                 @foreach (var item in Model.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
                 {
-                    <div class="item-box">
-                        @await Html.PartialAsync("_ProductBox", item)
-                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.Details.StockAvailability))
+                    {
+                        <div class="item-box">
+                            @await Html.PartialAsync("_ProductBox", item)
+                        </div>
+                    }
                 }
             </div>
         </div>
@@ -64,12 +73,14 @@
             <div class="title">
                 <strong>Nuestra oferta de precios bajos!</strong>
             </div>
-            <div class="item-grid">
-                @foreach (var item in Model.Where(v => !v.MarkAsNew).OrderBy(v => v.DisplayOrder))
-                {
-                    <div class="item-box">
-                        @await Html.PartialAsync("_ProductBox", item)
-                    </div>
+            <div id="product_list" class="item-grid">          
+                @{
+                    foreach (var item in Model.Where(v => !v.MarkAsNew).OrderBy(v => v.DisplayOrder))
+                    {
+                        <div class="item-box">
+                            @await Html.PartialAsync("_ProductBox", item)
+                        </div>
+                    }
                 }
             </div>
         </div>

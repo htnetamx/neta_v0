@@ -5,8 +5,8 @@
 
 @inject IWorkContext workContext
 
-<div class="footer">
-    <div class="footer-lower">
+<div class="footer" style="position: fixed; left: 0;bottom:0;width:100vw;height: 5vh">
+    <div class="footer-lower" id="foot-low" style="display:flex;justify-content:center">
         <div class="footer-info">
             <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
         </div>

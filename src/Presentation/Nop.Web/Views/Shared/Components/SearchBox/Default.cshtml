@@ -1,14 +1,16 @@
 ﻿@model SearchBoxModel
-<div class="topic-block">
-    <div class="topic-block-title">
-        <h2>@Model.CurrentStoreName</h2>
+<div class="topic-block" style="margin:0px;padding: 0px">
+    <div class="topic-block-title" style="margin: 0px; padding: 0px; min-height: 0px">
+        <a href="@Url.RouteUrl("Homepage")" style="text-decoration:none;">
+            <h2 href="@Url.RouteUrl("Homepage")">@Model.CurrentStoreName</h2>
+        </a>
     </div>
 </div>
 @{
     string absoluteurl = Context.Request.Path;
     if (!absoluteurl.Contains("search"))
     {
-        <form asp-route="ProductSearch" method="get" id="small-search-box-form">
+        <form asp-route="ProductSearch" method="get" id="small-search-box-form" style="display: flex;flex-wrap: wrap;justify-content: flex-end;">
             @if (Model.ShowSearchBox)
             {
                 <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" name="q" placeholder="@T("Search.SearchBox.Tooltip")" aria-label="@T("Search.SearchBox.Text.Label")" />

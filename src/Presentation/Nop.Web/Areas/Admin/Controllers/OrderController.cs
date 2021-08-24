@@ -1313,17 +1313,25 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 var qtyDifference = orderItem.Quantity - quantity;
 
-                if (!_orderSettings.AutoUpdateOrderTotalsOnEditingOrder)
-                {
-                    orderItem.UnitPriceInclTax = unitPriceInclTax;
-                    orderItem.UnitPriceExclTax = unitPriceExclTax;
-                    orderItem.Quantity = quantity;
-                    orderItem.DiscountAmountInclTax = discountInclTax;
-                    orderItem.DiscountAmountExclTax = discountExclTax;
-                    orderItem.PriceInclTax = priceInclTax;
-                    orderItem.PriceExclTax = priceExclTax;
-                    await _orderService.UpdateOrderItemAsync(orderItem);
-                }
+                //if (!_orderSettings.AutoUpdateOrderTotalsOnEditingOrder)
+                //{
+                //    orderItem.UnitPriceInclTax = unitPriceInclTax;
+                //    orderItem.UnitPriceExclTax = unitPriceExclTax;
+                //    orderItem.Quantity = quantity;
+                //    orderItem.DiscountAmountInclTax = discountInclTax;
+                //    orderItem.DiscountAmountExclTax = discountExclTax;
+                //    orderItem.PriceInclTax = priceInclTax;
+                //    orderItem.PriceExclTax = priceExclTax;
+                //    await _orderService.UpdateOrderItemAsync(orderItem);
+                //}
+                orderItem.UnitPriceInclTax = unitPriceInclTax;
+                orderItem.UnitPriceExclTax = unitPriceExclTax;
+                orderItem.Quantity = quantity;
+                orderItem.DiscountAmountInclTax = discountInclTax;
+                orderItem.DiscountAmountExclTax = discountExclTax;
+                orderItem.PriceInclTax = priceInclTax;
+                orderItem.PriceExclTax = priceExclTax;
+                await _orderService.UpdateOrderItemAsync(orderItem);
 
                 //adjust inventory
                 await _productService.AdjustInventoryAsync(product, qtyDifference, orderItem.AttributesXml,

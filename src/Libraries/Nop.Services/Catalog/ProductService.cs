@@ -19,7 +19,6 @@ using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Services.Shipping.Date;
 using Nop.Services.Stores;
-
 namespace Nop.Services.Catalog
 {
     /// <summary>
@@ -42,6 +41,7 @@ namespace Nop.Services.Catalog
         protected readonly IRepository<DiscountProductMapping> _discountProductMappingRepository;
         protected readonly IRepository<LocalizedProperty> _localizedPropertyRepository;
         protected readonly IRepository<Product> _productRepository;
+        protected readonly IRepository<Category> _categoryRepository;
         protected readonly IRepository<ProductAttributeCombination> _productAttributeCombinationRepository;
         protected readonly IRepository<ProductAttributeMapping> _productAttributeMappingRepository;
         protected readonly IRepository<ProductCategory> _productCategoryRepository;
@@ -62,6 +62,7 @@ namespace Nop.Services.Catalog
         protected readonly IStoreMappingService _storeMappingService;
         protected readonly IStoreService _storeService;
         protected readonly IWorkContext _workContext;
+        protected readonly ICategoryService _categoryservice;
         protected readonly LocalizationSettings _localizationSettings;
 
         #endregion
@@ -81,6 +82,7 @@ namespace Nop.Services.Catalog
             IRepository<DiscountProductMapping> discountProductMappingRepository,
             IRepository<LocalizedProperty> localizedPropertyRepository,
             IRepository<Product> productRepository,
+            IRepository<Category> categoryRepository,
             IRepository<ProductAttributeCombination> productAttributeCombinationRepository,
             IRepository<ProductAttributeMapping> productAttributeMappingRepository,
             IRepository<ProductCategory> productCategoryRepository,
@@ -101,7 +103,8 @@ namespace Nop.Services.Catalog
             IStoreService storeService,
             IStoreMappingService storeMappingService,
             IWorkContext workContext,
-            LocalizationSettings localizationSettings)
+            LocalizationSettings localizationSettings,
+            ICategoryService categoryservice)
         {
             _catalogSettings = catalogSettings;
             _commonSettings = commonSettings;
@@ -116,6 +119,7 @@ namespace Nop.Services.Catalog
             _discountProductMappingRepository = discountProductMappingRepository;
             _localizedPropertyRepository = localizedPropertyRepository;
             _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
             _productAttributeCombinationRepository = productAttributeCombinationRepository;
             _productAttributeMappingRepository = productAttributeMappingRepository;
             _productCategoryRepository = productCategoryRepository;
@@ -137,6 +141,7 @@ namespace Nop.Services.Catalog
             _storeService = storeService;
             _workContext = workContext;
             _localizationSettings = localizationSettings;
+            _categoryservice = categoryservice;
         }
 
         #endregion
@@ -538,6 +543,20 @@ namespace Nop.Services.Catalog
             return products.OrderBy(v => v.DisplayOrder).ToList();
         }
 
+        public virtual async Task<IList<Product>> GetAllProductsAsync()
+        {
+            var products = await _productRepository.GetAllAsync(query =>
+            {
+                return from p in query
+                       orderby p.DisplayOrder, p.Id
+                       where p.Published &&
+                             !p.Deleted
+                       select p;
+            }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductsHomepageCacheKey));
+
+            return products.OrderBy(v => v.DisplayOrder).ToList();
+        }
+
         /// <summary>
         /// Gets product
         /// </summary>
@@ -723,13 +742,49 @@ namespace Nop.Services.Catalog
                query = await _aclService.ApplyAcl(query, customer);
                var dias = 2;
                var myDate = DateTime.UtcNow.AddDays(-dias);
-                query = from p in query
+               query = from p in query
                         where p.Published
                         && !p.Deleted
                         && p.CreatedOnUtc >= myDate
-                select p;
-                return query.Take(_catalogSettings.NewProductsNumber)
-                    .OrderBy(ProductSortingEnum.CreatedOn);
+                        select p;
+                return query.OrderBy(ProductSortingEnum.CreatedOn);
+            });
+        }
+        /// <summary>
+        /// Gets products which are part of the curiosities category
+        /// </summary>
+        /// <param name="storeId">Store identifier; 0 if you want to get all records</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the list of new products
+        /// </returns>
+        /// 
+        public virtual async Task<IList<Product>> GetProductCategoryByName(string categoryName = "", int storeId = 0)
+        {
+            return await _productRepository.GetAllAsync(async query =>
+            {
+
+            query = _productRepository.Table.Where(p => p.Published && !p.Deleted);
+
+            //apply store mapping constraints
+            query = await _storeMappingService.ApplyStoreMapping(query, storeId);
+
+            //apply ACL constraints
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+            query = await _aclService.ApplyAcl(query, customerRoleIds);
+
+            //category filtering
+            if (categoryName != "")
+            {
+                query = from p in query
+                        join pc in _productCategoryRepository.Table on p.Id equals pc.ProductId
+                        join c in _categoryRepository.Table on pc.CategoryId equals c.Id
+                        where c.Name == categoryName
+                        select p;
+                }
+              
+             return query.OrderBy(ProductSortingEnum.CreatedOn);
             });
         }
         /// <summary>

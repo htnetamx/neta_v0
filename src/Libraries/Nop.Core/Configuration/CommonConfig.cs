@@ -49,5 +49,7 @@
         /// Get or set the blacklist of static file extension for plugin directories
         /// </summary>
         public string PluginStaticFileExtensionsBlacklist { get; set; } = "";
+
+        public string StoreInWhatsappVerifyFlow { get; set; } = "";
     }
 }
