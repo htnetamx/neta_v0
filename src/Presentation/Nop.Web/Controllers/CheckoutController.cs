@@ -327,6 +327,15 @@ namespace Nop.Web.Controllers
             return Content(json, "application/json");
         }
 
+        public virtual async Task<IActionResult> PostVerifyMessage(IFormCollection form)
+        {
+            NetaAuronixMessaging.Send(form["Password"], 
+                "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion", 
+                form["code_generated"]);
+            
+            return Content("{'rta': true }", "application/json");
+        }
+
         /// <summary>
         /// Save edited address
         /// </summary>
@@ -1143,20 +1152,19 @@ namespace Nop.Web.Controllers
                         list.Add(item.Quantity.ToString());
                     }
 
-                    var name = "Netero";
-                    if((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
-                    {
-                        var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-                        name = customer.FirstName;
-                    }
-
-                    NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username, 
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_horario",
-                        name,
-                        list.ToArray(),
-                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
-                        (await _storeContext.GetCurrentStoreAsync()).Name,
-                        "5pm", "https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 " + (await _storeContext.GetCurrentStoreAsync()).Url);
+                    //var name = "Netero";
+                    //if((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
+                    //{
+                    //    var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                    //    name = customer.FirstName;
+                    //}
+                    //NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username, 
+                    //    "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_horario",
+                    //    name,
+                    //    list.ToArray(),
+                    //    placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                    //    (await _storeContext.GetCurrentStoreAsync()).Name,
+                    //    "5pm", "https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 " + (await _storeContext.GetCurrentStoreAsync()).Url);
 
                     return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
                 }
@@ -1899,20 +1907,19 @@ namespace Nop.Web.Controllers
                         list.Add(item.Quantity.ToString());
                     }
 
-                    var name = "Netero";
-                    if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
-                    {
-                        var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-                        name = customer.FirstName;
-                    }
-
-                    NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_horario",
-                        name,
-                        list.ToArray(),
-                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
-                        (await _storeContext.GetCurrentStoreAsync()).Name,
-                        "5pm", "https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 " + (await _storeContext.GetCurrentStoreAsync()).Url);
+                    //var name = "Netero";
+                    //if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
+                    //{
+                    //    var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                    //    name = customer.FirstName;
+                    //}
+                    //NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
+                    //    "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_horario",
+                    //    name,
+                    //    list.ToArray(),
+                    //    placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                    //    (await _storeContext.GetCurrentStoreAsync()).Name,
+                    //    "5pm", "https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 " + (await _storeContext.GetCurrentStoreAsync()).Url);
 
 
                     var paymentMethod = await _paymentPluginManager

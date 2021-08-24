@@ -80,7 +80,8 @@ namespace Nop.Web.Components
             //Descuentos con para la orden completa
             if (discounts.Where(v => v.DiscountTypeId == 1).Any())
             {
-                ViewBag.RoyaltyMessage = "Royalty Program a Nivel de Orden";
+                var first = discounts.Where(v => v.DiscountTypeId == 1).First();
+                ViewBag.RoyaltyMessage = $"{first.DiscountPercentage.ToString()}% de descuento parejo para nuestros clientes los más neta!";
             }
 
             

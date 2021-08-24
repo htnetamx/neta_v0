@@ -119,6 +119,7 @@ namespace Nop.Web.Models.Catalog
         public int StockQuantity { get; set; }
         public decimal CurrentStockQuantity { get; set; }
         public decimal CurrentProductQuantity { get; set; }
+        public bool ShowOnHomePage { get; set; }
 
         #region Nested Classes
 
