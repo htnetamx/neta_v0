@@ -1659,16 +1659,17 @@ namespace Nop.Web.Factories
 
             //sorting
             await PrepareSortingOptionsAsync(model, command);
+
             //view mode
             await PrepareViewModesAsync(model, command);
             //page size
+
             await PreparePageSizeOptionsAsync(model, command, _catalogSettings.SearchPageAllowCustomersToSelectPageSize,
                 _catalogSettings.SearchPagePageSizeOptions, _catalogSettings.SearchPageProductsPerPage);
-
+    
             var searchTerms = searchModel.q == null
                 ? string.Empty
                 : searchModel.q.Trim();
-
             IPagedList<Product> products = new PagedList<Product>(new List<Product>(), 0, 1);
             // only search if query string search keyword is set (used to aasync Task searching or displaying search term min length error message on /search page load)
             //we don't use "!string.IsNullOrEmpty(searchTerms)" in cases of "ProductSearchTermMinimumLength" set to 0 but searching by other parameters (e.g. category or price filter)
@@ -1759,7 +1760,7 @@ namespace Nop.Web.Factories
 
                         model.PriceRangeFilter = await PreparePriceRangeFilterAsync(selectedPriceRange, availablePriceRange);
                     }
-
+                    
                     //products
                     products = await _productService.SearchProductsAsync(
                         command.PageNumber - 1,
@@ -1776,7 +1777,6 @@ namespace Nop.Web.Factories
                         languageId: workingLanguage.Id,
                         orderBy: (ProductSortingEnum)command.OrderBy,
                         vendorId: vendorId);
-
                     //search term statistics
                     if (!string.IsNullOrEmpty(searchTerms))
                     {
@@ -1798,7 +1798,6 @@ namespace Nop.Web.Factories
                             await _searchTermService.InsertSearchTermAsync(searchTerm);
                         }
                     }
-
                     //event
                     await _eventPublisher.PublishAsync(new ProductSearchEvent
                     {
@@ -1811,10 +1810,8 @@ namespace Nop.Web.Factories
                     });
                 }
             }
-
             var isFiltering = !string.IsNullOrEmpty(searchTerms);
             await PrepareCatalogProductsAsync(model, products, isFiltering);
-
             return model;
         }
 
@@ -1929,6 +1926,7 @@ namespace Nop.Web.Factories
         public virtual Task PreparePageSizeOptionsAsync(CatalogProductsModel model, CatalogProductsCommand command,
             bool allowCustomersToSelectPageSize, string pageSizeOptions, int fixedPageSize)
         {
+
             if (command.PageNumber <= 0)
                 command.PageNumber = 1;
 

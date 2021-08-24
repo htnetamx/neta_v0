@@ -55,18 +55,9 @@
         <div class="title">
             <strong>Nuestra oferta de precios bajos!</strong>
         </div>
-        @*<div id="product_list" class="item-grid">
-            @{
-                foreach (var item in Model.CatalogProductsModel.Products.Where(v => !v.MarkAsNew).OrderBy(v => v.DisplayOrder))
-                {
-                    <div class="item-box">
-                        @await Html.PartialAsync("_ProductBox", item)
-                    </div>
-                }
-            }
-        </div>*@
+        @*Hide Order By and page size
         @await Html.PartialAsync("_CatalogSelectors", Model.CatalogProductsModel)
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })*@
     <div class="search-results">
         @{
             var catalogProductsViewData = new ViewDataDictionary(ViewData);
@@ -74,26 +65,6 @@
             var a = catalogProductsViewData;
         }
         @await Html.PartialAsync("_CatalogProducts", Model.CatalogProductsModel, catalogProductsViewData)
-        <script asp-location="Footer">
-                $(document).ready(function () {
-                    $(CatalogProducts).on('before', function (e) {
-                        var isAdvanced = $('#@Html.IdFor(model => model.advs)').is(':checked');
-
-                        e.payload.urlBuilder
-                            .addParameter('q', $('#@Html.IdFor(model => model.q)').val())
-                            .addParameter('advs', isAdvanced);
-
-                        if (isAdvanced) {
-                            e.payload.urlBuilder
-                                .addParameter('cid', $('#@Html.IdFor(model => model.cid)').val())
-                                .addParameter('isc', $('#@Html.IdFor(model => model.isc)').is(':checked'))
-                                .addParameter('mid', $('#@Html.IdFor(model => model.mid)').val())
-                                .addParameter('vid', $('#@Html.IdFor(model => model.vid)').val())
-                                .addParameter('sid', $('#@Html.IdFor(model => model.sid)').is(':checked'));
-                        }
-                    });
-                });
-        </script>
     </div>
     </div>
 

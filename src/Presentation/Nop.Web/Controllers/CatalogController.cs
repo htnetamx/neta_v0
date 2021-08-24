@@ -301,6 +301,7 @@ namespace Nop.Web.Controllers
 
         public virtual async Task<IActionResult> Search(SearchModel model, CatalogProductsCommand command)
         {
+
             //'Continue shopping' URL
             await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(),
                 NopCustomerDefaults.LastContinueShoppingPageAttribute,
@@ -309,7 +310,6 @@ namespace Nop.Web.Controllers
 
             if (model == null)
                 model = new SearchModel();
-
             model = await _catalogModelFactory.PrepareSearchModelAsync(model, command);
 
             return View(model);

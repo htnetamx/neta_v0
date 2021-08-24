@@ -866,6 +866,7 @@ namespace Nop.Services.Catalog
             bool showHidden = false,
             bool? overridePublished = null)
         {
+            
             //some databases don't support int.MaxValue
             if (pageSize == int.MaxValue)
                 pageSize = int.MaxValue - 1;
@@ -903,7 +904,7 @@ namespace Nop.Services.Catalog
                     (priceMin == null || p.Price >= priceMin) &&
                     (priceMax == null || p.Price <= priceMax)
                 select p;
-
+ 
             if (!string.IsNullOrEmpty(keywords))
             {
                 var langs = await _languageService.GetAllLanguagesAsync(showHidden: true);
@@ -1050,7 +1051,7 @@ namespace Nop.Services.Catalog
                         select p;
                 }
             }
-            
+
             return await productsQuery.OrderBy(orderBy).ToPagedListAsync(pageIndex, pageSize);
         }
 

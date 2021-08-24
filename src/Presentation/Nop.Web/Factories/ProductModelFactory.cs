@@ -1304,22 +1304,9 @@ namespace Nop.Web.Factories
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
-
-            var model = new CatalogProductsModel
-            {
-                UseAjaxLoading = _catalogSettings.UseAjaxCatalogProductsLoading
-            };
-
-
-            ////sorting
-            //await PrepareSortingOptionsAsync(model, command);
-            ////view mode
-            //await PrepareViewModesAsync(model, command);
-            ////page size
-            //await PreparePageSizeOptionsAsync(model, command, _catalogSettings.SearchPageAllowCustomersToSelectPageSize,
-            //    _catalogSettings.SearchPagePageSizeOptions, _catalogSettings.SearchPageProductsPerPage);
-
-            IPagedList<Product> products = new PagedList<Product>(products1.ToList(), 0, 1);
+            var queryable = products1.AsQueryable().OrderBy((ProductSortingEnum)command.OrderBy);
+            IPagedList<Product> products = new PagedList<Product>(queryable.ToList(), command.PageNumber, command.PageSize);
+         
             return products;
         }
 
