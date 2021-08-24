@@ -1,5 +1,5 @@
 ﻿{
-  "DataConnectionString": "server=localhost;database=netamxnop;allowuservariables=True;user id=root;password=Temp@1324",
+  "DataConnectionString": "server=localhost;database=netamx;allowuservariables=True;user id=root;password=Andresposada015!",
   "DataProvider": "mysql",
   "SQLCommandTimeout": null,
   "RawDataSettings": {}

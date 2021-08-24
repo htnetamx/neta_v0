@@ -1,14 +1,4 @@
 ﻿@model Nop.Web.Models.Catalog.SearchModel
-<div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh">
-    <a class="button-1 search-box-button" href="/newproducts">NUEVOS PRODUCTOS</a>
-    <a class="button-1 search-box-button" href="/curiosities">CURIOSIDADES NETA</a>
-</div>
-
-@if (Model.CatalogProductsModel.Products.Count > 0)
-{
-    if (ViewBag.RoyaltyMessage != null)
-    {
-﻿@model IList<ProductOverviewModel>
 @inject Nop.Core.IStoreContext storeContext
     <div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh">
         <a style="background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw" href="/newproducts">Haz click aqui para nuevos productos</a>
@@ -16,7 +6,7 @@
     </div>
     
     
-    @if (Model.Count > 0)
+    @if (Model.CatalogProductsModel.Products.Count > 0)
     {
         var store = storeContext.GetCurrentStore();
         if (store.Id == 165)
@@ -44,7 +34,7 @@
         }
         else
         {
-            if (Model.Where(v => v.MarkAsLoyalty).Any())
+            if (Model.CatalogProductsModel.Products.Where(v => v.MarkAsLoyalty).Any())
             {
                 <div class="product-grid home-page-product-grid">
                     <div class="title">
@@ -53,7 +43,7 @@
                     <h2>Acumula $300 pesos o mas de compras en la semana y entra a la super promo diaria! No te quedes sin este beneficio</h2>
                     <h2>El electrolit coco suero está a $8 con tu código!</h2>
                     <div class="item-grid">
-                        @foreach (var item in Model.Where(v => v.MarkAsLoyalty))
+                        @foreach (var item in Model.CatalogProductsModel.Products.Where(v => v.MarkAsLoyalty))
                         {
                             <div class="item-box">
                                 @await Html.PartialAsync("_ProductBox", item)
@@ -69,7 +59,7 @@
             </div>
             <div class="item-grid">
                 <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
-                @foreach (var item in Model.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
+                @foreach (var item in Model.CatalogProductsModel.Products.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
                 {
                     @if (!string.IsNullOrWhiteSpace(item.Details.StockAvailability))
                     {
@@ -102,19 +92,21 @@
             </div>
         }
     }
-    <div class="product-grid home-page-product-grid">
-        <div class="title">
-            <strong>@T("Homepage.Products")</strong>
-        </div>
-        <div class="item-grid">
+    
+
+        <div class="product-grid home-page-product-grid">
+            <div class="title">
+                <strong>@T("Homepage.Products")</strong>
+            </div>
+            <div class="item-grid">
             @foreach (var item in Model.CatalogProductsModel.Products.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
             {
                 <div class="item-box">
                     @await Html.PartialAsync("_ProductBox", item)
                 </div>
             }
+            </div>
         </div>
-    </div>
     <div class="product-grid home-page-product-grid">
         <div class="title">
             <strong>Nuestra oferta de precios bajos!</strong>
