@@ -55,6 +55,50 @@
     }
   },
 
+
+  getProductsBySize: function (pageSize) {
+    if (this.params.jqXHR && this.params.jqXHR.readyState !== 4) {
+      this.params.jqXHR.abort();
+    }
+
+    var urlBuilder = createProductsURLBuilder(this.settings.browserPath);
+
+    if (pageSize) {
+      urlBuilder.addParameter('pagesize', pageSize);
+    }
+
+    var beforePayload = {
+      urlBuilder
+    };
+    $(this).trigger({ type: "before", payload: beforePayload });
+
+    this.setBrowserHistory(urlBuilder.build());
+
+    if (!this.settings.ajax) {
+      setLocation(urlBuilder.build());
+    } else {
+      this.setLoadWaiting(1);
+
+      var self = this;
+      this.params.jqXHR = $.ajax({
+        cache: false,
+        url: urlBuilder.addBaseUrl(this.settings.fetchUrl).build(),
+        type: 'GET',
+        success: function (response) {
+          $('.products-wrapper').html(response);
+          $(self).trigger({ type: "loaded" });
+        },
+        error: function () {
+          $(self).trigger({ type: "error" });
+        },
+        complete: function () {
+          self.setLoadWaiting();
+        }
+      });
+    }
+  },
+
+
   setLoadWaiting(enable) {
     var $busyEl = $('.ajax-products-busy');
     if (enable) {

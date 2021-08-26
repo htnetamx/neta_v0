@@ -1296,6 +1296,22 @@ namespace Nop.Web.Factories
             return models;
         }
 
+
+        public virtual async Task<IPagedList<Product>> PrepareProductOverviewModelsAsync1(IEnumerable<Product> products1,
+            bool preparePriceModel = true, bool preparePictureModel = true,
+            int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
+            bool forceRedirectionAfterAddingToCart = false, IList<Core.Domain.Discounts.Discount> discounts = null,
+            CatalogProductsCommand command=null)
+        {
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+
+            var queryable = products1.AsQueryable().OrderBy((ProductSortingEnum)command.OrderBy);
+            IPagedList<Product> products = new PagedList<Product>(queryable.ToList(), command.PageNumber, command.PageSize);
+         
+            return products;
+        }
+
         /// <summary>
         /// Prepare the product combination models
         /// </summary>

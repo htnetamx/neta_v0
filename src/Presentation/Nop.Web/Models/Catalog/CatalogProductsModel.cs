@@ -86,6 +86,11 @@ namespace Nop.Web.Models.Catalog
         /// </summary>
         public IList<ProductOverviewModel> Products { get; set; }
 
+        public int MaxProducts { get; set; }
+        public string MinimumProducts { get; set; }
+        public string Increment { get; set; }
+        public string StartingProducts { get; set; }
+        
         #endregion
 
         #region Ctor
@@ -99,6 +104,11 @@ namespace Nop.Web.Models.Catalog
             AvailableViewModes = new List<SelectListItem>();
             PageSizeOptions = new List<SelectListItem>();
             Products = new List<ProductOverviewModel>();
+            MaxProducts = 0;
+            MinimumProducts = "0";
+            Increment = "0";
+            StartingProducts = "0";
+
         }
 
         #endregion

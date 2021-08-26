@@ -23,7 +23,7 @@
                 <a class="viewmode-icon list @if (listMode.Selected){<text>selected</text>}" data-viewmode="@listMode.Value" title="@listMode.Text">@listMode.Text</a>
             }
         </div>
-        <script asp-location="Footer">
+        @*<script asp-location="Footer">
             $(document).ready(function () {
                 var $viewModeEls = $('[data-viewmode]');
                 $viewModeEls.on('click', function () {
@@ -42,7 +42,7 @@
                     }
                 });
             });
-        </script>
+        </script>*@
     }
 
     @if (Model.AllowProductSorting)

@@ -39,7 +39,7 @@ namespace Nop.Services.Stores
                 return;
             
             var stores = (await _storeService.GetAllStoresAsync())
-                .Where(s => s.DisplayOrder >0 && s.DisplayOrder<3);
+                .Where(s => s.DisplayOrder >0 && s.DisplayOrder<4);
             var productos = (await _productService.GetAllProductsAsync());
             var store_mapping = (await _storeMapping.GetFullStoreMappingsAsync());
 
