@@ -1357,8 +1357,13 @@ namespace Nop.Web.Controllers
                 if (await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync()) && !_orderSettings.AnonymousCheckoutAllowed)
                     throw new Exception("Anonymous checkout is not allowed");
 
-                int.TryParse(form["billing_address_id"], out var billingAddressId);
-                if (billingAddressId > 0)
+                var billingAddressId = 0;
+                int.TryParse(form["hdn_billing_address_id"], out billingAddressId);
+                if (!string.IsNullOrWhiteSpace(form["billing_address_id"]))
+                {
+                    int.TryParse(form["billing_address_id"], out billingAddressId);
+                }
+                if (billingAddressId > 0 && string.IsNullOrWhiteSpace(model.BillingNewAddress.FirstName))
                 {
                     //existing address
                     var address = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
@@ -1371,6 +1376,14 @@ namespace Nop.Web.Controllers
                 {
                     //new address
                     var newAddress = model.BillingNewAddress;
+                    if(billingAddressId > 0)
+                    {
+                        var address1 = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
+                            ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+
+                        newAddress.Email = address1.PhoneNumber;
+                        newAddress.PhoneNumber = address1.PhoneNumber;
+                    }
 
                     //custom address attributes
                     var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
@@ -1429,7 +1442,7 @@ namespace Nop.Web.Controllers
                     }
 
                     //newAddress.Email = $"{newAddress.FirstName.Replace(" ", ".").Replace("á", "a").Replace("é", "e").Replace("í", "i").Replace("ó", "o").Replace("ú", "u") }@yopmail.com";
-                    newAddress.Email = "compra@yopmail.com";
+                    //newAddress.Email = "compra@yopmail.com";
                     newAddress.Address1 = await _localizationService.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(), x => x.CompanyAddress);
                     newAddress.LastName = model.BillingNewAddress.ActionId == "No" ? "0" : "1";
                     newAddress.FaxNumber = model.BillingNewAddress.ActionName;

@@ -110,6 +110,18 @@ namespace Nop.Services.Common
                 cache => cache.PrepareKeyForShortTermCache(NopEntityCacheDefaults<Address>.ByIdCacheKey, addressId));
         }
 
+        public virtual async Task<IList<Address>> GetRelatedAddressByIdAsync(string phoneParent)
+        {
+            if (string.IsNullOrWhiteSpace(phoneParent))
+                return new List<Address>();
+
+            var query = from a in _addressRepository.Table
+                        where a.PhoneNumber.StartsWith(phoneParent)
+                        select a;
+
+            return await query.ToListAsync();
+        }
+
         /// <summary>
         /// Inserts an address
         /// </summary>

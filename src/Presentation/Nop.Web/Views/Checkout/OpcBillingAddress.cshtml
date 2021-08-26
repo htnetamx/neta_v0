@@ -2,8 +2,14 @@
 @using Nop.Core.Infrastructure
 @{ 
     var service = EngineContext.Current.Resolve<Nop.Services.Common.IAddressService>();
-    var billingAddress = workContext.GetCurrentCustomerAsync().Result.BillingAddressId;
-    var name = service.GetAddressByIdAsync(billingAddress ?? 0).Result?.FirstName;
+    var currentCustomer = workContext.GetCurrentCustomerAsync().Result;
+    var billingAddress = currentCustomer?.BillingAddressId;
+    var addressObj = service.GetAddressByIdAsync(billingAddress ?? 0).Result;
+    var name = addressObj?.FirstName;
+    var phone = addressObj?.PhoneNumber;
+
+    var children = service.GetRelatedAddressByIdAsync(phone).Result;
+
     if (string.IsNullOrWhiteSpace(name))
     {
         name = "Sin Nombre";
@@ -21,79 +27,50 @@
                 </p>
             </div>
         }*@
-    @*@if (Model.ExistingAddresses.Count > 0)
-        {
-                <div class="section select-billing-address">
-                    <label for="billing-address-select">@T("Checkout.SelectBillingAddressOrEnterNewOne")</label>
-                    @if (Model.InvalidExistingAddresses.Count > 0)
+    @if (children.Count > 0)
+    {
+        <div class="section select-billing-address">
+            <label for="billing-address-select">@T("Checkout.SelectBillingAddressOrEnterNewOne")</label>
+            <div>
+                <select name="billing_address_id" id="billing-address-select" class="address-select"
+                        title="" onchange="Billing.resetBillingForm();Billing.newAddress(!this.value)">
+                    @foreach (var address in children)
                     {
-                        <label class="min-amount-warning">
-                            @string.Format(T("Checkout.Addresses.Invalid").Text, Model.InvalidExistingAddresses.Count)
-                        </label>
-                    }
-                <div>
-                    <select name="billing_address_id" id="billing-address-select" class="address-select"
-                            title="" onchange="Billing.resetBillingForm();Billing.newAddress(!this.value)">
-                        @foreach (var address in Model.ExistingAddresses)
+                        if (address.Id == billingAddress)
                         {
-                            var addressLine = "";
-                            addressLine += address.FirstName;
-                            addressLine += " " + address.LastName;
-                            if (address.StreetAddressEnabled && !string.IsNullOrEmpty(address.Address1))
-                            {
-                                addressLine += ", " + address.Address1;
-                            }
-                            if (address.CityEnabled && !string.IsNullOrEmpty(address.City))
-                            {
-                                addressLine += ", " + address.City;
-                            }
-                            if (address.CountyEnabled && !string.IsNullOrEmpty(address.County))
-                            {
-                                addressLine += ", " + address.County;
-                            }
-                            if (address.StateProvinceEnabled && !string.IsNullOrEmpty(address.StateProvinceName))
-                            {
-                                addressLine += ", " + address.StateProvinceName;
-                            }
-                            if (address.ZipPostalCodeEnabled && !string.IsNullOrEmpty(address.ZipPostalCode))
-                            {
-                                addressLine += " " + address.ZipPostalCode;
-                            }
-                            if (address.CountryEnabled && !string.IsNullOrWhiteSpace(address.CountryName))
-                            {
-                                addressLine += ", " + address.CountryName;
-                            }
-                            //how should we render "FormattedCustomAddressAttributes" here?
-                            <option value="@(address.Id)">@(addressLine)</option>
+                            <option value="@(address.Id)" selected="selected">@(address.FirstName)</option>
                         }
+                        else
+                        {
+                            <option value="@(address.Id)">@(address.FirstName)</option>
+                        }
+                    }
+                    <option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
+                    @if (children.Count < 7)
+                    {
                         <option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
-                    </select>
-                </div>
+                    }
+                </select>
             </div>
-        }*@
+        </div>
+    }
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressMiddle })
-    @if (string.IsNullOrWhiteSpace(workContext.GetCurrentCustomerAsync().Result.Username))
-    {
-        <div class="section new-billing-address" id="billing-new-address-form">
-            <div class="enter-address">
-                <div asp-validation-summary="ModelOnly" class="message-error"></div>
-                @{
-                    var dataDictAddress = new ViewDataDictionary(ViewData);
-                    dataDictAddress.TemplateInfo.HtmlFieldPrefix = "BillingNewAddress";
-                    @await Html.PartialAsync("_CreateOrUpdateAddress", Model.BillingNewAddress, dataDictAddress)
-                }
-            </div>
+    <div class="section new-billing-address" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:none" : "display:block")">
+        <div class="enter-address">
+            <p>Hola de nuevo! @name</p>
         </div>
-    }
-    else
-    {
-        <div class="section new-billing-address" id="billing-new-address-form">
-            <div class="enter-address">
-                <p>Hola de nuevo! @name</p>
-            </div>
+    </div>
+    <div class="section new-billing-address" id="billing-new-address-form" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:block" : "display:none")">
+        <div class="enter-address">
+            <div asp-validation-summary="ModelOnly" class="message-error"></div>
+            @{
+                var dataDictAddress = new ViewDataDictionary(ViewData);
+                dataDictAddress.TemplateInfo.HtmlFieldPrefix = "BillingNewAddress";
+                @await Html.PartialAsync("_CreateOrUpdateAddress1", Model.BillingNewAddress, dataDictAddress)
+            }
         </div>
-        <input type="hidden" id="billing_address_id" name="billing_address_id" value="@billingAddress" />
-    }
+    </div>
+    <input type="hidden" id="billing_address_id" name="hdn_billing_address_id" value="@billingAddress" />
 
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressBottom })
 </div>
