@@ -59,17 +59,19 @@ namespace Nop.Web.Components
         {
             var currentUser = (await _workContext.GetCurrentCustomerAsync()).Username;
             bool isLoggedIn = string.IsNullOrWhiteSpace(currentUser) ? false : (currentUser == "admin@neta.mx" || currentUser == "admin@yourstore.com");
-            var products = await (await _productService.GetAllProductsDisplayedOnHomepageAsync())
-            //ACL and store mapping
-            .WhereAwait(async p => await _aclService.AuthorizeAsync(p) && await _storeMappingService.AuthorizeAsync(p))
-            //availability dates
-            .Where(p => isLoggedIn || _productService.ProductIsAvailable(p))
-            //visible individually
-            .Where(p => p.VisibleIndividually).ToListAsync();
+            var products = await _productService.GetAllProductsDisplayedOnHomepageAsync();
+            var pp = products.Where(p => p.DisplayOrder == 0);
 
+            //ACL and store mapping
+            products = await products.WhereAwait(async p => await _aclService.AuthorizeAsync(p) && await _storeMappingService.AuthorizeAsync(p)).ToListAsync();
+            pp = products.Where(p => p.DisplayOrder == 0);
+            //availability dates
+            products = products.Where(p => isLoggedIn || _productService.ProductIsAvailable(p)).ToList();
+
+            //visible individually
+            products = await products.Where(p => p.VisibleIndividually).ToListAsync();
             if (!products.Any())
                 return Content("");
-
             var discounts = await _discountService.GetAllDiscountsAsync1(
                 (await _storeContext.GetCurrentStoreAsync()).Id,
                 System.DateTime.UtcNow, System.DateTime.UtcNow);
@@ -91,30 +93,34 @@ namespace Nop.Web.Components
 
             Uri myUri = new Uri(_webHelper.GetThisPageUrl(true));
 
-            var defaultIndex = 1;
+            var defaultIndex = "1";
+            var defaultOrderBy = "0";
+            var defaultPageSize = "6";
+            var defaultIncrement = "10";
+            var defaultMinimumProducts = "2";
+
             var pageSize = HttpUtility.ParseQueryString(myUri.Query).Get("pagesize");
             var pageNumber = HttpUtility.ParseQueryString(myUri.Query).Get("pagenumber");
             var orderBy = HttpUtility.ParseQueryString(myUri.Query).Get("orderby");
             
             if (pageSize is null)
             {
-                pageSize = defaultIndex.ToString();
+                pageSize = defaultPageSize;
+               
             }
             if (pageNumber is null)
             {
-                pageNumber = "1";
+                pageNumber = defaultIndex;
             }
             if (orderBy is null)
             {
-                orderBy = "0";
+                orderBy = defaultOrderBy;
             }
             var search_Model_Type = "custom";
             //var search_Model_Type = "default";
 
             var model = new SearchModel();
 
-
-            //Page Size
             if (search_Model_Type == "custom")
             {
                 var pageSizeOptions = "3,6,10,20";
@@ -129,46 +135,52 @@ namespace Nop.Web.Components
             {
                 model = await _catalogModelFactory.PrepareSearchModelAsync(model, command);
             }
+            var old_i=0;
+            var new_i=0;
 
-
-            //Page Index
+            //For Homepage with deafult paging and _selector
+            /*
+            Page Index
             var old_i = model.CatalogProductsModel.PageSizeOptions.ToList().FindIndex(p => p.Selected);
             var new_i = model.CatalogProductsModel.PageSizeOptions.ToList().FindIndex(p => p.Value==pageSize);
 
             if (old_i==-1 || new_i==-1)
             {
-                old_i = defaultIndex;
-                new_i = defaultIndex;
-                pageSize = model.CatalogProductsModel.PageSizeOptions[defaultIndex].Value;
+                old_i = Int32.Parse(defaultIndex);
+                new_i = Int32.Parse(defaultIndex);
+                pageSize = model.CatalogProductsModel.PageSizeOptions[Int32.Parse(defaultIndex)].Value;
             }
             model.CatalogProductsModel.PageSizeOptions[old_i].Selected = false;
             model.CatalogProductsModel.PageSizeOptions[new_i].Selected = true;
+            */
 
-            var mi = model.CatalogProductsModel.AvailableSortOptions.ToList();
             //Sorting
             old_i = model.CatalogProductsModel.AvailableSortOptions.ToList().FindIndex(p => p.Selected);
             new_i = model.CatalogProductsModel.AvailableSortOptions.ToList().FindIndex(p => p.Value == orderBy);
             if (old_i == -1 || new_i == -1)
             {
-                old_i = 0;
-                new_i = 0;
-                pageSize = model.CatalogProductsModel.AvailableSortOptions[0].Value;
+                old_i = Int32.Parse(defaultOrderBy);
+                new_i = Int32.Parse(defaultOrderBy);
+                orderBy = model.CatalogProductsModel.AvailableSortOptions[Int32.Parse(defaultOrderBy)].Value;
             }
             model.CatalogProductsModel.AvailableSortOptions[old_i].Selected = false;
             model.CatalogProductsModel.AvailableSortOptions[new_i].Selected = true;
 
 
             //Update Command
-
-            //Force the input
-                pageSize = "6";
-                orderBy = "0";
             command.PageSize = Convert.ToInt32(pageSize);
             command.PageNumber = Convert.ToInt32(pageNumber) - 1;
             command.OrderBy = Convert.ToInt32(orderBy);
-   
+
             var modelList = (await _productModelFactory.PrepareProductOverviewModelsAsync1(products, true, true, productThumbPictureSize, discounts: discProducts,command: command));
             model.CatalogProductsModel.Products = (await _productModelFactory.PrepareProductOverviewModelsAsync(modelList)).ToList();
+
+
+            //For Homepage with only Show less and Show More buttons
+            model.CatalogProductsModel.Increment = defaultIncrement;
+            model.CatalogProductsModel.StartingProducts = defaultPageSize;
+            model.CatalogProductsModel.MinimumProducts = defaultMinimumProducts;
+            model.CatalogProductsModel.MaxProducts = products.Count;
             model.CatalogProductsModel.LoadPagedList(modelList);
             return View(model);
         }

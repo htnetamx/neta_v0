@@ -114,19 +114,12 @@
         @*Hide Order By and page size
         @await Html.PartialAsync("_CatalogSelectors", Model.CatalogProductsModel)
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })*@
-    <div class="search-results">
-        @{
-            var catalogProductsViewData = new ViewDataDictionary(ViewData);
-            catalogProductsViewData["fetchUrl"] = Html.Raw(Url.Action("SearchProducts", "Catalog"));
-            var a = catalogProductsViewData;
-        }
-        @await Html.PartialAsync("_CatalogProducts", Model.CatalogProductsModel, catalogProductsViewData)
+        <div class="search-results">
+            @{
+                var catalogProductsViewData = new ViewDataDictionary(ViewData);
+                catalogProductsViewData["fetchUrl"] = Html.Raw(Url.Action("SearchProducts", "Catalog"));
+                var a = catalogProductsViewData;
+            }
+            @await Html.PartialAsync("_CatalogProductsHome", Model.CatalogProductsModel, catalogProductsViewData)
+        </div>
     </div>
-    </div>
-
-
-
-
-
-
-                }

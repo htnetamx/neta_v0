@@ -1305,6 +1305,7 @@ namespace Nop.Web.Factories
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
+
             var queryable = products1.AsQueryable().OrderBy((ProductSortingEnum)command.OrderBy);
             IPagedList<Product> products = new PagedList<Product>(queryable.ToList(), command.PageNumber, command.PageSize);
          
