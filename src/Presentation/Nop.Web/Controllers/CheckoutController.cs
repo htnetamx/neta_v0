@@ -1166,6 +1166,8 @@ namespace Nop.Web.Controllers
                     //    (await _storeContext.GetCurrentStoreAsync()).Name,
                     //    "5pm", "https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 " + (await _storeContext.GetCurrentStoreAsync()).Url);
 
+
+
                     return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
                 }
 
@@ -1899,6 +1901,8 @@ namespace Nop.Web.Controllers
                         Order = placeOrderResult.PlacedOrder
                     };
 
+                    
+                    //postProcessPaymentRequest.Order.
                     var list = new List<string>();
                     foreach (var item in cart)
                     {
