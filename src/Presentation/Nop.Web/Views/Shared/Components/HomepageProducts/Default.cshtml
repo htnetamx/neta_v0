@@ -53,44 +53,6 @@
                 </div>
             }
         }
-        <div class="product-grid home-page-product-grid">
-            <div class="title">
-                <strong>5% de descuento parejo para nuestros clientes los más neta!</strong>
-            </div>
-            <div class="item-grid">
-                <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un 5% de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
-                @foreach (var item in Model.CatalogProductsModel.Products.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
-                {
-                    @if (!string.IsNullOrWhiteSpace(item.Details.StockAvailability))
-                    {
-                        <div class="item-box">
-                            @await Html.PartialAsync("_ProductBox", item)
-                        </div>
-                    }
-                }
-            </div>
-        </div>
-    }
-    else
-    {
-        if (Model.CatalogProductsModel.Products.Where(v => v.MarkAsLoyalty).Any())
-        {
-            <div class="product-grid home-page-product-grid">
-                <div class="title">
-                    <strong>Super promoción del día para nuestros clientes los más neta!</strong>
-                </div>
-                <h2>Acumula $300 pesos o mas de compras en la semana y entra a la super promo diaria! No te quedes sin este beneficio</h2>
-                <h2>El electrolit coco suero está a $8 con tu código!</h2>
-                <div class="item-grid">
-                    @foreach (var item in Model.CatalogProductsModel.Products.Where(v => v.MarkAsLoyalty))
-                    {
-                        <div class="item-box">
-                            @await Html.PartialAsync("_ProductBox", item)
-                        </div>
-                    }
-                </div>
-            </div>
-        }
     }
     
 
