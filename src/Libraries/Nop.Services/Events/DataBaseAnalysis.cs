@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Threading;
 using Nop.Services.Orders;
 using Nop.Services.Tasks;
 using Nop.Services.Stores;
@@ -14,6 +14,7 @@ using Nop.Core.Domain.Orders;
 using Nop.Data;
 using Nop.Services.Shipping;
 using Nop.Core.Domain.Stores;
+using Nop.Services.Google;
 
 namespace Nop.Services.Events
 {
@@ -81,7 +82,27 @@ namespace Nop.Services.Events
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            var stores_With_Errors = _storeRepository.Table.Where(p => p.CompanyPhoneNumber == null);
+            
+
+            var spreadsheetId = "1qn_oyT1sxvqyJ7YyykaukARXzrq2kfp_OH7yLDcPg0k";
+            var sheet = "Stores";
+
+            var stores_With_Errors = (from s in _storeRepository.Table
+                                     select new InfoShopsErrors()
+                                     {
+                                         StoreId = s.Id.ToString(),
+                                         StoreName = s.Name,
+                                         StoreUrl = s.Url,
+                                         StorePhoneNumber = s.CompanyPhoneNumber,
+                                         Error=""}).ToList();
+
+            if (stores_With_Errors.Count>0)
+            {
+                var range = "A:CC";
+                var deleteResponse = GoogleAPI.DeleteSpreadSheetContent(spreadsheetId, sheet, range);
+                range = "A:D";
+                var appendResponse = GoogleAPI.AppendOnSpreadSheet(spreadsheetId, sheet, range, stores_With_Errors);
+            }
         }
 
         #endregion
