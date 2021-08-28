@@ -24,17 +24,24 @@
     var Less_More_buttons = true;
     @if (Less_More_buttons)
     {
-        <div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; border-top-width: 1px; border-top-color: black; border-top-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh ">
-            <button id="Less_Products" style="background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw" onclick=mostrarMenos()>Ver menos!</button>
-            <p id="Cantidad_Productos" style="font-size:20px;background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw;border-style: solid; border-width: 1px; border-color: black">5</p>
-            <button id="More_Products" style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw " onclick=mostrarMas()>Ver mas!</button>
+        @*<div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; border-top-width: 1px; border-top-color: black; border-top-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh ">
+                <button id="Less_Products" style="background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw" onclick=mostrarMenos()>Ver menos!</button>
+                <p id="Cantidad_Productos" style="font-size:20px;background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw;border-style: solid; border-width: 1px; border-color: black">5</p>
+                <button id="More_Products" style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw " onclick=mostrarMas()>Ver mas!</button>
+            </div>*@
+
+        <div style="justify-content: space-around; display: flex; padding: 2vh 0 2vh 0;flex-direction:column;align-items: center">
+            <p id="Cantidad_Productos" style="font-size:20px;background-color: none; color: black;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw;border-style: solid; border-width: 1px; border-color: black;width: 20vw;text-align: center">5</p>    
+        </div>
+        <div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; border-top-width: 1px; border-top-color: black; border-top-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh;flex-direction:column;align-items: center;margin-top: 3vh">
+            <button id="More_Products" style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw; width: 40vw" onclick=mostrarMas()>Haz click para ver más productos!</button>
         </div>
         <script asp-location="Footer">
             var incremento = @Model.Increment;
             var starting_products = @Model.StartingProducts;
             var minimum_products = @Model.MinimumProducts;
             var max_products = @Model.MaxProducts;
-            
+
             window.onload = update;
 
             function update() {
@@ -46,10 +53,10 @@
                 }
 
                 document.getElementById("Cantidad_Productos").textContent = current;
-
+                /*
                 if (current == minimum_products) {
                     document.getElementById("Less_Products").style.visibility = 'hidden';
-                }
+                }*/
                 if (current == max_products) {
                     document.getElementById("More_Products").style.visibility = 'hidden';
                 }
@@ -72,6 +79,7 @@
 
                 CatalogProducts.getProductsBySize(new_cantidad);
             }
+            /*
             function mostrarMenos() {
                 var prev_cantidad = parseInt(document.getElementById("Cantidad_Productos").textContent);
                 var new_cantidad = prev_cantidad - incremento;
@@ -83,9 +91,10 @@
                 if (new_cantidad < starting_products && prev_cantidad > starting_products) {
                     new_cantidad = starting_products;
                 }
-             
+
                 CatalogProducts.getProductsBySize(new_cantidad);
             }
+            */
         </script>
     }
     else
