@@ -23,24 +23,24 @@ namespace Nop.Web.Infrastructure
 
         public async Task Invoke(HttpContext httpContext)
         {
-            //await _next(httpContext);
-            if (string.IsNullOrWhiteSpace(httpContext.Request.Host.Host))
-                await _next(httpContext);
-            else
-            {
-                var stores = await _storeService.GetAllStoresAsync();
-                var store = stores.Where(v => v.Hosts.Contains(httpContext.Request.Host.Host)).Any();
-                if (!store)
-                {
-                    httpContext.Response.Redirect("https://api.whatsapp.com/send/?phone=525574174213&text=Hola%21+Cu%C3%A1l+es+la+nueva+liga+de+netamx&app_absent=0");
-                    //httpContext.Response.Redirect("https://wa.me/525574174213?text=Hola!%20Cuál%20es%20la%20nueva%20liga%20de%20netamx", permanent: true);
-                    return;
-                }
-                else
-                {
-                    await _next(httpContext);
-                }
-            }
+            await _next(httpContext);
+            //if (string.IsNullOrWhiteSpace(httpContext.Request.Host.Host))
+            //    await _next(httpContext);
+            //else
+            //{
+            //    var stores = await _storeService.GetAllStoresAsync();
+            //    var store = stores.Where(v => v.Hosts.Contains(httpContext.Request.Host.Host)).Any();
+            //    if (!store)
+            //    {
+            //        httpContext.Response.Redirect("https://api.whatsapp.com/send/?phone=525574174213&text=Hola%21+Cu%C3%A1l+es+la+nueva+liga+de+netamx&app_absent=0");
+            //        //httpContext.Response.Redirect("https://wa.me/525574174213?text=Hola!%20Cuál%20es%20la%20nueva%20liga%20de%20netamx", permanent: true);
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        await _next(httpContext);
+            //    }
+            //}
         }
     }
 
