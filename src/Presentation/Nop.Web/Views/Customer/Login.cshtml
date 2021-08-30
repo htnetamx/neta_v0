@@ -195,7 +195,7 @@
                             </div>
                             <div class="inputs" id="codeVerifContainer" style="display: none">
                                 <label>Código:</label>
-                                <input id="codeVerif" name="codeVerif" type="text" class="text" />
+                                <input id="codeVerif" name="codeVerif" type="text" class="text" required />
                                 <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
                             </div>
                             <div style="text-align: center">
@@ -231,6 +231,7 @@
 
         $(document).ready(function () {
             $("#btnCodeVerif").click(() => {
+                $("#Password").val($("#Password").val().replaceAll(" ", ""));
                 $.ajax({
                     cache: false,
                     url: "@(storeConext.GetCurrentStore().Url)checkout/PostVerifyMessage/",
@@ -249,6 +250,14 @@
                         $("#btnCodeVerif").hide();
                     }
                 });
+            });
+
+            $("#formVerifData").on("submit", (e) => {
+                var cod = $("codeVerif").val();
+                if (cod === '') {
+                    alert("Revisa tu whatsapp y copia el código que te enviamos para poder terminar tu compra.");
+                    return false;
+                }
             });
         });
 
