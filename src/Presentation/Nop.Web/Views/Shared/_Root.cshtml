@@ -32,7 +32,7 @@
         </div>
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentAfter })
     </div>
-    @await Component.InvokeAsync("Footer")
+    @*@await Component.InvokeAsync("Footer")*@
     <script>
         window.onresize = setResize;
         setResize();
