@@ -32,25 +32,64 @@
         </div>
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentAfter })
     </div>
-    @await Component.InvokeAsync("Footer")
+    @*@await Component.InvokeAsync("Footer")*@
     <script>
         window.onresize = setResize;
         setResize();
-        
         function setResize() {
             if (window.innerWidth > 575) {
-                document.getElementById("logo-img").style.width = "10vw"
-                document.getElementById("shopping-cart-label").style.fontSize = "2vw"
-                document.getElementById("shopping-cart-qty").style.fontSize = "2vw"
-                document.getElementById("shopping-cart-qty").style.lineHeight = "7vh"
-                document.getElementById("foot-low").style.padding = "1vh 0 1vh 0"
+                try {
+                    document.getElementById("logo-img").style.width = "10vw"
+                } catch {
+                    console.log("Error Size Logo")
+                }
+                try {
+                    document.getElementById("shopping-cart-label").style.fontSize = "2vw"
+                } catch {
+                    console.log("Error Shoppin cart label")
+                }
+                try {
+                    document.getElementById("shopping-cart-qty").style.fontSize = "2vw"
+                } catch {
+                    console.log("Error Shoppin cart quantity Font")
+                }
+                try {
+                    document.getElementById("shopping-cart-qty").style.lineHeight = "7vh"
+                } catch {
+                    console.log("Error Shoppin cart quantity Line Height")
+                }
+                try {
+                    document.getElementById("foot-low").style.padding = "1vh 0 1vh 0"
+                } catch {
+                    console.log("Error Footer")
+                }      
             }
             else {
-                document.getElementById("logo-img").style.width = "30vw"
-                document.getElementById("shopping-cart-label").style.fontSize = "3vw"
-                document.getElementById("shopping-cart-qty").style.fontSize = "3vw"
-                document.getElementById("shopping-cart-qty").style.lineHeight = "3vh"
-                document.getElementById("foot-low").style.padding = "2vh 0 2vh 0"
+                try {
+                    document.getElementById("logo-img").style.width = "30vw"
+                } catch {
+                    console.log("Error Size Logo 2")
+                }
+                try {
+                    document.getElementById("shopping-cart-label").style.fontSize = "3vw"
+                } catch {
+                    console.log("Error Shoppin cart label 2")
+                }
+                try {
+                    document.getElementById("shopping-cart-qty").style.fontSize = "3vw"
+                } catch {
+                    console.log("Error Shoppin cart quantity Font 2")
+                }
+                try {
+                    document.getElementById("shopping-cart-qty").style.lineHeight = "3vh"
+                } catch {
+                    console.log("Error Shoppin cart quantity Line Height 2")
+                }
+                try {
+                    document.getElementById("foot-low").style.padding = "2vh 0 2vh 0"
+                } catch {
+                    console.log("Error Footer 2")
+                }      
             }
             var clientHeight = document.getElementById("upper-page").clientHeight;
             document.getElementById("master-wrapper-cont").style.top = (parseInt((clientHeight / window.innerHeight) * 100, 10) + 2) + "vh";
