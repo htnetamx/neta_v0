@@ -116,7 +116,7 @@ namespace Nop.Services.Common
                 return new List<Address>();
 
             var query = from a in _addressRepository.Table
-                        where a.PhoneNumber.StartsWith(phoneParent)
+                        where a.PhoneNumber.StartsWith(phoneParent) && a.PhoneNumber.Length > phoneParent.Length
                         select a;
 
             return await query.ToListAsync();

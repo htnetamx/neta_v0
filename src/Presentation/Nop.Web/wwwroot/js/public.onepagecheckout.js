@@ -124,6 +124,7 @@ var Billing = {
 
     if (isNew) {
       $('#billing-new-address-form').show();
+      $('#new-address-button').hide();
       $('#edit-address-button').hide();
       $('#delete-address-button').hide();
     } else {

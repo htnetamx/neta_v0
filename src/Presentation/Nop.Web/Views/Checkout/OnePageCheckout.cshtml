@@ -1,6 +1,7 @@
 ﻿@model OnePageCheckoutModel
 @using Nop.Core
 @using Nop.Services.Customers
+@using Nop.Core.Infrastructure
 @inject IWebHelper webHelper
 @inject IWorkContext workContext
 @inject ICustomerService _customerService
@@ -19,6 +20,20 @@
     Html.AppendPageCssClassParts("html-checkout-page");
 }
 @{
+    var service = EngineContext.Current.Resolve<Nop.Services.Common.IAddressService>();
+    var currentCustomer = workContext.GetCurrentCustomerAsync().Result;
+    var billingAddress = currentCustomer?.BillingAddressId;
+    var addressObj = service.GetAddressByIdAsync(billingAddress ?? 0).Result;
+    var name = addressObj?.FirstName;
+    var phone = addressObj?.PhoneNumber;
+
+    var children = service.GetRelatedAddressByIdAsync(phone).Result;
+
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        name = "Sin Nombre";
+    }
+
     //step numbers
     var billingAddressStepNumber = 1;
     var shippingAddressStepNumber = 2;
@@ -74,11 +89,16 @@
                         }
                     </script>
                     <div class="buttons" id="billing-buttons-container">
-                        <button id="edit-address-button" type="button" class="button-1" style="display: none" onclick="Billing.editAddress('@(storeLocation)checkout/GetAddressById/'); return false;">@T("Common.Edit")</button>
+                        @if (children.Count <= 7)
+                        {
+                            <button id="new-address-button" type="button" class="button-1" onclick="Billing.resetBillingForm(); Billing.newAddress(true); return false;">@T("Checkout.NewAddress")</button>
+                        }
 
-                        <button id="delete-address-button" type="button" class="button-1" style="display: none" onclick="Billing.deleteAddress('@(storeLocation)checkout/DeleteEditAddress/'); return false;">@T("Common.Delete")</button>
+                        <button id="edit-address-button" type="button" class="button-1" onclick="Billing.editAddress('@(storeLocation)checkout/GetAddressById/'); return false;">@T("Common.Edit")</button>
 
-                        <button id="save-address-button" type="button" class="button-1" style="display: none" onclick="Billing.saveEditAddress('@(storeLocation)checkout/SaveEditAddress/'); return false;">@T("Common.Save")</button>
+                        <button id="delete-address-button" type="button" class="button-1" onclick="Billing.deleteAddress('@(storeLocation)checkout/DeleteEditAddress/'); return false;">@T("Common.Delete")</button>
+
+                        <button id="save-address-button" style="display: none" type="button" class="button-1" onclick="Billing.saveEditAddress('@(storeLocation)checkout/SaveEditAddress/'); return false;">@T("Common.Save")</button>
 
                         <button type="button" name="save" class="button-1 new-address-next-step-button" onclick="Billing.save()">@T("Common.Continue")</button>
 

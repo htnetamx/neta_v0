@@ -45,11 +45,11 @@
                             <option value="@(address.Id)">@(address.FirstName)</option>
                         }
                     }
-                    <option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
+                    @*<option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
                     @if (children.Count < 7)
                     {
                         <option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
-                    }
+                    }*@
                 </select>
             </div>
         </div>
