@@ -1152,19 +1152,27 @@ namespace Nop.Web.Controllers
                         list.Add(item.Quantity.ToString());
                     }
 
-                    //var name = "Netero";
-                    //if((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
-                    //{
-                    //    var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-                    //    name = customer.FirstName;
-                    //}
-                    //NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username, 
-                    //    "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_horario",
-                    //    name,
-                    //    list.ToArray(),
-                    //    placeOrderResult.PlacedOrder.OrderTotal.ToString(),
-                    //    (await _storeContext.GetCurrentStoreAsync()).Name,
-                    //    "5pm", "https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 " + (await _storeContext.GetCurrentStoreAsync()).Url);
+                    var billingAddressId = (await _workContext.GetCurrentCustomerAsync()).BillingAddressId;
+                    var orders = await _orderService.GetOrdersByStoreIdsAsync((await _storeContext.GetCurrentStoreAsync()).Id);
+                    orders = orders.Where(v => v.CreatedOnUtc.Date == DateTime.UtcNow.Date).ToList();
+                    //orders = orders.Where(v => v.BillingAddressId == (billingAddressId ?? 0)).ToList();
+
+                    var name = "Netero";
+                    if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
+                    {
+                        var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                        name = customer.FirstName;
+                    }
+
+                    NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes",
+                        "*"+name+"*",
+                        string.Join("\r", list.ToArray()),
+                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                        (await _storeContext.GetCurrentStoreAsync()).Name,
+                        //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
+                        "5pm", orders.Count.ToString(),
+                        "https://bit.ly/3zztZVa" + (await _storeContext.GetCurrentStoreAsync()).Url);
 
                     return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
                 }
@@ -1907,19 +1915,26 @@ namespace Nop.Web.Controllers
                         list.Add(item.Quantity.ToString());
                     }
 
-                    //var name = "Netero";
-                    //if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
-                    //{
-                    //    var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-                    //    name = customer.FirstName;
-                    //}
-                    //NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                    //    "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_horario",
-                    //    name,
-                    //    list.ToArray(),
-                    //    placeOrderResult.PlacedOrder.OrderTotal.ToString(),
-                    //    (await _storeContext.GetCurrentStoreAsync()).Name,
-                    //    "5pm", "https://api.whatsapp.com/send/?text=Hola,%20vi%20estas%20promos%20locas%20en%20netamx.%20Elige%20el%20producto%20que%20quieras%20y%20juntos%20bajemos%20el%20precio:%20 " + (await _storeContext.GetCurrentStoreAsync()).Url);
+                    var billingAddressId = (await _workContext.GetCurrentCustomerAsync()).BillingAddressId;
+                    var orders = await _orderService.GetOrdersByStoreIdsAsync((await _storeContext.GetCurrentStoreAsync()).Id);
+                    orders = orders.Where(v => v.CreatedOnUtc.Date == DateTime.UtcNow.Date).ToList();
+                    orders =orders.Where(v => v.BillingAddressId == (billingAddressId ?? 0)).ToList();
+
+                    var name = "Netero";
+                    if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
+                    {
+                        var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                        name = customer.FirstName;
+                    }
+                    NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes",
+                        "*" + name + "*",
+                        string.Join("\r", list.ToArray()),
+                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                        (await _storeContext.GetCurrentStoreAsync()).Name,
+                        //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
+                        "5pm", orders.Count.ToString(),
+                        "https://bit.ly/3zztZVa" + (await _storeContext.GetCurrentStoreAsync()).Url);
 
 
                     var paymentMethod = await _paymentPluginManager
