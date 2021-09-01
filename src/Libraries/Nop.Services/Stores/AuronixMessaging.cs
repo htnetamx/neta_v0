@@ -35,8 +35,8 @@ namespace Nop.Services.Stores
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            if ((DateTime.UtcNow.AddHours(-5)).DayOfWeek==DayOfWeek.Sunday)
-                return;
+            //if ((DateTime.UtcNow.AddHours(-5)).DayOfWeek==DayOfWeek.Sunday)
+            //    return;
             
             var stores = (await _storeService.GetAllStoresAsync())
                 .Where(s => s.DisplayOrder >0 && s.DisplayOrder<4);
@@ -48,31 +48,50 @@ namespace Nop.Services.Stores
                 .GroupBy(sm => sm.StoreId,(storeId, sm_stores) => new{StoreId = storeId, Best_Promo = sm_stores.Max(sm=>sm.OldPrice-sm.Price)});
     
             var query = (max_discounts.Join(stores, md => md.StoreId, s => s.Id,
-                (md, s) => new { CompanyPhoneNumber = s.CompanyPhoneNumber, StoreName = s.Name, CompanyURL =s.Url, md.Best_Promo }))
+                (md, s) => new { StoreId=s.Id,CompanyPhoneNumber = s.CompanyPhoneNumber, StoreName = s.Name, CompanyURL =s.Url, md.Best_Promo, Phase=s.DisplayOrder }))
                 .Join(productos, store => store.Best_Promo, p => (p.OldPrice - p.Price),
-                (s,p) => new { CompanyPhoneNumber=s.CompanyPhoneNumber, ProductName=p.Name, ProductOldPrice=p.OldPrice, ProductPrice=p.Price, s.CompanyURL});
+                (s,p) => new { StoreId=s.StoreId, Phase=s.Phase, CompanyPhoneNumber=s.CompanyPhoneNumber, ProductName=p.Name, ProductOldPrice=p.OldPrice, ProductPrice=p.Price, s.CompanyURL});
 
             var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:promo_hoy";
             foreach (var info in query)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
-                    if (info.CompanyURL == "Hteijiz.com" || info.CompanyURL == "Aposada.com" || info.CompanyURL == "DCorona.com")
+                    if (info.Phase == 1)
                     {
-                        Send(info.CompanyPhoneNumber, template_Link_Viralizacion, info.ProductName, info.ProductOldPrice, info.ProductPrice, info.CompanyURL);
+                        var rta = await Send(info.CompanyPhoneNumber, template_Link_Viralizacion, $"\r*{info.ProductName}*", $"~${info.ProductOldPrice.ToString("N2")}~", $"*${info.ProductPrice.ToString("N2")}*", $"*{info.CompanyURL}*");
+                    }
+                    if (info.Phase == 2)
+                    {
+                        var prodMap = store_mapping.Where(v => v.StoreId == info.StoreId);
+                        var products = productos.Where(v => prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice > v.Price && v.Name != info.ProductName);
+
+                        var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+
+                        var rta = Send(info.CompanyPhoneNumber, template_Link_Viralizacion, $"\r*{info.ProductName}*", $"~*${info.ProductOldPrice.ToString("N2")}*~", $"*${info.ProductPrice.ToString("N2")}*,\r{prodList}", $"*{info.CompanyURL}*");
+                    }
+                    if (info.Phase == 3)
+                    {
+                        var prodMap = store_mapping.Where(v => v.StoreId == info.StoreId);
+                        var products = productos.Where(v => prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice > v.Price && v.Name != info.ProductName
+                        && DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc && DateTime.UtcNow <= v.MarkAsNewEndDateTimeUtc);
+
+                        var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+
+                        var rta = Send(info.CompanyPhoneNumber, template_Link_Viralizacion, $"\r*{info.ProductName}*", $"~*${info.ProductOldPrice.ToString("N2")}*~", $"*${info.ProductPrice.ToString("N2")}*,\r{prodList}", $"*{info.CompanyURL}*");
                     }
                 }
             }
         }
    
-        private async void Send(string number, string template, params object[] data)
+        private async Task<string> Send(string number, string template, params object[] data)
         {
-            var url = "https://netamx.calixtachat.com/api/v1/chats?api_token=59cFxxN0bAFnGtRviXp51ac4irjFDv&language=es_MX&";
+            var url = "https://netamx.calixtachat.com/api/v1/chats?";
             using var client = new HttpClient();
 
             var builder = new StringBuilder();
-            builder.Append("channel_id=10&");
             builder.Append($"template_id={template}&");
+            builder.Append("api_token=59cFxxN0bAFnGtRviXp51ac4irjFDv&");
             builder.Append($"session={number}&");
             foreach (var item in data)
             {
@@ -89,9 +108,13 @@ namespace Nop.Services.Stores
                     builder.Append($"vars[]={item}&");
                 }
             }
+            builder.Append("channel_id=10&");
+            builder.Append("language=es_MX");
 
-            var response = await client.PostAsync(url + builder.ToString().TrimEnd('&'), null);
+            var response = await client.PostAsync(url + builder.ToString(), null);
             string result = await response.Content.ReadAsStringAsync();
+
+            return result;
         }
 
         private async void Blank(string number, string template, params object[] data) {

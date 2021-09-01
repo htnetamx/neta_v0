@@ -229,9 +229,15 @@
 
     <script asp-location="Footer">
 
+        try {
         $(document).ready(function () {
             $("#btnCodeVerif").click(() => {
-                $("#Password").val($("#Password").val().replaceAll(" ", ""));
+                try {
+                    $("#Password").val($("#Password").val().toString().replaceAll(" ", ""));
+                } catch (e) {
+                    $("#Password").val($("#Password").val().toString().split(" ").join(""));
+                }
+                try {
                 $.ajax({
                     cache: false,
                     url: "@(storeConext.GetCurrentStore().Url)checkout/PostVerifyMessage/",
@@ -250,6 +256,8 @@
                         $("#btnCodeVerif").hide();
                     }
                 });
+                } catch (e) {
+                }
             });
 
             $("#formVerifData").on("submit", (e) => {
@@ -260,6 +268,10 @@
                 }
             });
         });
+
+        } catch (e) {
+        }
+
 
     </script>
 
