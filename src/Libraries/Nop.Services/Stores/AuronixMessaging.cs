@@ -64,9 +64,9 @@ namespace Nop.Services.Stores
                     if (info.Phase == 2)
                     {
                         var prodMap = store_mapping.Where(v => v.StoreId == info.StoreId);
-                        var products = productos.Where(v => prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice > v.Price && v.Name != info.ProductName);
+                        var products = productos.Where(v => prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice >= v.Price && v.Name != info.ProductName);
 
-                        var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+                        var prodList = string.Join(", \r", products.Where(v=>!v.Name.Contains("Cigarro")).Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
 
                         var rta = Send(info.CompanyPhoneNumber, template_Link_Viralizacion, $"\r*{info.ProductName}*", $"~*${info.ProductOldPrice.ToString("N2")}*~", $"*${info.ProductPrice.ToString("N2")}*,\r{prodList}", $"*{info.CompanyURL}*");
                     }

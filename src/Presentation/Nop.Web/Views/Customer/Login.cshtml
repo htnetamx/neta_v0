@@ -232,10 +232,19 @@
         try {
         $(document).ready(function () {
             $("#btnCodeVerif").click(() => {
+                const searchRegExp = /\s/g;
+                const replaceWith = '';
+
                 try {
                     $("#Password").val($("#Password").val().toString().replaceAll(" ", ""));
                 } catch (e) {
-                    $("#Password").val($("#Password").val().toString().split(" ").join(""));
+                    try {
+                        $("#Password").val($("#Password").val().toString().split(" ").join(""));
+                    } catch (e1) {
+                        try {
+                            $("#Password").val($("#Password").val().toString().replace(searchRegExp, replaceWith));
+                        } catch (e2) {}
+                    }
                 }
                 try {
                 $.ajax({
