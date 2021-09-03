@@ -357,7 +357,9 @@ namespace Nop.Web.Controllers
                 if (address == null)
                     throw new Exception("Address can't be loaded");
 
-                address = model.BillingNewAddress.ToEntity(address);
+                //address = model.BillingNewAddress.ToEntity(address);
+                address.FirstName = model.BillingNewAddress.FirstName;
+                address.PhoneNumber = model.BillingNewAddress.PhoneNumber;
                 await _addressService.UpdateAddressAsync(address);
 
                 (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = address.Id;
@@ -400,37 +402,67 @@ namespace Nop.Web.Controllers
         /// </returns>
         public virtual async Task<IActionResult> DeleteEditAddress(int addressId, bool opc = false)
         {
-            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
-            if (!cart.Any())
-                throw new Exception("Your cart is empty");
-
-            var customer = await _workContext.GetCurrentCustomerAsync();
-
-            var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
-            if (address != null)
+            try
             {
-                await _customerService.RemoveCustomerAddressAsync(customer, address);
-                await _customerService.UpdateCustomerAsync(customer);
-                await _addressService.DeleteAddressAsync(address);
-            }
+                var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
+                if (!cart.Any())
+                    throw new Exception("Your cart is empty");
 
-            if (!opc)
-            {
+                var customer = await _workContext.GetCurrentCustomerAsync();
+
+                var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
+                if (address != null)
+                {
+                    if (string.IsNullOrWhiteSpace(address.Email))
+                    {
+                        var billingAddressModel1 = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart);
+                        return Json(new
+                        {
+                            update_section = new UpdateSectionJsonModel
+                            {
+                                name = "billing",
+                                html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel1)
+                            },
+                            wrong_billing_address = true,
+                        });
+                    }
+                    await _customerService.RemoveCustomerAddressAsync(customer, address);
+                    await _customerService.UpdateCustomerAsync(customer);
+                    await _addressService.DeleteAddressAsync(address);
+                }
+                else
+                {
+                    address = await _customerService.GetCustomerAddressAsync1(addressId);
+                    await _customerService.RemoveCustomerAddressAsync(customer, address);
+
+                    customer.BillingAddressId = 30752;
+                    await _customerService.UpdateCustomerAsync(customer);
+
+                    await _addressService.DeleteAddressAsync(address);
+                }
+
+                if (!opc)
+                {
+                    return Json(new
+                    {
+                        redirect = Url.RouteUrl("CheckoutBillingAddress")
+                    });
+                }
+
+                var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart);
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("CheckoutBillingAddress")
+                    update_section = new UpdateSectionJsonModel
+                    {
+                        name = "billing",
+                        html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
+                    }
                 });
             }
-
-            var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart);
-            return Json(new
+            catch (Exception ex)
             {
-                update_section = new UpdateSectionJsonModel
-                {
-                    name = "billing",
-                    html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
-                }
-            });
+                throw;
+            }
         }
 
         #endregion
@@ -1375,12 +1407,22 @@ namespace Nop.Web.Controllers
                 }
                 if (billingAddressId > 0 && string.IsNullOrWhiteSpace(model.BillingNewAddress.FirstName))
                 {
-                    //existing address
-                    var address = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
-                        ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+                    try
+                    {
+                        var address = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
+                            ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
 
-                    (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = address.Id;
-                    await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
+                        (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = address.Id;
+                        await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
+                    }
+                    catch (Exception e)
+                    {
+                        (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = billingAddressId;
+                        await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
+
+                        var address = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
+                            ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+                    }
                 }
                 else
                 {
@@ -1388,11 +1430,14 @@ namespace Nop.Web.Controllers
                     var newAddress = model.BillingNewAddress;
                     if(billingAddressId > 0)
                     {
-                        var address1 = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
-                            ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+                        if (!string.IsNullOrWhiteSpace(model.BillingNewAddress.FirstName))
+                        {
+                            var address1 = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
+                                ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
 
-                        newAddress.Email = address1.PhoneNumber;
-                        newAddress.PhoneNumber = address1.PhoneNumber;
+                            var children = await _addressService.GetRelatedAddressByIdAsync(address1.PhoneNumber);
+                            newAddress.Email = children.Where(v=>v.Email == null).Single().PhoneNumber;
+                        }
                     }
 
                     //custom address attributes
@@ -1894,6 +1939,15 @@ namespace Nop.Web.Controllers
                 //prevent 2 orders being placed within an X seconds time frame
                 //if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
+                
+                foreach(var item in cart)
+                {
+                    var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId);
+                    if (cnt > 35)
+                    {
+                        throw new Exception("Limite en cantidad de Compras. La suma de los asociados supera las 5 unidades de cada uno.");
+                    }
+                }
 
                 //place order
                 var processPaymentRequest = HttpContext.Session.Get<ProcessPaymentRequest>("OrderPaymentInfo");

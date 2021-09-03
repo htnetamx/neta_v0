@@ -74,7 +74,7 @@ namespace Nop.Services.Stores
                     {
                         var prodMap = store_mapping.Where(v => v.StoreId == info.StoreId);
                         var products = productos.Where(v => prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice > v.Price && v.Name != info.ProductName
-                        && DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc && DateTime.UtcNow <= v.MarkAsNewEndDateTimeUtc);
+                        && DateTime.UtcNow >= v.AvailableStartDateTimeUtc && DateTime.UtcNow <= v.AvailableEndDateTimeUtc);
 
                         var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
 

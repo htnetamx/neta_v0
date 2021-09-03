@@ -115,11 +115,28 @@ namespace Nop.Services.Common
             if (string.IsNullOrWhiteSpace(phoneParent))
                 return new List<Address>();
 
-            var query = from a in _addressRepository.Table
-                        where a.PhoneNumber.StartsWith(phoneParent) && a.PhoneNumber.Length > phoneParent.Length
-                        select a;
+            var addressComp = new AddressComparer();
 
-            return await query.ToListAsync();
+            var query = from a in _addressRepository.Table
+                        where a.PhoneNumber == phoneParent || a.Email == phoneParent
+                        select a;
+            var addr = await query.FirstOrDefaultAsync();
+            if (string.IsNullOrWhiteSpace(addr.Email))
+            {
+                var query1 = from a in _addressRepository.Table
+                            where a.Email == addr.PhoneNumber || a.PhoneNumber == addr.PhoneNumber
+                             select a;
+
+                return (await query1.ToListAsync()).Distinct(addressComp).ToList();
+            }
+            else
+            {
+                var query1 = from a in _addressRepository.Table
+                             where a.Email == addr.Email || a.PhoneNumber == addr.Email
+                             select a;
+
+                return (await query1.ToListAsync()).Distinct(addressComp).ToList();
+            }
         }
 
         /// <summary>
@@ -328,5 +345,36 @@ namespace Nop.Services.Common
         }
 
         #endregion
+    }
+
+    public class AddressComparer : IEqualityComparer<Address>
+    {
+        public bool Equals(Address x, Address y)
+        {
+            //First check if both object reference are equal then return true
+            if (object.ReferenceEquals(x, y))
+            {
+                return true;
+            }
+            //If either one of the object refernce is null, return false
+            if (object.ReferenceEquals(x, null) || object.ReferenceEquals(y, null))
+            {
+                return false;
+            }
+            //Comparing all the properties one by one
+            return x.FirstName == y.FirstName;
+        }
+        public int GetHashCode(Address obj)
+        {
+            //If obj is null then return 0
+            if (obj == null)
+            {
+                return 0;
+            }
+            //Get the string HashCode Value
+            //Check for null refernece exception
+            int nameHashCode = obj.FirstName == null ? 0 : obj.FirstName.GetHashCode();
+            return nameHashCode;
+        }
     }
 }

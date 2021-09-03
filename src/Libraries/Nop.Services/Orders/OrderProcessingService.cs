@@ -822,8 +822,9 @@ namespace Nop.Services.Orders
             if (details.BillingAddress is null)
                 throw new NopException("Billing address is not provided");
 
-            await _addressService.InsertAddressAsync(details.BillingAddress);
-            order.BillingAddressId = details.BillingAddress.Id;
+            //await _addressService.InsertAddressAsync(details.BillingAddress);
+            //order.BillingAddressId = details.BillingAddress.Id;
+            order.BillingAddressId = (await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0;
 
             if (details.PickupAddress != null)
             {

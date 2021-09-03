@@ -619,19 +619,6 @@ namespace Nop.Services.Customers
             if (string.IsNullOrWhiteSpace(username))
                 return null;
 
-            var query1 = from c in _customerAddressRepository.Table
-                         orderby c.Id
-                         where c.PhoneNumber == username && (c.Email == "" || c.Email.Contains("@"))
-                         select c;
-            var customer1 = await query1.FirstOrDefaultAsync();
-            if (customer1 != null)
-            {
-                return new Customer()
-                {
-                    Id = -1
-                };
-            }
-
             var query = from c in _customerRepository.Table
                         orderby c.Id
                         where c.Username == username
@@ -1696,6 +1683,18 @@ namespace Nop.Services.Customers
             var key = _staticCacheManager.PrepareKeyForShortTermCache(NopCustomerServicesDefaults.CustomerAddressCacheKey, customerId, addressId);
 
             return await _staticCacheManager.GetAsync(key, async () => await query.FirstOrDefaultAsync());
+        }
+
+        public virtual async Task<Address> GetCustomerAddressAsync1(int addressId)
+        {
+            if (addressId == 0)
+                return null;
+
+            var query = from address in _customerAddressRepository.Table
+                        where address.Id == addressId
+                        select address;
+
+            return await query.FirstOrDefaultAsync();
         }
 
         /// <summary>

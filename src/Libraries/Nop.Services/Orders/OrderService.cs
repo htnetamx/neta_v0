@@ -14,6 +14,7 @@ using Nop.Core.Html;
 using Nop.Data;
 using Nop.Data.Extensions;
 using Nop.Services.Catalog;
+using Nop.Services.Common;
 using Nop.Services.Shipping;
 
 namespace Nop.Services.Orders
@@ -36,6 +37,7 @@ namespace Nop.Services.Orders
         private readonly IRepository<RecurringPayment> _recurringPaymentRepository;
         private readonly IRepository<RecurringPaymentHistory> _recurringPaymentHistoryRepository;
         private readonly IShipmentService _shipmentService;
+        private readonly IAddressService _addressService;
 
         #endregion
 
@@ -51,7 +53,8 @@ namespace Nop.Services.Orders
             IRepository<ProductWarehouseInventory> productWarehouseInventoryRepository,
             IRepository<RecurringPayment> recurringPaymentRepository,
             IRepository<RecurringPaymentHistory> recurringPaymentHistoryRepository,
-            IShipmentService shipmentService)
+            IShipmentService shipmentService,
+            IAddressService addressService)
         {
             _productService = productService;
             _addressRepository = addressRepository;
@@ -64,6 +67,7 @@ namespace Nop.Services.Orders
             _recurringPaymentRepository = recurringPaymentRepository;
             _recurringPaymentHistoryRepository = recurringPaymentHistoryRepository;
             _shipmentService = shipmentService;
+            _addressService = addressService;
         }
 
         #endregion
@@ -224,6 +228,28 @@ namespace Nop.Services.Orders
                     join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                     where oi.Id == orderItemId
                     select o).FirstOrDefaultAsync();
+        }
+
+        public virtual async Task<int> GetOrderSkuCountAsync(int addressId, int productId)
+        {
+            if (addressId == 0 || productId == 0)
+                return -1;
+
+            var currentAddress = await _addressService.GetAddressByIdAsync(addressId);
+            var children = await _addressService.GetRelatedAddressByIdAsync(currentAddress.PhoneNumber);
+
+            var total = 0;
+            foreach(var child in children)
+            {
+                var cnt = await (from o in _orderRepository.Table
+                              join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
+                              join a in _addressRepository.Table on o.BillingAddressId equals a.Id
+                              where oi.ProductId == productId && o.BillingAddressId == child.Id
+                              select o).CountAsync();
+                total += cnt;
+            }
+
+            return total;
         }
 
         /// <summary>

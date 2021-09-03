@@ -55,11 +55,11 @@
         </div>
     }
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressMiddle })
-    <div class="section new-billing-address" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:none" : "display:block")">
+    @*<div class="section new-billing-address" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:none" : "display:block")">
         <div class="enter-address">
             <p>Hola de nuevo! @name</p>
         </div>
-    </div>
+    </div>*@
     <div class="section new-billing-address" id="billing-new-address-form" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:block" : "display:none")">
         <div class="enter-address">
             <div asp-validation-summary="ModelOnly" class="message-error"></div>
