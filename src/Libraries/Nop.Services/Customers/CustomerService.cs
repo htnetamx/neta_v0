@@ -619,6 +619,19 @@ namespace Nop.Services.Customers
             if (string.IsNullOrWhiteSpace(username))
                 return null;
 
+            var query1 = from c in _customerAddressRepository.Table
+                         orderby c.Id
+                         where c.PhoneNumber == username && (c.Email == "" || c.Email.Contains("@"))
+                         select c;
+            var customer1 = await query1.FirstOrDefaultAsync();
+            if (customer1 != null)
+            {
+                return new Customer()
+                {
+                    Id = -1
+                };
+            }
+
             var query = from c in _customerRepository.Table
                         orderby c.Id
                         where c.Username == username
