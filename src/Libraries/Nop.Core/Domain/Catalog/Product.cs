@@ -612,5 +612,10 @@ namespace Nop.Core.Domain.Catalog
             get => (RentalPricePeriod)RentalPricePeriodId;
             set => RentalPricePeriodId = (int)value;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating the amount of product to fill a Tara
+        /// </summary>
+        public decimal PerTaras { get; set; }
     }
 }

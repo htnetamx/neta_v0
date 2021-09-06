@@ -730,7 +730,7 @@ namespace Nop.Services.Catalog
         /// The task result contains the list of new products
         /// </returns>
         /// 
-        public virtual async Task<IList<Product>> GetProducts48hAsync(int storeId = 0)
+        public virtual async Task<IList<Product>> GetNewPPoductsAsync(int storeId = 0,int hours=0)
         {
             return await _productRepository.GetAllAsync(async query =>
             {
@@ -740,7 +740,7 @@ namespace Nop.Services.Catalog
                //apply ACL constraints
                var customer = await _workContext.GetCurrentCustomerAsync();
                query = await _aclService.ApplyAcl(query, customer);
-               var dias = 2;
+               var dias = hours/24;
                var myDate = DateTime.UtcNow.AddDays(-dias);
                query = from p in query
                         where p.Published

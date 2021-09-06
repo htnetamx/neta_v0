@@ -81,27 +81,22 @@ namespace Nop.Services.Events
         }
 
         /// <summary>
-        /// Write Data To Google Spread Sheet
+        /// Write Data To Google Spread Sheet - Shops Errors
         /// </summary>
-        public static AppendValuesResponse AppendOnSpreadSheet<T>(string spreadsheetId, string sheet, string rangeA1D1Format, List<T> values)
+        public static AppendValuesResponse AppendOnSpreadSheetInfoShopsErros(string spreadsheetId, string sheet, string rangeA1D1Format,List<InfoShopsErrors> values)
         {
             var range = $"{sheet}!{rangeA1D1Format}";
 
             var valueRange = new ValueRange();
             var fullInfo = new List<IList<object>>();
-            if (values[0].GetType().Name == "InfoShopsErrors")
+            fullInfo.Add(InfoShopsErrors.Headers());
+            foreach (var row in values)
             {
-                fullInfo.Add(InfoShopsErrors.Headers());
-                foreach (var row in values)
+                if (row.HasErrors())
                 {
-                    var store = ((InfoShopsErrors)(object)row);
-                    if (store.HasErrors())
-                    {
-                        fullInfo.Add(store.ToStringList());
-                    }
+                    fullInfo.Add(row.ToStringList());
                 }
             }
-
             valueRange.Values = fullInfo;
             var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
             appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
@@ -109,10 +104,185 @@ namespace Nop.Services.Events
             return appendResponse;
         }
 
+        /// <summary>
+        /// Write Data To Google Spread Sheet - 9 to 9 process Ops
+        /// </summary>
+        public static AppendValuesResponse AppendOnSpreadSheet929OpsGMV(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOpsGMV> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOpsGMV.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+
+        public static AppendValuesResponse AppendOnSpreadSheet929Ops(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOps> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOps.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+        public static AppendValuesResponse AppendOnSpreadSheet929OpsStoreUniqueClients(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOpsUnique> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOpsUnique.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+        public static AppendValuesResponse AppendOnSpreadSheet929OpsStoreUniqueClientsC10(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOpsUniqueC10> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOpsUniqueC10.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+        public static AppendValuesResponse AppendOnSpreadSheet929OpsAllStores(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOpsAllStores> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOpsAllStores.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+        public static AppendValuesResponse AppendOnSpreadSheet929OpsDispatch(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOpsStoresDispatchDecision> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOpsStoresDispatchDecision.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+
+        public static AppendValuesResponse AppendOnSpreadSheet929OpsDispatchTaras(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOpsStoresDispatchTarasSymmary> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOpsStoresDispatchTarasSymmary.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+
+        public static AppendValuesResponse AppendOnSpreadSheet929OpsDispatchOrders(string spreadsheetId, string sheet, string rangeA1D1Format, List<NineToNineOpsStoresDispatchOrderSummary> values, List<object> datesMX, List<object> datesUTC)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(datesMX);
+            fullInfo.Add(datesUTC);
+            fullInfo.Add(NineToNineOpsStoresDispatchOrderSummary.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
+        public static AppendValuesResponse AppendOnSpreadSheetLatLong(string spreadsheetId, string sheet, string rangeA1D1Format, List<LatLong> values)
+        {
+            var range = $"{sheet}!{rangeA1D1Format}";
+
+            var valueRange = new ValueRange();
+            var fullInfo = new List<IList<object>>();
+            fullInfo.Add(LatLong.Headers());
+            foreach (var row in values)
+            {
+                fullInfo.Add(row.ToStringList());
+            }
+            valueRange.Values = fullInfo;
+            var appendRequest = _service.Spreadsheets.Values.Append(valueRange, spreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendResponse = appendRequest.Execute();
+            return appendResponse;
+        }
         public static ClearValuesResponse DeleteSpreadSheetContent(string spreadsheetId, string sheet, string rangeA1D1Format)
         {
             ClearValuesRequest clearValuesRequest = new ClearValuesRequest();
-            var clearRequest= _service.Spreadsheets.Values.Clear(clearValuesRequest,spreadsheetId, rangeA1D1Format);
+            var clearRequest= _service.Spreadsheets.Values.Clear(clearValuesRequest,spreadsheetId, "'"+sheet+"'!"+rangeA1D1Format);
             var clearResponse = clearRequest.Execute();
             return clearResponse;
         }
