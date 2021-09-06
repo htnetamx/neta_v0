@@ -1435,7 +1435,7 @@ namespace Nop.Web.Controllers
                                 ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
 
                             var children = await _addressService.GetRelatedAddressByIdAsync(address1.PhoneNumber);
-                            newAddress.Email = children.Where(v=>v.Email == null).Single().PhoneNumber;
+                            newAddress.Email = children.Where(v=>v.Email == null || v.Email.Contains("@")).Single().PhoneNumber;
                         }
                     }
 
