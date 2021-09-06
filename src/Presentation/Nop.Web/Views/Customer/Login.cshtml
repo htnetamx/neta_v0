@@ -35,13 +35,13 @@
                 @if (Model.RegistrationType == UserRegistrationType.Disabled)
                 {
                     @*<div class="new-wrapper">
-                        <div class="title">
-                            @T("Account.Register")
-                        </div>
-                        <div class="text">
-                            @T("Account.Register.Result.Disabled")
-                        </div>
-                    </div>*@
+                            <div class="title">
+                                @T("Account.Register")
+                            </div>
+                            <div class="text">
+                                @T("Account.Register.Result.Disabled")
+                            </div>
+                        </div>*@
                 }
                 else if (Model.CheckoutAsGuest)
                 {
@@ -61,16 +61,16 @@
                 else
                 {
                     @*<div class="new-wrapper register-block">
-                        <div class="title">
-                            <strong>@T("Account.Login.NewCustomer")</strong>
-                        </div>
-                        <div class="text">
-                            @T("Account.Login.NewCustomerText")
-                        </div>
-                        <div class="buttons">
-                            <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
-                        </div>
-                    </div>*@
+                            <div class="title">
+                                <strong>@T("Account.Login.NewCustomer")</strong>
+                            </div>
+                            <div class="text">
+                                @T("Account.Login.NewCustomerText")
+                            </div>
+                            <div class="buttons">
+                                <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                            </div>
+                        </div>*@
                 }
                 <div class="returning-wrapper fieldset">
                     <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
@@ -127,13 +127,13 @@
                 @if (Model.RegistrationType == UserRegistrationType.Disabled)
                 {
                     @*<div class="new-wrapper">
-                        <div class="title">
-                            @T("Account.Register")
-                        </div>
-                        <div class="text">
-                            @T("Account.Register.Result.Disabled")
-                        </div>
-                    </div>*@
+                            <div class="title">
+                                @T("Account.Register")
+                            </div>
+                            <div class="text">
+                                @T("Account.Register.Result.Disabled")
+                            </div>
+                        </div>*@
                 }
                 else if (Model.CheckoutAsGuest)
                 {
@@ -153,16 +153,16 @@
                 else
                 {
                     @*<div class="new-wrapper register-block">
-                        <div class="title">
-                            <strong>@T("Account.Login.NewCustomer")</strong>
-                        </div>
-                        <div class="text">
-                            @T("Account.Login.NewCustomerText")
-                        </div>
-                        <div class="buttons">
-                            <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
-                        </div>
-                    </div>*@
+                            <div class="title">
+                                <strong>@T("Account.Login.NewCustomer")</strong>
+                            </div>
+                            <div class="text">
+                                @T("Account.Login.NewCustomerText")
+                            </div>
+                            <div class="buttons">
+                                <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                            </div>
+                        </div>*@
                 }
                 <div class="returning-wrapper fieldset">
                     <form id="formVerifData" asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
