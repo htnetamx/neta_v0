@@ -333,7 +333,7 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> NewProducts()
         {
             var storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
-            var products = await _productService.GetProducts48hAsync(storeId);
+            var products = await _productService.GetNewPPoductsAsync(storeId,168);
             var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products)).ToList();
 
             return View(model);

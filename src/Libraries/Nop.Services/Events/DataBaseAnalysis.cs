@@ -101,7 +101,7 @@ namespace Nop.Services.Events
                 var range = "A:CC";
                 var deleteResponse = GoogleAPI.DeleteSpreadSheetContent(spreadsheetId, sheet, range);
                 range = "A:D";
-                var appendResponse = GoogleAPI.AppendOnSpreadSheet(spreadsheetId, sheet, range, stores_With_Errors);
+                var appendResponse = GoogleAPI.AppendOnSpreadSheetInfoShopsErros(spreadsheetId, sheet, range, stores_With_Errors);
             }
         }
 
