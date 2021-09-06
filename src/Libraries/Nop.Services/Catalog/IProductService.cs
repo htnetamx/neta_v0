@@ -82,7 +82,7 @@ namespace Nop.Services.Catalog
         /// </returns>
         /// 
 
-        Task<IList<Product>> GetProducts48hAsync(int storeId = 0);
+        Task<IList<Product>> GetNewPPoductsAsync(int storeId = 0, int hours=0);
 
         /// <summary>
         /// Gets product
