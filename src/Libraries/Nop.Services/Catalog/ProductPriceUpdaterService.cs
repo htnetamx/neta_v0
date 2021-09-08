@@ -27,11 +27,11 @@ namespace Nop.Services.Catalog
 
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            if (DateTime.UtcNow.Hour != 5)
-                return;
-
+            //if (DateTime.UtcNow.Hour != 5)
+            //    return;
             var products = (await _productService.GetAllProductsDisplayedOnHomepageAsync())
-                .Where(p => p.MarkAsNew && p.AvailableEndDateTimeUtc.Value.Date <= DateTime.UtcNow.Date);
+                .Where(p => p.MarkAsNew && 
+                            p.AvailableEndDateTimeUtc.Value.Date <= DateTime.UtcNow.Date);
             foreach (var product in products)
             {
                 product.MarkAsNew = false;
