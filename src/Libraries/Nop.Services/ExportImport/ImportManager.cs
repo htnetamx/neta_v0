@@ -1597,6 +1597,11 @@ namespace Nop.Services.ExportImport
 
                 product.UpdatedOnUtc = DateTime.UtcNow;
 
+                if(product.Price <= 0 || product.OldPrice<=0)
+                    throw new Exception("El precio no puede ser cero");
+
+                product.LimitedToStores = true;
+
                 if (isNew)
                     await _productService.InsertProductAsync(product);
                 else
@@ -1737,16 +1742,16 @@ namespace Nop.Services.ExportImport
                     await _productTagService.UpdateProductTagsAsync(product, productTags.Where(pt => !filter.Contains(pt)).ToArray());
                 }
 
-                tempProperty = metadata.Manager.GetProperty("LimitedToStores");
-                if (tempProperty != null)
-                {
-                    var limitedToStoresList = tempProperty.StringValue;
+                //tempProperty = metadata.Manager.GetProperty("LimitedToStores");
+                //if (tempProperty != null)
+                //{
+                //    var limitedToStoresList = tempProperty.StringValue;
 
-                    var importedStores = product.LimitedToStores ? limitedToStoresList.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(x => allStores.FirstOrDefault(store => store.Name == x.Trim())?.Id ?? int.Parse(x.Trim())).ToList() : new List<int>();
+                //    var importedStores = product.LimitedToStores ? limitedToStoresList.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                //        .Select(x => allStores.FirstOrDefault(store => store.Name == x.Trim())?.Id ?? int.Parse(x.Trim())).ToList() : new List<int>();
 
-                    await _productService.UpdateProductStoreMappingsAsync(product, importedStores);
-                }
+                //    await _productService.UpdateProductStoreMappingsAsync(product, importedStores);
+                //}
 
                 var picture1 = await DownloadFileAsync(metadata.Manager.GetProperty("Picture1")?.StringValue, downloadedFiles);
                 var picture2 = await DownloadFileAsync(metadata.Manager.GetProperty("Picture2")?.StringValue, downloadedFiles);
