@@ -114,13 +114,8 @@
             var filas_actuales = Math.ceil((current / cantidadProductosFila));
             console.log("--------------------------------------------------------------------------------------------------------------------------------");
             var filas_a_restar = filas_actuales - filas_anteriores - end_sum;
-            var fila_final = filas_actuales - filas_a_restar;
-            if (current == 0 || current == null) {
-                fila_final = 0;
-            }
-            //console.log("Estoy en la fila " + fila_final);
-            console.log(newHeight);
-            console.log(heightP * filas_a_restar);
+            var fila_final = (filas_actuales - filas_a_restar)*end_sum;
+            console.log("Estoy en la fila " + fila_final);
             window.scrollTo(0, heightP * fila_final);
             console.log("--------------------------------------------------------------------------------------------------------------------------------");
 
