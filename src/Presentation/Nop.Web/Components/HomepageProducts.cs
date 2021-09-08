@@ -67,9 +67,8 @@ namespace Nop.Web.Components
             pp = products.Where(p => p.DisplayOrder == 0);
             //availability dates
             products = products.Where(p => isLoggedIn || _productService.ProductIsAvailable(p)).ToList();
-
             //visible individually
-            .Where(p => p.VisibleIndividually).ToListAsync();
+            products = await products.Where(p => p.VisibleIndividually).ToListAsync();
 
             var fase = await _storeContext.GetCurrentStoreAsync();
             if (fase.DisplayOrder == 1)
