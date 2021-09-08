@@ -37,49 +37,52 @@ namespace Nop.Services.Stores
         {
             //if ((DateTime.UtcNow.AddHours(-5)).DayOfWeek==DayOfWeek.Sunday)
             //    return;
-            
-            var stores = (await _storeService.GetAllStoresAsync())
-                .Where(s => s.DisplayOrder >0 && s.DisplayOrder<4);
-            var productos = (await _productService.GetAllProductsAsync());
-            var store_mapping = (await _storeMapping.GetFullStoreMappingsAsync());
 
-            var max_discounts = (productos.Join(store_mapping, p => p.Id, sm => sm.EntityId,
-                (p, sm) => new { StoreId = sm.StoreId, ProductId = p.Id, OldPrice = p.OldPrice, Price=p.Price}))
-                .GroupBy(sm => sm.StoreId,(storeId, sm_stores) => new{StoreId = storeId, Best_Promo = sm_stores.Max(sm=>sm.OldPrice-sm.Price)});
-    
-            var query = (max_discounts.Join(stores, md => md.StoreId, s => s.Id,
-                (md, s) => new { StoreId=s.Id,CompanyPhoneNumber = s.CompanyPhoneNumber, StoreName = s.Name, CompanyURL =s.Url, md.Best_Promo, Phase=s.DisplayOrder }))
-                .Join(productos, store => store.Best_Promo, p => (p.OldPrice - p.Price),
-                (s,p) => new { StoreId=s.StoreId, Phase=s.Phase, CompanyPhoneNumber=s.CompanyPhoneNumber, ProductName=p.Name, ProductOldPrice=p.OldPrice, ProductPrice=p.Price, s.CompanyURL});
-
-            var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:promo_hoy";
-            foreach (var info in query)
+            var stores = await _storeService.GetAllStoresAsync();
+                
+            var fase1 = stores.Where(s => s.DisplayOrder == 1);
+            foreach(var info in fase1)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
-                    if (info.Phase == 1)
-                    {
-                        var rta = await Send(info.CompanyPhoneNumber, template_Link_Viralizacion, $"\r*{info.ProductName}*", $"~${info.ProductOldPrice.ToString("N2")}~", $"*${info.ProductPrice.ToString("N2")}*", $"*{info.CompanyURL}*");
-                    }
-                    if (info.Phase == 2)
-                    {
-                        var prodMap = store_mapping.Where(v => v.StoreId == info.StoreId);
-                        var products = productos.Where(v => prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice >= v.Price && v.Name != info.ProductName);
+                    var rta = await Send(info.CompanyPhoneNumber,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f1", 
+                        info.CompanyName, 
+                        info.Url);
+                }
+            }
 
-                        var prodList = string.Join(", \r", products.Where(v=>!v.Name.Contains("Cigarro")).Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+            var fase2 = stores.Where(s => s.DisplayOrder == 2);
+            foreach (var info in fase2)
+            {
+                if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
+                {
+                    var rta = await Send(info.CompanyPhoneNumber,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f2",
+                        info.CompanyName, 
+                        info.Url);
+                }
+            }
 
-                        var rta = Send(info.CompanyPhoneNumber, template_Link_Viralizacion, $"\r*{info.ProductName}*", $"~*${info.ProductOldPrice.ToString("N2")}*~", $"*${info.ProductPrice.ToString("N2")}*,\r{prodList}", $"*{info.CompanyURL}*");
-                    }
-                    if (info.Phase == 3)
-                    {
-                        var prodMap = store_mapping.Where(v => v.StoreId == info.StoreId);
-                        var products = productos.Where(v => prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice > v.Price && v.Name != info.ProductName
-                        && DateTime.UtcNow >= v.AvailableStartDateTimeUtc && DateTime.UtcNow <= v.AvailableEndDateTimeUtc);
+            var fase3 = stores.Where(s => s.DisplayOrder == 3);
+            foreach (var info in fase3)
+            {
+                if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
+                {
+                    var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == info.Id);
 
-                        var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+                    var products = (await _productService.GetAllProductsAsync()).Where(v => 
+                    prodMap.Any(x => x.EntityId == v.Id) && v.OldPrice > v.Price && 
+                    DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc && 
+                    DateTime.UtcNow <= v.MarkAsNewEndDateTimeUtc);
 
-                        var rta = Send(info.CompanyPhoneNumber, template_Link_Viralizacion, $"\r*{info.ProductName}*", $"~*${info.ProductOldPrice.ToString("N2")}*~", $"*${info.ProductPrice.ToString("N2")}*,\r{prodList}", $"*{info.CompanyURL}*");
-                    }
+                    var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+
+                    var rta = Send(info.CompanyPhoneNumber, 
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2",
+                        info.Url, 
+                        info.Name, 
+                        prodList);
                 }
             }
         }
