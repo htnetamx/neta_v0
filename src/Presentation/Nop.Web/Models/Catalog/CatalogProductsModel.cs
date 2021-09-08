@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Nop.Services.Tasks;
 using Nop.Web.Framework.UI.Paging;
 
 namespace Nop.Web.Models.Catalog
@@ -94,8 +90,7 @@ namespace Nop.Web.Models.Catalog
         public string MinimumProducts { get; set; }
         public string Increment { get; set; }
         public string StartingProducts { get; set; }
-
-
+        
         #endregion
 
         #region Ctor
