@@ -125,7 +125,8 @@ namespace Nop.Services.Common
             {
                 var query1 = from a in _addressRepository.Table
                             where a.Email == addr.PhoneNumber || a.PhoneNumber == addr.PhoneNumber
-                             select a;
+                            orderby a.Id
+                            select a;
 
                 return (await query1.ToListAsync()).Distinct(addressComp).ToList();
             }
@@ -133,6 +134,7 @@ namespace Nop.Services.Common
             {
                 var query1 = from a in _addressRepository.Table
                              where a.Email == addr.Email || a.PhoneNumber == addr.Email
+                             orderby a.Id
                              select a;
 
                 return (await query1.ToListAsync()).Distinct(addressComp).ToList();
