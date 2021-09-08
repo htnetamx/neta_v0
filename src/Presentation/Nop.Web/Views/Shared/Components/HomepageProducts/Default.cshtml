@@ -5,7 +5,6 @@
         <a style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw "  href="/curiosities">Haz click y descubre curiosidades neta</a>
     </div>
     
-    
     @if (Model.CatalogProductsModel.Products.Count > 0)
     {
         var store = storeContext.GetCurrentStore();
@@ -91,7 +90,6 @@
             var queryString = window.location.search;
             var urlParams = new URLSearchParams(queryString);
             var current = urlParams.get('pagesize');
-            var newHeight = document.querySelector(".master-wrapper-content").scrollHeight;
             var newWidth = document.querySelector(".master-wrapper-content").scrollWidth;
             var heightP = document.querySelector('.item-box').scrollHeight;
             var widthP = document.querySelector('.item-box').scrollWidth;
