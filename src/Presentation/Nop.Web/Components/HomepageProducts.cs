@@ -52,6 +52,20 @@ namespace Nop.Web.Components
             //visible individually
             .Where(p => p.VisibleIndividually).ToListAsync();
 
+            var fase = await _storeContext.GetCurrentStoreAsync();
+            if (fase.DisplayOrder == 1)
+            {
+                products = products.Where(v => v.Sku.EndsWith("F1")).ToList();
+            }
+            else if (fase.DisplayOrder == 2)
+            {
+                products = products.Where(v => v.Sku.EndsWith("F2")).ToList();
+            }
+            else
+            {
+                products = products.Where(v => !(v.Sku.EndsWith("F1") || v.Sku.EndsWith("F2"))).ToList();
+            }
+
             if (!products.Any())
                 return Content("");
 
