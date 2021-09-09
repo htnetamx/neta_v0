@@ -40,7 +40,7 @@ namespace Nop.Services.Stores
 
             var stores = await _storeService.GetAllStoresAsync();
                 
-            var fase1 = stores.Where(s => s.DisplayOrder == 1);
+            var fase1 = stores.Where(s => s.Name=="Testing" && s.DisplayOrder == 1);
             foreach(var info in fase1)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
@@ -52,7 +52,7 @@ namespace Nop.Services.Stores
                 }
             }
 
-            var fase2 = stores.Where(s => s.DisplayOrder == 2);
+            var fase2 = stores.Where(s => s.Name == "Testing" && s.DisplayOrder == 2);
             foreach (var info in fase2)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
@@ -64,7 +64,7 @@ namespace Nop.Services.Stores
                 }
             }
 
-            var fase3 = stores.Where(s => s.DisplayOrder == 3);
+            var fase3 = stores.Where(s => s.Name == "Testing" && s.DisplayOrder == 3);
             foreach (var info in fase3)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
