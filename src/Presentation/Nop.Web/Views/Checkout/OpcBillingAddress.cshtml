@@ -1,12 +1,16 @@
 ﻿@model CheckoutBillingAddressModel
 @using Nop.Core.Infrastructure
-@{ 
+@using Nop.Core
+@inject IWebHelper webHelper
+@{
     var service = EngineContext.Current.Resolve<Nop.Services.Common.IAddressService>();
     var currentCustomer = workContext.GetCurrentCustomerAsync().Result;
     var billingAddress = currentCustomer?.BillingAddressId;
     var addressObj = service.GetAddressByIdAsync(billingAddress ?? 0).Result;
     var name = addressObj?.FirstName;
     var phone = addressObj?.PhoneNumber;
+
+    var storeLocation = webHelper.GetStoreLocation();
 
     var children = service.GetRelatedAddressByIdAsync(phone).Result;
 
@@ -32,34 +36,47 @@
         <div class="section select-billing-address">
             <label for="billing-address-select">@T("Checkout.SelectBillingAddressOrEnterNewOne")</label>
             <div>
-                <select name="billing_address_id" id="billing-address-select" class="address-select"
-                        title="" onchange="Billing.resetBillingForm();Billing.newAddress(!this.value)">
-                    @foreach (var address in children)
-                    {
-                        if (address.Id == billingAddress)
+                <table cellspacing="0" cellpadding="0" border="0">
+                    @{
+                        var i = 0;
+                        foreach (var address in children)
                         {
-                            <option value="@(address.Id)" selected="selected">@(address.FirstName)</option>
-                        }
-                        else
-                        {
-                            <option value="@(address.Id)">@(address.FirstName)</option>
+                            if (i == 0)
+                            {
+                                        <tr>
+                                            <td style="padding: 5px"><h2 class="title">@(address.FirstName)</h2></td>
+                                            @if (children.Count > 1)
+                                            {
+                                                <td style="padding: 5px">
+                                                    <button type="button" name="save" class="button-1 new-address-next-step-button" onclick="Billing.save(@(address.Id))">Seleccionar</button>
+                                                </td>
+                                            }
+                                        </tr>
+                                i = 1;
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td style="padding: 5px"><h2 class="title">@(address.FirstName)</h2></td>
+                                    <td style="padding: 5px">
+                                        <button type="button" name="save" class="button-1 new-address-next-step-button" onclick="Billing.save(@(address.Id))">Seleccionar</button>
+                                        <button id="delete-address-button" type="button" class="button-1" onclick="Billing.deleteAddress('@(storeLocation)checkout/DeleteEditAddress/', @(address.Id), '@(address.FirstName)'); return false;">@T("Common.Delete")</button>
+                                    </td>
+                                </tr>
+                            }
                         }
                     }
-                    @*<option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
-                    @if (children.Count < 7)
-                    {
-                        <option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
-                    }*@
-                </select>
+                </table>
+                <input type="hidden" id="billing_address_id" name="billing_address_id" />
             </div>
         </div>
     }
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressMiddle })
     @*<div class="section new-billing-address" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:none" : "display:block")">
-        <div class="enter-address">
-            <p>Hola de nuevo! @name</p>
-        </div>
-    </div>*@
+            <div class="enter-address">
+                <p>Hola de nuevo! @name</p>
+            </div>
+        </div>*@
     <div class="section new-billing-address" id="billing-new-address-form" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:block" : "display:none")">
         <div class="enter-address">
             <div asp-validation-summary="ModelOnly" class="message-error"></div>

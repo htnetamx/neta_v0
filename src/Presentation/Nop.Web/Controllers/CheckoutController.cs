@@ -408,37 +408,12 @@ namespace Nop.Web.Controllers
                 if (!cart.Any())
                     throw new Exception("Your cart is empty");
 
-                var customer = await _workContext.GetCurrentCustomerAsync();
-
-                var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
+                var address = await _addressService.GetAddressByIdAsync(addressId);
                 if (address != null)
                 {
-                    if (string.IsNullOrWhiteSpace(address.Email))
-                    {
-                        var billingAddressModel1 = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart);
-                        return Json(new
-                        {
-                            update_section = new UpdateSectionJsonModel
-                            {
-                                name = "billing",
-                                html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel1)
-                            },
-                            wrong_billing_address = true,
-                        });
-                    }
-                    await _customerService.RemoveCustomerAddressAsync(customer, address);
-                    await _customerService.UpdateCustomerAsync(customer);
-                    await _addressService.DeleteAddressAsync(address);
-                }
-                else
-                {
-                    address = await _customerService.GetCustomerAddressAsync1(addressId);
-                    await _customerService.RemoveCustomerAddressAsync(customer, address);
-
-                    customer.BillingAddressId = 30752;
-                    await _customerService.UpdateCustomerAsync(customer);
-
-                    await _addressService.DeleteAddressAsync(address);
+                    address.Email = "";
+                    address.PhoneNumber = "";
+                    await _addressService.UpdateAddressAsync(address);
                 }
 
                 if (!opc)
