@@ -411,6 +411,12 @@ namespace Nop.Web.Controllers
                 var address = await _addressService.GetAddressByIdAsync(addressId);
                 if (address != null)
                 {
+                    var parent = await _addressService.GetRelatedAddressByIdAsync(address.PhoneNumber);
+                    var customer = await _workContext.GetCurrentCustomerAsync();
+                    customer.BillingAddressId = parent.First().Id;
+                    await _customerService.UpdateCustomerAsync(customer);
+
+
                     address.Email = "";
                     address.PhoneNumber = "";
                     await _addressService.UpdateAddressAsync(address);
