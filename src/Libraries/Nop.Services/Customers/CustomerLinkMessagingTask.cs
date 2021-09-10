@@ -40,13 +40,13 @@ namespace Nop.Services.Customers
         {
             var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:compartir";
             var orders = await _orderService.SearchOrdersAsync(
-                createdFromUtc: DateTime.UtcNow.Date, 
+                createdFromUtc: DateTime.UtcNow.Date.AddHours(2), 
                 createdToUtc: DateTime.UtcNow.Date.AddDays(1).AddMinutes(-1));
 
             var init = 0;
             var end = orders.Count;
             var rndList = new List<int>();
-            for(var i = 0; i < 100; i++)
+            for(var i = 0; i < (orders.Count > 100 ? 100 : orders.Count); i++)
             {
                 var rndNumber = new Random().Next(init, end);
                 if (!rndList.Contains(rndNumber))
@@ -61,10 +61,10 @@ namespace Nop.Services.Customers
 
                 var address = await _addressService.GetAddressByIdAsync(customer.BillingAddressId);
                 var store = await _storeService.GetStoreByIdAsync(customer.StoreId);
-                
+
                 var rta = await Send(address.PhoneNumber,
                     template_Link_Viralizacion,
-                    address.FirstName.Split(" ")[0],
+                    "*" + address.FirstName.Split(" ")[0] + "*",
                     store.Url);
             }
         }

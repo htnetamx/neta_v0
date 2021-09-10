@@ -40,31 +40,30 @@ namespace Nop.Services.Stores
 
             var stores = await _storeService.GetAllStoresAsync();
                 
-            var fase1 = stores.Where(s => s.Name=="Testing" && s.DisplayOrder == 1);
+            var fase1 = stores.Where(s => s.DisplayOrder == 1);
             foreach(var info in fase1)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
                     var rta = await Send(info.CompanyPhoneNumber,
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f1", 
-                        info.CompanyName, 
+                        info.Name, 
                         info.Url);
                 }
             }
 
-            var fase2 = stores.Where(s => s.Name == "Testing" && s.DisplayOrder == 2);
+            var fase2 = stores.Where(s => s.DisplayOrder == 2);
             foreach (var info in fase2)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
                     var rta = await Send(info.CompanyPhoneNumber,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f2",
-                        info.CompanyName, 
-                        info.Url);
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f2", 
+                        info.Url, "*"+info.Name+"*");
                 }
             }
 
-            var fase3 = stores.Where(s => s.Name == "Testing" && s.DisplayOrder == 3);
+            var fase3 = stores.Where(s => s.DisplayOrder == 3);
             foreach (var info in fase3)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
@@ -76,7 +75,7 @@ namespace Nop.Services.Stores
                     DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc && 
                     DateTime.UtcNow <= v.MarkAsNewEndDateTimeUtc);
 
-                    var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+                    var prodList = string.Join(" \r", products.Select(v => $"- {v.Name} a *${v.Price.ToString("N2")}* (En otros lugares a ~${v.OldPrice.ToString("N2")}~)").ToArray());
 
                     var rta = Send(info.CompanyPhoneNumber, 
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2",
