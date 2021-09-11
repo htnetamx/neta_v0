@@ -9,8 +9,8 @@
     Layout = "_ColumnsOne";
 
     //scripts
-    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.accordion.js");
-    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.onepagecheckout.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.accordion.js?" + Guid.NewGuid());
+    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.onepagecheckout.js?" + Guid.NewGuid());
 
     var storeLocation = webHelper.GetStoreLocation();
 
