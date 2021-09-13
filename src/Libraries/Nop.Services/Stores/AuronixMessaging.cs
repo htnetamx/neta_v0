@@ -47,7 +47,7 @@ namespace Nop.Services.Stores
                 {
                     var rta = await Send(info.CompanyPhoneNumber,
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f1", 
-                        info.CompanyName, 
+                        info.Name, 
                         info.Url);
                 }
             }
@@ -58,9 +58,8 @@ namespace Nop.Services.Stores
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
                     var rta = await Send(info.CompanyPhoneNumber,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f2",
-                        info.CompanyName, 
-                        info.Url);
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f2", 
+                        info.Url, "*"+info.Name+"*");
                 }
             }
 
@@ -76,7 +75,7 @@ namespace Nop.Services.Stores
                     DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc && 
                     DateTime.UtcNow <= v.MarkAsNewEndDateTimeUtc);
 
-                    var prodList = string.Join(", \r", products.Select(v => $"*{v.Name}* de ~*${v.OldPrice.ToString("N2")}*~ a *${v.Price.ToString("N2")}*").ToArray());
+                    var prodList = string.Join(" \r", products.Select(v => $"- {v.Name} a *${v.Price.ToString("N2")}* (En otros lugares a ~${v.OldPrice.ToString("N2")}~)").ToArray());
 
                     var rta = Send(info.CompanyPhoneNumber, 
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2",

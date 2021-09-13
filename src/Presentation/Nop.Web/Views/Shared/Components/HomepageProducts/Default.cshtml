@@ -8,10 +8,7 @@
     @if (Model.CatalogProductsModel.Products.Count > 0)
     {
         var store = storeContext.GetCurrentStore();
-        if (store.Id == 165)
-        {
-            ViewBag.RoyaltyMessage = null;
-        }
+        ViewBag.RoyaltyMessage = null;
         if (ViewBag.RoyaltyMessage != null)
         {
             if (store.Id == 49)
