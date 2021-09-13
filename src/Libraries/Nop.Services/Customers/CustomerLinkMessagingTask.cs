@@ -7,25 +7,26 @@ using System.Threading.Tasks;
 using Nop.Services.Tasks;
 using Nop.Services.Catalog;
 using Nop.Services.Stores;
+using Nop.Services.Orders;
+using Nop.Services.Common;
 
 namespace Nop.Services.Customers
 {
     class CustomerLinkMessagingTask : IScheduleTask
     {
         #region Fields
-
         private readonly IStoreService _storeService;
-        private readonly IProductService _productService;
-        private readonly IStoreMappingService _storeMapping;
+        private readonly IOrderService _orderService;
+        private readonly IAddressService _addressService;
         #endregion
 
         #region Ctor
 
-        public CustomerLinkMessagingTask(IStoreService storeService, IProductService productService, IStoreMappingService storeMapping)
+        public CustomerLinkMessagingTask(IStoreService storeService, IOrderService orderService, IAddressService addressService)
         {
             _storeService = storeService;
-            _productService = productService;
-            _storeMapping = storeMapping;
+            _orderService = orderService;
+            _addressService = addressService;
         }
 
         #endregion
@@ -37,7 +38,35 @@ namespace Nop.Services.Customers
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:promo_hoy";
+            var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:compartir";
+            var orders = await _orderService.SearchOrdersAsync(
+                createdFromUtc: DateTime.UtcNow.Date.AddHours(2), 
+                createdToUtc: DateTime.UtcNow.Date.AddDays(1).AddMinutes(-1));
+
+            var init = 0;
+            var end = orders.Count;
+            var rndList = new List<int>();
+            for(var i = 0; i < (orders.Count > 100 ? 100 : orders.Count); i++)
+            {
+                var rndNumber = new Random().Next(init, end);
+                if (!rndList.Contains(rndNumber))
+                {
+                    rndList.Add(rndNumber);
+                }
+            }
+
+            foreach(var position in rndList)
+            {
+                var customer = orders[position];
+
+                var address = await _addressService.GetAddressByIdAsync(customer.BillingAddressId);
+                var store = await _storeService.GetStoreByIdAsync(customer.StoreId);
+
+                var rta = await Send(address.PhoneNumber,
+                    template_Link_Viralizacion,
+                    "*" + address.FirstName.Split(" ")[0] + "*",
+                    store.Url);
+            }
         }
 
         private async Task<string> Send(string number, string template, params object[] data)
