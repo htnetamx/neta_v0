@@ -5,7 +5,7 @@
     {
         var total = Model.StockQuantity;
         var curPerc = Model.CurrentStockQuantity / (Model.StockQuantity) * 100;
-        var falta= Model.StockQuantity - Model.CurrentStockQuantity;
+        var falta = Model.StockQuantity - Model.CurrentStockQuantity;
         <div class="availability">
             <div class="stock">
                 <span class="value">@Model.CurrentStoreName</span>
@@ -94,4 +94,12 @@
     {
         <div>@ex.Message</div>
     }
+}
+else { 
+    <div class="availability" id="legendCtrl-@Model.Id">
+        <div class="stock" style="padding-top: 10px">
+            <span class="label">@T("Products.Availability"):</span>
+            <span class="value" id="stock-availability-value-@Model.Id">Sin Stock</span>
+        </div>
+    </div>
 }
