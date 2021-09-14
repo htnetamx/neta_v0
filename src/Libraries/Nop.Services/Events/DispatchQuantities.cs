@@ -84,13 +84,13 @@ namespace Nop.Services.Events
         {
             var spreadsheetId = "1-6Jl47MkqAnZMxi3I-MVV8AO8h_NgOHcDtm6HDC7vic";
             var sheet = "9 to 9 - Despacho";
-            var range = "A:K";
+            var range = "A:L";
             int gmvColumn = ((int)'A' % 32) - 1;
             int storeIdColumn = ((int)'B' % 32)-1;
-            int decisionColumn = ((int)'I' % 32)-1;
-            int byesterdayColumn =((int)'C' % 32)-1;
-            int yesterdayColumn = ((int)'E' % 32)-1;
-            int liberadaColumn = ((int)'K' % 32) - 1;
+            int byesterdayColumn = ((int)'C' % 32) - 1;
+            int yesterdayColumn = ((int)'E' % 32) - 1;
+            int decisionColumn = ((int)'J' % 32)-1;
+            int liberadaColumn = ((int)'L' % 32) - 1;
             var nine2Nine = GoogleAPI.ReadSpreadSheet(spreadsheetId, sheet, range);
 
             DateTime before_yesterday=new DateTime();
