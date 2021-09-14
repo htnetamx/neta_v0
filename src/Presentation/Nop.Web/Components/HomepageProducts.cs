@@ -109,7 +109,7 @@ namespace Nop.Web.Components
 
             var defaultIndex = "1";
             var defaultOrderBy = "0";
-            var defaultPageSize = "40";
+            var defaultPageSize = "100";
             var defaultIncrement = "10";
             var defaultMinimumProducts = "2";
 
