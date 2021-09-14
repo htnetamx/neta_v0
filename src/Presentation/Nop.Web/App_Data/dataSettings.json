@@ -1,6 +1,6 @@
 ﻿{
-  "DataConnectionString": "Data Source=SQL5105.site4now.net;Initial Catalog=db_9ffe24_netamx_1;Integrated Security=False;Persist Security Info=False;User ID=DB_9ffe24_netamx_1_admin;Password=Temp@1324",
-  "DataProvider": "sqlserver",
+  "DataConnectionString": "server=localhost;database=netamxnop;allowuservariables=True;user id=root;password=Temp@1324",
+  "DataProvider": "mysql",
   "SQLCommandTimeout": null,
   "RawDataSettings": {}
 }

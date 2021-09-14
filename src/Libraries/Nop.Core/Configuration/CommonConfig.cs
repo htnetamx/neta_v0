@@ -51,5 +51,9 @@
         public string PluginStaticFileExtensionsBlacklist { get; set; } = "";
 
         public string StoreInWhatsappVerifyFlow { get; set; } = "";
+
+        public bool ValidateQtyPerEndClients { get; set; } = false;
+
+        public int QtyPerEndClients { get; set; } = 0;
     }
 }

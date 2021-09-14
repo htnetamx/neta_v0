@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Nop.Core;
+using Nop.Core.Configuration;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Http.Extensions;
+using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -1919,13 +1921,21 @@ namespace Nop.Web.Controllers
                 //prevent 2 orders being placed within an X seconds time frame
                 //if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
-                
-                foreach(var item in cart)
+
+                var appSettings = EngineContext.Current.Resolve<AppSettings>();
+                var qtyValidation = appSettings.CommonConfig.QtyPerEndClients;
+                var validQty = appSettings.CommonConfig.ValidateQtyPerEndClients;
+                if (validQty)
                 {
-                    var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId);
-                    if (cnt > 35)
+                    var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                    var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
+                    foreach (var item in cart)
                     {
-                        throw new Exception("Limite en cantidad de Compras. La suma de los asociados supera las 5 unidades de cada uno.");
+                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId);
+                        if (qtyValidation > 0 && (cnt > qtyValidation * children.Count))
+                        {
+                            throw new Exception("Limite en cantidad de Compras. La suma de los asociados supera las 5 unidades de cada uno.");
+                        }
                     }
                 }
 
