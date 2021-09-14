@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Localization;
+﻿using System;
+using Nop.Core.Domain.Localization;
 
 namespace Nop.Core.Domain.Stores
 {
@@ -66,5 +67,10 @@ namespace Nop.Core.Domain.Stores
         /// Gets or sets the company Longitude
         /// </summary>
         public decimal Longitud { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time of order creation
+        /// </summary>
+        public DateTime CreatedOnUtc { get; set; }
     }
 }

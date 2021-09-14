@@ -59,8 +59,6 @@ namespace Nop.Services.Events
             DateTime firstOrder_MX = IDateService.ChangeUTCToMX(firstOrder);
             DateTime nowDate_MX = IDateService.ChangeUTCToMX(nowDate);
 
-            nowDate_MX = new DateTime(2021, 8, 12, 10, 0, 0);
-
             if (nowDate_MX.DayOfWeek != DayOfWeek.Sunday)
             {
                 if (nowDate_MX.Hour < 21)
@@ -242,9 +240,9 @@ namespace Nop.Services.Events
                 if (all_Stores.Count > 0)
                 {
                     sheet = "All Stores";
-                    range = "A:G";
+                    range = "A:H";
                     var deleteResponse = GoogleAPI.DeleteSpreadSheetContent(spreadsheetId, sheet, range);
-                    range = "A:G";
+                    range = "A:H";
                     datesMX = new List<object> { "", "MX -Información entre:", before_yesterday_mx.ToString("dd/MM/yyyy HH:mm:ss"), "y", yesterday_mx.ToString("dd/MM/yyyy HH:mm:ss") };
                     datesUTC = new List<object> { "", "UTC-Información entre:", before_yesterday.ToString("dd/MM/yyyy HH:mm:ss"), "y", yesterday.ToString("dd/MM/yyyy HH:mm:ss") };
                     var appendResponse = GoogleAPI.AppendOnSpreadSheet929OpsAllStores(spreadsheetId, sheet, range, all_Stores, datesMX, datesUTC);

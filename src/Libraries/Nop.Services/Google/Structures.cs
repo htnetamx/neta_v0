@@ -133,8 +133,8 @@ namespace Nop.Services.Google
     {
         public Store Store;
 
-        public static List<object> Headers() => new List<object> { "Store Id", "Store Name", "Store Url", "Store Hosts", "Store Phone Number", "Store Address","Fase", "Unique Customers" };
-        public List<object> ToStringList() => new List<object> { Store.Id, Store.Name, Store.Url, Store.Hosts, Store.CompanyPhoneNumber, Store.CompanyAddress,Store.DisplayOrder };
+        public static List<object> Headers() => new List<object> { "Store Id", "Store Name", "Store Url", "Store Hosts", "Store Phone Number", "Store Address","Fase", "CreatedOnUtc"};
+        public List<object> ToStringList() => new List<object> { Store.Id, Store.Name, Store.Url, Store.Hosts, Store.CompanyPhoneNumber, Store.CompanyAddress,Store.DisplayOrder, Store.CreatedOnUtc.ToString("dd/MM/yyyy HH:mm:ss")};
 
     }
     public struct NineToNineOpsStoresDispatch
