@@ -109,7 +109,7 @@ namespace Nop.Web.Components
 
             var defaultIndex = "1";
             var defaultOrderBy = "0";
-            var defaultPageSize = "100";
+            var defaultPageSize = "10";
             var defaultIncrement = "10";
             var defaultMinimumProducts = "2";
 
@@ -189,6 +189,8 @@ namespace Nop.Web.Components
             var modelList = (await _productModelFactory.PrepareProductOverviewModelsAsync1(products, true, true, productThumbPictureSize, discounts: discProducts,command: command));
             model.CatalogProductsModel.Products = (await _productModelFactory.PrepareProductOverviewModelsAsync(modelList)).ToList();
 
+            var modelList1 = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true, productThumbPictureSize, discounts: discProducts));
+            model.CatalogProductsModel.Promos = modelList1.Where(v => v.MarkAsNew).ToList();
 
             //For Homepage with only Show less and Show More buttons
             model.CatalogProductsModel.Increment = defaultIncrement;

@@ -57,7 +57,7 @@
                 <strong>@T("Homepage.Products")</strong>
             </div>
             <div class="item-grid">
-            @foreach (var item in Model.CatalogProductsModel.Products.Where(v => v.MarkAsNew).OrderBy(v => v.DisplayOrder))
+            @foreach (var item in Model.CatalogProductsModel.Promos.OrderBy(v => v.DisplayOrder))
             {
                 <div class="item-box">
                     @await Html.PartialAsync("_ProductBox", item)

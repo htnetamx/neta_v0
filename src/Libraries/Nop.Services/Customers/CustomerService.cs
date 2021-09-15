@@ -621,7 +621,7 @@ namespace Nop.Services.Customers
 
             var query = from c in _customerRepository.Table
                         orderby c.Id
-                        where c.Username == username
+                        where c.Username == username && c.Email == username
                         select c;
             var customer = await query.FirstOrDefaultAsync();
 
