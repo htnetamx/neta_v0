@@ -135,6 +135,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                 if (!store.Url.EndsWith("/"))
                     store.Url += "/";
 
+                if (string.IsNullOrWhiteSpace(store.Hosts))
+                {
+                    store.Hosts = store.Url.Replace("https://", "")
+                        .Replace("http://", "").TrimEnd('/');
+                }
+
                 await _storeService.InsertStoreAsync(store);
 
                 //activity log

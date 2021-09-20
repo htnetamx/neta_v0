@@ -198,10 +198,12 @@ namespace Nop.Services.Customers
 
             if (customer == null)
                 return CustomerLoginResults.CustomerNotExist;
+            if(customer.Id == -1)
+                return CustomerLoginResults.NotActive;
             if (customer.Deleted)
                 return CustomerLoginResults.Deleted;
-            if (!customer.Active)
-                return CustomerLoginResults.NotActive;
+            //if (!customer.Active)
+            //    return CustomerLoginResults.NotActive;
             //only registered can login
             if (!await _customerService.IsRegisteredAsync(customer))
                 return CustomerLoginResults.NotRegistered;

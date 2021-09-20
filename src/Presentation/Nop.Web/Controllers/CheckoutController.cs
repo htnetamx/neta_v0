@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Nop.Core;
+using Nop.Core.Configuration;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Http.Extensions;
+using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -357,7 +359,9 @@ namespace Nop.Web.Controllers
                 if (address == null)
                     throw new Exception("Address can't be loaded");
 
-                address = model.BillingNewAddress.ToEntity(address);
+                //address = model.BillingNewAddress.ToEntity(address);
+                address.FirstName = model.BillingNewAddress.FirstName;
+                address.PhoneNumber = model.BillingNewAddress.PhoneNumber;
                 await _addressService.UpdateAddressAsync(address);
 
                 (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = address.Id;
@@ -400,37 +404,48 @@ namespace Nop.Web.Controllers
         /// </returns>
         public virtual async Task<IActionResult> DeleteEditAddress(int addressId, bool opc = false)
         {
-            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
-            if (!cart.Any())
-                throw new Exception("Your cart is empty");
-
-            var customer = await _workContext.GetCurrentCustomerAsync();
-
-            var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
-            if (address != null)
+            try
             {
-                await _customerService.RemoveCustomerAddressAsync(customer, address);
-                await _customerService.UpdateCustomerAsync(customer);
-                await _addressService.DeleteAddressAsync(address);
-            }
+                var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
+                if (!cart.Any())
+                    throw new Exception("Your cart is empty");
 
-            if (!opc)
-            {
+                var address = await _addressService.GetAddressByIdAsync(addressId);
+                if (address != null)
+                {
+                    var parent = await _addressService.GetRelatedAddressByIdAsync(address.PhoneNumber);
+                    var customer = await _workContext.GetCurrentCustomerAsync();
+                    customer.BillingAddressId = parent.First().Id;
+                    await _customerService.UpdateCustomerAsync(customer);
+
+
+                    address.Email = "";
+                    address.PhoneNumber = "";
+                    await _addressService.UpdateAddressAsync(address);
+                }
+
+                if (!opc)
+                {
+                    return Json(new
+                    {
+                        redirect = Url.RouteUrl("CheckoutBillingAddress")
+                    });
+                }
+
+                var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart);
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("CheckoutBillingAddress")
+                    update_section = new UpdateSectionJsonModel
+                    {
+                        name = "billing",
+                        html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
+                    }
                 });
             }
-
-            var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart);
-            return Json(new
+            catch (Exception ex)
             {
-                update_section = new UpdateSectionJsonModel
-                {
-                    name = "billing",
-                    html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
-                }
-            });
+                throw;
+            }
         }
 
         #endregion
@@ -1366,20 +1381,46 @@ namespace Nop.Web.Controllers
                 if (await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync()) && !_orderSettings.AnonymousCheckoutAllowed)
                     throw new Exception("Anonymous checkout is not allowed");
 
-                int.TryParse(form["billing_address_id"], out var billingAddressId);
-                if (billingAddressId > 0)
+                var billingAddressId = 0;
+                int.TryParse(form["hdn_billing_address_id"], out billingAddressId);
+                if (!string.IsNullOrWhiteSpace(form["billing_address_id"]))
                 {
-                    //existing address
-                    var address = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
-                        ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+                    int.TryParse(form["billing_address_id"], out billingAddressId);
+                }
+                if (billingAddressId > 0 && string.IsNullOrWhiteSpace(model.BillingNewAddress.FirstName))
+                {
+                    try
+                    {
+                        var address = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
+                            ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
 
-                    (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = address.Id;
-                    await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
+                        (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = address.Id;
+                        await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
+                    }
+                    catch (Exception e)
+                    {
+                        (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = billingAddressId;
+                        await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
+
+                        var address = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
+                            ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+                    }
                 }
                 else
                 {
                     //new address
                     var newAddress = model.BillingNewAddress;
+                    if(billingAddressId > 0)
+                    {
+                        if (!string.IsNullOrWhiteSpace(model.BillingNewAddress.FirstName))
+                        {
+                            var address1 = await _customerService.GetCustomerAddressAsync((await _workContext.GetCurrentCustomerAsync()).Id, billingAddressId)
+                                ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+
+                            var children = await _addressService.GetRelatedAddressByIdAsync(address1.PhoneNumber);
+                            newAddress.Email = children.Where(v=>v.Email == null || v.Email.Contains("@")).First().PhoneNumber;
+                        }
+                    }
 
                     //custom address attributes
                     var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
@@ -1438,7 +1479,7 @@ namespace Nop.Web.Controllers
                     }
 
                     //newAddress.Email = $"{newAddress.FirstName.Replace(" ", ".").Replace("á", "a").Replace("é", "e").Replace("í", "i").Replace("ó", "o").Replace("ú", "u") }@yopmail.com";
-                    newAddress.Email = "compra@yopmail.com";
+                    //newAddress.Email = "compra@yopmail.com";
                     newAddress.Address1 = await _localizationService.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(), x => x.CompanyAddress);
                     newAddress.LastName = model.BillingNewAddress.ActionId == "No" ? "0" : "1";
                     newAddress.FaxNumber = model.BillingNewAddress.ActionName;
@@ -1880,6 +1921,23 @@ namespace Nop.Web.Controllers
                 //prevent 2 orders being placed within an X seconds time frame
                 //if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
+
+                var appSettings = EngineContext.Current.Resolve<AppSettings>();
+                var qtyValidation = appSettings.CommonConfig.QtyPerEndClients;
+                var validQty = appSettings.CommonConfig.ValidateQtyPerEndClients;
+                if (validQty)
+                {
+                    var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                    var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
+                    foreach (var item in cart)
+                    {
+                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId);
+                        if (qtyValidation > 0 && (cnt > qtyValidation * children.Count))
+                        {
+                            throw new Exception("Limite en cantidad de Compras. La suma de los asociados supera las 5 unidades de cada uno.");
+                        }
+                    }
+                }
 
                 //place order
                 var processPaymentRequest = HttpContext.Session.Get<ProcessPaymentRequest>("OrderPaymentInfo");

@@ -621,7 +621,7 @@ namespace Nop.Services.Customers
 
             var query = from c in _customerRepository.Table
                         orderby c.Id
-                        where c.Username == username
+                        where c.Username == username && c.Email == username
                         select c;
             var customer = await query.FirstOrDefaultAsync();
 
@@ -1683,6 +1683,18 @@ namespace Nop.Services.Customers
             var key = _staticCacheManager.PrepareKeyForShortTermCache(NopCustomerServicesDefaults.CustomerAddressCacheKey, customerId, addressId);
 
             return await _staticCacheManager.GetAsync(key, async () => await query.FirstOrDefaultAsync());
+        }
+
+        public virtual async Task<Address> GetCustomerAddressAsync1(int addressId)
+        {
+            if (addressId == 0)
+                return null;
+
+            var query = from address in _customerAddressRepository.Table
+                        where address.Id == addressId
+                        select address;
+
+            return await query.FirstOrDefaultAsync();
         }
 
         /// <summary>

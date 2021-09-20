@@ -1073,6 +1073,29 @@ namespace Nop.Services.Catalog
                 }
             }
 
+            //var store = await _storeService.GetStoreByIdAsync(storeId);
+            //if(store.DisplayOrder == 1)
+            //{
+            //    productsQuery =
+            //        from p in productsQuery
+            //        where p.Sku.EndsWith("F1")
+            //        select p;
+            //}
+            //if (store.DisplayOrder == 2)
+            //{
+            //    productsQuery =
+            //        from p in productsQuery
+            //        where p.Sku.EndsWith("F2")
+            //        select p;
+            //}
+            //if (store.DisplayOrder == 3)
+            //{
+            //    productsQuery =
+            //        from p in productsQuery
+            //        where !(p.Sku.EndsWith("F1") || p.Sku.EndsWith("F2"))
+            //        select p;
+            //}
+
             return await productsQuery.OrderBy(orderBy).ToPagedListAsync(pageIndex, pageSize);
         }
 

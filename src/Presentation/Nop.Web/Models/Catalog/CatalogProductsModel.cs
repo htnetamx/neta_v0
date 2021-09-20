@@ -90,6 +90,8 @@ namespace Nop.Web.Models.Catalog
         /// </summary>
         public IList<ProductOverviewModel> Products { get; set; }
 
+        public IList<ProductOverviewModel> Promos { get; set; }
+
         public int MaxProducts { get; set; }
         public string MinimumProducts { get; set; }
         public string Increment { get; set; }
@@ -109,6 +111,7 @@ namespace Nop.Web.Models.Catalog
             AvailableViewModes = new List<SelectListItem>();
             PageSizeOptions = new List<SelectListItem>();
             Products = new List<ProductOverviewModel>();
+            Promos = new List<ProductOverviewModel>();
             MaxProducts = 0;
             MinimumProducts = "0";
             Increment = "0";

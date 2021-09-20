@@ -110,6 +110,44 @@ namespace Nop.Services.Common
                 cache => cache.PrepareKeyForShortTermCache(NopEntityCacheDefaults<Address>.ByIdCacheKey, addressId));
         }
 
+        public virtual async Task<IList<Address>> GetRelatedAddressByIdAsync(string phoneParent)
+        {
+            if (string.IsNullOrWhiteSpace(phoneParent))
+                return new List<Address>();
+
+            var addressComp = new AddressComparer();
+
+            var query = from a in _addressRepository.Table
+                        where a.PhoneNumber == phoneParent || a.Email == phoneParent
+                        orderby a.Id
+                        select a;
+            var addr = await query.FirstOrDefaultAsync();
+            if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
+            {
+                var query1 = from a in _addressRepository.Table
+                            where a.Id == addr.Id || (a.Email == addr.PhoneNumber || a.PhoneNumber == addr.PhoneNumber) && !a.Email.Contains("@")
+                            orderby a.Id
+                            select a;
+
+                return (await query1.ToListAsync()).Distinct(addressComp).ToList();
+            }
+            else
+            {
+                var query1 = from a in _addressRepository.Table
+                             where (a.Email == addr.Email || a.PhoneNumber == addr.Email)
+                             orderby a.Id
+                             select a;
+                var addr1 = query1.ToList().First();
+
+                var query2 = from a in _addressRepository.Table
+                             where a.Id==addr1.Id || (a.Email == addr.Email || a.PhoneNumber == addr.Email) && !a.Email.Contains("@")
+                             orderby a.Id
+                             select a;
+
+                return (await query2.ToListAsync()).Distinct(addressComp).ToList();
+            }
+        }
+
         /// <summary>
         /// Inserts an address
         /// </summary>
@@ -316,5 +354,36 @@ namespace Nop.Services.Common
         }
 
         #endregion
+    }
+
+    public class AddressComparer : IEqualityComparer<Address>
+    {
+        public bool Equals(Address x, Address y)
+        {
+            //First check if both object reference are equal then return true
+            if (object.ReferenceEquals(x, y))
+            {
+                return true;
+            }
+            //If either one of the object refernce is null, return false
+            if (object.ReferenceEquals(x, null) || object.ReferenceEquals(y, null))
+            {
+                return false;
+            }
+            //Comparing all the properties one by one
+            return x.FirstName == y.FirstName;
+        }
+        public int GetHashCode(Address obj)
+        {
+            //If obj is null then return 0
+            if (obj == null)
+            {
+                return 0;
+            }
+            //Get the string HashCode Value
+            //Check for null refernece exception
+            int nameHashCode = obj.FirstName == null ? 0 : obj.FirstName.GetHashCode();
+            return nameHashCode;
+        }
     }
 }

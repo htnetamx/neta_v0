@@ -469,6 +469,12 @@ namespace Nop.Web.Controllers
                     (await _storeContext.GetCurrentStoreAsync()).Id,
                     true));
             }
+            if (loginResult == CustomerLoginResults.NotActive)
+            {
+                ModelState.AddModelError("", "El teléfono que indicaste ya está registrado. No es posible que lo vuelvas a registrar.");
+                model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
+                return View(model);
+            }
             var customer = await _customerService.GetCustomerByTelephoneAsync(model.Password);
             return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
 

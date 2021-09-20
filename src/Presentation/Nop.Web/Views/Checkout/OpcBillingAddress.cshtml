@@ -1,9 +1,19 @@
 ﻿@model CheckoutBillingAddressModel
 @using Nop.Core.Infrastructure
-@{ 
+@using Nop.Core
+@inject IWebHelper webHelper
+@{
     var service = EngineContext.Current.Resolve<Nop.Services.Common.IAddressService>();
-    var billingAddress = workContext.GetCurrentCustomerAsync().Result.BillingAddressId;
-    var name = service.GetAddressByIdAsync(billingAddress ?? 0).Result?.FirstName;
+    var currentCustomer = workContext.GetCurrentCustomerAsync().Result;
+    var billingAddress = currentCustomer?.BillingAddressId;
+    var addressObj = service.GetAddressByIdAsync(billingAddress ?? 0).Result;
+    var name = addressObj?.FirstName;
+    var phone = addressObj?.PhoneNumber;
+
+    var storeLocation = webHelper.GetStoreLocation();
+
+    var children = service.GetRelatedAddressByIdAsync(phone).Result;
+
     if (string.IsNullOrWhiteSpace(name))
     {
         name = "Sin Nombre";
@@ -21,79 +31,63 @@
                 </p>
             </div>
         }*@
-    @*@if (Model.ExistingAddresses.Count > 0)
-        {
-                <div class="section select-billing-address">
-                    <label for="billing-address-select">@T("Checkout.SelectBillingAddressOrEnterNewOne")</label>
-                    @if (Model.InvalidExistingAddresses.Count > 0)
-                    {
-                        <label class="min-amount-warning">
-                            @string.Format(T("Checkout.Addresses.Invalid").Text, Model.InvalidExistingAddresses.Count)
-                        </label>
-                    }
-                <div>
-                    <select name="billing_address_id" id="billing-address-select" class="address-select"
-                            title="" onchange="Billing.resetBillingForm();Billing.newAddress(!this.value)">
-                        @foreach (var address in Model.ExistingAddresses)
-                        {
-                            var addressLine = "";
-                            addressLine += address.FirstName;
-                            addressLine += " " + address.LastName;
-                            if (address.StreetAddressEnabled && !string.IsNullOrEmpty(address.Address1))
-                            {
-                                addressLine += ", " + address.Address1;
-                            }
-                            if (address.CityEnabled && !string.IsNullOrEmpty(address.City))
-                            {
-                                addressLine += ", " + address.City;
-                            }
-                            if (address.CountyEnabled && !string.IsNullOrEmpty(address.County))
-                            {
-                                addressLine += ", " + address.County;
-                            }
-                            if (address.StateProvinceEnabled && !string.IsNullOrEmpty(address.StateProvinceName))
-                            {
-                                addressLine += ", " + address.StateProvinceName;
-                            }
-                            if (address.ZipPostalCodeEnabled && !string.IsNullOrEmpty(address.ZipPostalCode))
-                            {
-                                addressLine += " " + address.ZipPostalCode;
-                            }
-                            if (address.CountryEnabled && !string.IsNullOrWhiteSpace(address.CountryName))
-                            {
-                                addressLine += ", " + address.CountryName;
-                            }
-                            //how should we render "FormattedCustomAddressAttributes" here?
-                            <option value="@(address.Id)">@(addressLine)</option>
-                        }
-                        <option value="" selected="@Model.NewAddressPreselected">@T("Checkout.NewAddress")</option>
-                    </select>
-                </div>
-            </div>
-        }*@
-    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressMiddle })
-    @if (string.IsNullOrWhiteSpace(workContext.GetCurrentCustomerAsync().Result.Username))
+    @if (children.Count > 0)
     {
-        <div class="section new-billing-address" id="billing-new-address-form">
-            <div class="enter-address">
-                <div asp-validation-summary="ModelOnly" class="message-error"></div>
-                @{
-                    var dataDictAddress = new ViewDataDictionary(ViewData);
-                    dataDictAddress.TemplateInfo.HtmlFieldPrefix = "BillingNewAddress";
-                    @await Html.PartialAsync("_CreateOrUpdateAddress", Model.BillingNewAddress, dataDictAddress)
-                }
+        <div class="section select-billing-address">
+            <label for="billing-address-select">@T("Checkout.SelectBillingAddressOrEnterNewOne")</label>
+            <div>
+                <table cellspacing="0" cellpadding="0" border="0">
+                    @{
+                        var i = 0;
+                        foreach (var address in children)
+                        {
+                            if (i == 0)
+                            {
+                                        <tr>
+                                            <td style="padding: 5px"><h2 class="title">@(address.FirstName)</h2></td>
+                                            @if (children.Count > 1)
+                                            {
+                                                <td style="padding: 5px">
+                                                    <button type="button" name="save" class="button-1 new-address-next-step-button" onclick="Billing.save(@(address.Id))">Seleccionar</button>
+                                                </td>
+                                            }
+                                        </tr>
+                                i = 1;
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td style="padding: 5px"><h2 class="title">@(address.FirstName)</h2></td>
+                                    <td style="padding: 5px">
+                                        <button type="button" name="save" class="button-1 new-address-next-step-button" onclick="Billing.save(@(address.Id))">Seleccionar</button>
+                                        <button id="delete-address-button" type="button" class="button-1" onclick="Billing.deleteAddress('@(storeLocation)checkout/DeleteEditAddress/', @(address.Id), '@(address.FirstName)'); return false;">@T("Common.Delete")</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </table>
+                <input type="hidden" id="billing_address_id" name="billing_address_id" />
             </div>
         </div>
     }
-    else
-    {
-        <div class="section new-billing-address" id="billing-new-address-form">
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressMiddle })
+    @*<div class="section new-billing-address" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:none" : "display:block")">
             <div class="enter-address">
                 <p>Hola de nuevo! @name</p>
             </div>
+        </div>*@
+    <div class="section new-billing-address" id="billing-new-address-form" style="@(string.IsNullOrWhiteSpace(currentCustomer?.Username) ? "display:block" : "display:none")">
+        <div class="enter-address">
+            <div asp-validation-summary="ModelOnly" class="message-error"></div>
+            @{
+                var dataDictAddress = new ViewDataDictionary(ViewData);
+                dataDictAddress.TemplateInfo.HtmlFieldPrefix = "BillingNewAddress";
+                @await Html.PartialAsync("_CreateOrUpdateAddress1", Model.BillingNewAddress, dataDictAddress)
+            }
         </div>
-        <input type="hidden" id="billing_address_id" name="billing_address_id" value="@billingAddress" />
-    }
+    </div>
+    <input type="hidden" id="billing_address_id" name="hdn_billing_address_id" value="@billingAddress" />
 
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpCheckoutBillingAddressBottom })
 </div>

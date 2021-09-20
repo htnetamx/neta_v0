@@ -123,7 +123,9 @@ var Billing = {
     $('#save-address-button').hide();
 
     if (isNew) {
+      $('#save-address-button').show();
       $('#billing-new-address-form').show();
+      $('#new-address-button').hide();
       $('#edit-address-button').hide();
       $('#delete-address-button').hide();
     } else {
@@ -144,9 +146,10 @@ var Billing = {
     $(document).trigger({ type: "onepagecheckout_billing_address_reset" });
   },
 
-  save: function() {
+  save: function(id) {
     if (Checkout.loadWaiting !== false) return;
 
+    $("#billing_address_id").val(id);
     Checkout.setLoadWaiting('billing');
 
     $.ajax({
@@ -259,18 +262,21 @@ var Billing = {
     });
   },
 
-  deleteAddress: function (url) {
-    var selectedAddress = $('#billing-address-select').children("option:selected").val();
+  deleteAddress: function (url, id, name) {
+    var rta = window.confirm("Seguro que deseas eliminar a "+name+" de tu lista de amigos?");
+    if (!rta) return;
+
     $.ajax({
       cache: false,
       type: "GET",
       url: url,
       data: {
-        "addressId": selectedAddress,
+        "addressId": id,
         "opc": 'true'
       },
       success: function (response) {
-        Checkout.setStepResponse(response);
+        window.location.reload();
+        //Checkout.setStepResponse(response);
       },
       error: Checkout.ajaxFailure
     });
