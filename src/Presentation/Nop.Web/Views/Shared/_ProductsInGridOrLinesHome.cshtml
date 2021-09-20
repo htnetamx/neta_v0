@@ -41,7 +41,7 @@
             var starting_products = @Model.StartingProducts;
             var minimum_products = @Model.MinimumProducts;
             var max_products = @Model.MaxProducts;
-
+            var products_sum = @Model.Products.Where(v => !v.MarkAsNew).Count() + @Model.Promos.Count();;
             window.onload = update;
 
             function update() {
@@ -57,12 +57,11 @@
                 if (current == minimum_products) {
                     document.getElementById("Less_Products").style.visibility = 'hidden';
                 }*/
-                if (current == max_products) {
+                if (current == max_products || products_sum == max_products) {
                     document.getElementById("More_Products").style.visibility = 'hidden';
                 }
 
             }
-
 
             function mostrarMas() {
 
