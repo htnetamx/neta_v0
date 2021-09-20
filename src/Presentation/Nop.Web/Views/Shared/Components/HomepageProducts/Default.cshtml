@@ -83,9 +83,9 @@
     </div>
     <script>
         scroller();
-        productsInColumns(2);
-        var x = document.getElementsByClassName("product-title");
-
+        if (window.innerWidth < 575) {
+            productsInColumns(2);
+        }
         function scroller() {
             var queryString = window.location.search;
             var urlParams = new URLSearchParams(queryString);

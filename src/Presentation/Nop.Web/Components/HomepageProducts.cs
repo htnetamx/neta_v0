@@ -109,8 +109,8 @@ namespace Nop.Web.Components
 
             var defaultIndex = "1";
             var defaultOrderBy = "0";
-            var defaultPageSize = "10";
-            var defaultIncrement = "10";
+            var defaultPageSize = "200";
+            var defaultIncrement = "100";
             var defaultMinimumProducts = "2";
 
             var pageSize = HttpUtility.ParseQueryString(myUri.Query).Get("pagesize");
