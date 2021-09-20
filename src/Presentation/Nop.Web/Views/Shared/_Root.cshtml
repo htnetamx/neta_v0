@@ -89,37 +89,10 @@
                     document.getElementById("foot-low").style.padding = "2vh 0 2vh 0"
                 } catch {
                     console.log("Error Footer 2")
-                }      
+                }
             }
             var clientHeight = document.getElementById("upper-page").clientHeight;
             document.getElementById("master-wrapper-cont").style.top = (parseInt((clientHeight / window.innerHeight) * 100, 10) + 2) + "vh";
-
-            var x = document.getElementsByClassName("product-title");
-            var max = 0;
-            for (var i = 0; i < x.length; i++) {
-                if (x[i].clientHeight > max) {
-                    max = x[i].clientHeight;
-                }
-            }
-            for (var i = 0; i < x.length; i++) {
-                x[i].style.height = max.toString() + "px";
-            }
-
-            var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth;
-            var cantxfila = 2;
-            porcentaje_ancho = ((100 - 0) / cantxfila) / 100;
-            var ancho = clientWidth * porcentaje_ancho;
-            x = document.getElementsByClassName("item-box");
-            if (window.innerWidth < 465) {
-                for (var i = 0; i < x.length; i++) {
-                    x[i].style.width = ancho.toString() + "px";
-                }
-            }
-            else {
-                for (var i = 0; i < x.length; i++) {
-                    x[i].style.width = "";
-                }
-            }
         }
     </script>
 

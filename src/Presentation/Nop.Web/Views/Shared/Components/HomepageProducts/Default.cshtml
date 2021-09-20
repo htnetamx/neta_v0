@@ -60,7 +60,7 @@
             @foreach (var item in Model.CatalogProductsModel.Promos.OrderBy(v => v.DisplayOrder))
             {
                 <div class="item-box">
-                    @await Html.PartialAsync("_ProductBox", item)
+                    @await Html.PartialAsync("_ProductBoxHomePage", item)
                 </div>
             }
             </div>
@@ -83,6 +83,9 @@
     </div>
     <script>
         scroller();
+        productsInColumns(2);
+        var x = document.getElementsByClassName("product-title");
+
         function scroller() {
             var queryString = window.location.search;
             var urlParams = new URLSearchParams(queryString);
@@ -111,4 +114,37 @@
             var fila_final = (filas_actuales - filas_a_restar)*end_sum;
             window.scrollTo(0, heightP * fila_final);
         }
+
+        function productsInColumns(cantxfila) {
+            var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth-1;
+            console.log(clientWidth);
+            var err_percent = 5;
+            porcentaje_ancho = ((100 - err_percent) / cantxfila) / 100;
+            var ancho = (clientWidth * porcentaje_ancho);
+            ancho = Math.floor(ancho);
+            console.log(ancho);
+            var espacio_libre = clientWidth - ancho * cantxfila;
+            console.log(espacio_libre);
+            margen_izquierda = espacio_libre / (cantxfila - 1);
+            console.log(espacio_libre);
+            x = document.getElementsByClassName("item-box");
+            for (var i = 0; i < x.length; i++) {
+                x[i].style.width = ancho.toString() + "px";
+                if (i % cantxfila != 0) {
+                    x[i].style.marginLeft = margen_izquierda.toString() + "px";
+                }
+            }
+            
+            var x = document.getElementsByClassName("product-title");
+            var max = 0;
+            for (var i = 0; i < x.length; i++) {
+                if (x[i].clientHeight > max) {
+                    max = x[i].clientHeight;
+                }
+            }
+            for (var i = 0; i < x.length; i++) {
+                x[i].style.height = max.toString() + "px";
+            }
+        }
+
     </script>
