@@ -58,6 +58,8 @@ namespace Nop.Services.Orders
 
         Task<IList<Order>> GetOrdersByStoreIdsAsync(int storeId);
 
+        Task<IList<Order>> GetOrdersByPhoneNumberAsync(string phoneNumber);
+
         /// <summary>
         /// Gets an order
         /// </summary>

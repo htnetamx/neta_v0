@@ -48,6 +48,8 @@ namespace Nop.Services.Common
 
         Task<IList<Address>> GetRelatedAddressByIdAsync(string phoneParent);
 
+        Task<IList<string>> GetAllAddressesAsync();
+
         /// <summary>
         /// Inserts an address
         /// </summary>

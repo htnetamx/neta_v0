@@ -6,27 +6,24 @@ using System.Text;
 using System.Threading.Tasks;
 using Nop.Services.Tasks;
 using Nop.Services.Catalog;
-using Nop.Services.Stores;
 using Nop.Services.Orders;
 using Nop.Services.Common;
 
 namespace Nop.Services.Customers
 {
-    class CustomerLinkMessagingTask : IScheduleTask
+    class ChurnCustomerTask : IScheduleTask
     {
         #region Fields
-        private readonly IStoreService _storeService;
-        private readonly IOrderService _orderService;
         private readonly IAddressService _addressService;
+        private readonly IOrderService _orderService;
         #endregion
 
         #region Ctor
 
-        public CustomerLinkMessagingTask(IStoreService storeService, IOrderService orderService, IAddressService addressService)
+        public ChurnCustomerTask(IAddressService addressService, IOrderService orderService)
         {
-            _storeService = storeService;
-            _orderService = orderService;
             _addressService = addressService;
+            _orderService = orderService;
         }
 
         #endregion
@@ -38,34 +35,22 @@ namespace Nop.Services.Customers
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:compartir";
-            var orders = await _orderService.SearchOrdersAsync(
-                createdFromUtc: DateTime.UtcNow.Date.AddHours(2), 
-                createdToUtc: DateTime.UtcNow.Date.AddDays(1).AddMinutes(-1));
-
-            var init = 0;
-            var end = orders.Count;
-            var rndList = new List<int>();
-            for(var i = 0; i < (orders.Count > 100 ? 100 : orders.Count); i++)
+            var phoneNumberList = await _addressService.GetAllAddressesAsync();
+            foreach (var info in phoneNumberList)
             {
-                var rndNumber = new Random().Next(init, end);
-                if (!rndList.Contains(rndNumber))
+                var orders = (await _orderService.GetOrdersByPhoneNumberAsync(info))
+                    .OrderByDescending(v => v.CreatedOnUtc).FirstOrDefault();
+                if (orders != null)
                 {
-                    rndList.Add(rndNumber);
+                    var days = DateTime.UtcNow.Subtract(orders.CreatedOnUtc).Days;
+                    if (days >= 7)
+                    {
+                        //var rta = await Send(info.CompanyPhoneNumber,
+                        //    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_end_clients",
+                        //    info.Name,
+                        //    days.ToString());
+                    }
                 }
-            }
-
-            foreach(var position in rndList)
-            {
-                var customer = orders[position];
-
-                var address = await _addressService.GetAddressByIdAsync(customer.BillingAddressId);
-                var store = await _storeService.GetStoreByIdAsync(customer.StoreId);
-
-                var rta = await Send(address.PhoneNumber,
-                    template_Link_Viralizacion,
-                    "*" + address.FirstName.Split(" ")[0] + "*",
-                    store.Url);
             }
         }
 
@@ -113,6 +98,6 @@ namespace Nop.Services.Customers
             var d = "done";
 
         }
-        #endregion    
+        #endregion
     }
 }

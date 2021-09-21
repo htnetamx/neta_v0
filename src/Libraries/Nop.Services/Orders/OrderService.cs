@@ -230,6 +230,16 @@ namespace Nop.Services.Orders
                     select o).FirstOrDefaultAsync();
         }
 
+        public virtual async Task<IList<Order>> GetOrdersByPhoneNumberAsync(string phoneNumber)
+        {
+            var query = from o in _orderRepository.Table
+                             join a in _addressRepository.Table on o.BillingAddressId equals a.Id
+                             where a.PhoneNumber == phoneNumber
+                             select o;
+
+            return await query.ToListAsync();
+        }
+
         public virtual async Task<int> GetOrderSkuCountAsync(int addressId, int productId)
         {
             if (addressId == 0 || productId == 0)
