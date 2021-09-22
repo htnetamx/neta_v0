@@ -37,19 +37,22 @@ namespace Nop.Services.Stores
             var stores = await _storeService.GetAllStoresAsync();
             foreach (var info in stores)
             {
-                if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
+                if (info.DisplayOrder == 1 || info.DisplayOrder == 2 || info.DisplayOrder == 3)
                 {
-                    var orders = (await _orderService.GetOrdersByStoreIdsAsync(info.Id))
-                            .OrderByDescending(v => v.CreatedOnUtc).FirstOrDefault();
-                    if (orders != null)
+                    if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                     {
-                        var days = DateTime.UtcNow.Subtract(orders.CreatedOnUtc).Days;
-                        if (days >= 5)
+                        var orders = (await _orderService.GetOrdersByStoreIdsAsync(info.Id))
+                                .OrderByDescending(v => v.CreatedOnUtc).FirstOrDefault();
+                        if (orders != null)
                         {
-                            //var rta = await Send(info.CompanyPhoneNumber,
-                            //    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_shops",
-                            //    info.Name,
-                            //    days.ToString());
+                            var days = DateTime.UtcNow.Subtract(orders.CreatedOnUtc).Days;
+                            if (days >= 5)
+                            {
+                                var rta = await Send(info.CompanyPhoneNumber,
+                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_shops",
+                                    info.Name,
+                                    days.ToString());
+                            }
                         }
                     }
                 }

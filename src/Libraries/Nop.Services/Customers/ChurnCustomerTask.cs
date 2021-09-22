@@ -45,10 +45,17 @@ namespace Nop.Services.Customers
                     var days = DateTime.UtcNow.Subtract(orders.CreatedOnUtc).Days;
                     if (days >= 7)
                     {
-                        //var rta = await Send(info.CompanyPhoneNumber,
-                        //    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_end_clients",
-                        //    info.Name,
-                        //    days.ToString());
+                        var customer = await _addressService.GetAddressByIdAsync(orders.BillingAddressId);
+                        if(customer != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(customer.FirstName))
+                            {
+                                var rta = await Send(info,
+                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_end_clients",
+                                    customer.FirstName,
+                                    days.ToString());
+                            }
+                        }
                     }
                 }
             }

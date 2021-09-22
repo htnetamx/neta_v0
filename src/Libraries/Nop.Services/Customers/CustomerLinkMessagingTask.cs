@@ -40,13 +40,13 @@ namespace Nop.Services.Customers
         {
             var template_Link_Viralizacion = "02c89181_e473_461e_9e66_8f6b75af9b5e:compartir";
             var orders = await _orderService.SearchOrdersAsync(
-                createdFromUtc: DateTime.UtcNow.Date.AddHours(2), 
-                createdToUtc: DateTime.UtcNow.Date.AddDays(1).AddMinutes(-1));
+                createdFromUtc: DateTime.UtcNow.AddHours(-5).AddDays(20), 
+                createdToUtc: DateTime.UtcNow.AddHours(-5).AddDays(1).AddSeconds(-1));
 
             var init = 0;
             var end = orders.Count;
             var rndList = new List<int>();
-            for(var i = 0; i < (orders.Count > 100 ? 100 : orders.Count); i++)
+            for(var i = 0; i < (orders.Count > 200 ? 200 : orders.Count); i++)
             {
                 var rndNumber = new Random().Next(init, end);
                 if (!rndList.Contains(rndNumber))
