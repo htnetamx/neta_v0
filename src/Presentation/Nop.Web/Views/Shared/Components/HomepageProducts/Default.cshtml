@@ -93,16 +93,25 @@
 
 <script>
     scroller();
-    var cantxfilas = 1;
+    var cantxfilas = 1  ;
 
+    var hay_productos_descuentos =(@Model.CatalogProductsModel.Promos.Count > 0);
+    var hay_productos_ofertas = (@Model.CatalogProductsModel.Products.Count > 0);
 
     if (window.innerWidth < 575) {
-        productsInColumns("Descuentos-Dia", cantxfilas);
-        productsInColumns("Oferta-Precios-Bajos", cantxfilas);
+        if (hay_productos_descuentos) {
+            productsInColumns("Descuentos-Dia", cantxfilas);
+        }
+        if (hay_productos_ofertas){
+            productsInColumns("Oferta-Precios-Bajos", cantxfilas);
+        }
     }
-    
-    productTitleSizer("Descuentos-Dia");
-    productTitleSizer("Oferta-Precios-Bajos");
+    if (hay_productos_descuentos) {
+        productTitleSizer("Descuentos-Dia");
+    }
+    if (hay_productos_ofertas) {
+        productTitleSizer("Oferta-Precios-Bajos");
+    }
 
 
     function scroller() {
