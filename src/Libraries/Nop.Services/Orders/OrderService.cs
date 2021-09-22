@@ -230,7 +230,17 @@ namespace Nop.Services.Orders
                     select o).FirstOrDefaultAsync();
         }
 
-        public virtual async Task<int> GetOrderSkuCountAsync(int addressId, int productId)
+        public virtual async Task<IList<Order>> GetOrdersByPhoneNumberAsync(string phoneNumber)
+        {
+            var query = from o in _orderRepository.Table
+                             join a in _addressRepository.Table on o.BillingAddressId equals a.Id
+                             where a.PhoneNumber == phoneNumber
+                             select o;
+
+            return await query.ToListAsync();
+        }
+
+        public virtual async Task<int> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber)
         {
             if (addressId == 0 || productId == 0)
                 return -1;
@@ -238,14 +248,20 @@ namespace Nop.Services.Orders
             var currentAddress = await _addressService.GetAddressByIdAsync(addressId);
             var children = await _addressService.GetRelatedAddressByIdAsync(currentAddress.PhoneNumber);
 
+            DateTime date = DateTime.UtcNow.AddHours(-5).Date;
+
             var total = 0;
             foreach(var child in children)
             {
                 var cnt = await (from o in _orderRepository.Table
                               join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                               join a in _addressRepository.Table on o.BillingAddressId equals a.Id
-                              where oi.ProductId == productId && o.BillingAddressId == child.Id
+                              where oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.Date == date
                               select o).CountAsync();
+                if (child.PhoneNumber == phoneNumber)
+                {
+                    return cnt;
+                }
                 total += cnt;
             }
 

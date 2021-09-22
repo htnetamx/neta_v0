@@ -96,6 +96,14 @@ namespace Nop.Services.Common
             return await query.CountAsync();
         }
 
+        public virtual async Task<IList<string>> GetAllAddressesAsync()
+        {
+            var query = (from a in _addressRepository.Table
+                        select a.PhoneNumber).Distinct();
+
+            return await query.ToListAsync();
+        }
+
         /// <summary>
         /// Gets an address by address identifier
         /// </summary>

@@ -1922,19 +1922,19 @@ namespace Nop.Web.Controllers
                 //if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
-                var appSettings = EngineContext.Current.Resolve<AppSettings>();
-                var qtyValidation = appSettings.CommonConfig.QtyPerEndClients;
-                var validQty = appSettings.CommonConfig.ValidateQtyPerEndClients;
+                //var appSettings = EngineContext.Current.Resolve<AppSettings>();
+                var qtyValidation = 5; //appSettings.CommonConfig.QtyPerEndClients;
+                var validQty = true;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
                 if (validQty)
                 {
                     var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
                     var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
                     foreach (var item in cart)
                     {
-                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId);
-                        if (qtyValidation > 0 && (cnt > qtyValidation * children.Count))
+                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber);
+                        if (qtyValidation > 0 && ((cnt+item.Quantity) > qtyValidation))
                         {
-                            throw new Exception("Limite en cantidad de Compras. La suma de los asociados supera las 5 unidades de cada uno.");
+                            throw new Exception($"Limite en cantidad de Compras. La suma de los asociados supera las {qtyValidation} unidades de cada uno.");
                         }
                     }
                 }
