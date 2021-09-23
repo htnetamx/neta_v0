@@ -55,71 +55,74 @@
         <div class="description">
             @Html.Raw(Model.ShortDescription)
         </div>
-        @try
+        @if (Model.MarkAsNew)
         {
-            @await Html.PartialAsync("_Availability", Model.Details)
+            @try
+            {
+                @await Html.PartialAsync("_Availability", Model.Details)
+            }
+            catch (Exception exc)
+            {
+                <div>@exc.Message</div>
+            }
         }
-        catch (Exception exc)
-        {
-            <div>@exc.Message</div>
-        }
-    <div class="add-info">
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoBefore, additionalData = Model })
-        <div class="price-Qs">
-            <div class="prices">
-                <span class="price actual-price" style="margin: 0px; font: normal 30px Roboto; line-height: 33.6px; color: #212121">@Model.ProductPrice.Price</span>
-                @if (!string.IsNullOrEmpty(Model.ProductPrice.OldPrice))
-                {
-                    <span style="margin: 0px;font: normal 24px Roboto; line-height: 33.6px;color: #212121;font-weight:400;text-decoration:line-through">@Model.ProductPrice.OldPrice</span>
-                }
+        <div class="add-info">
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoBefore, additionalData = Model })
+            <div class="price-Qs">
+                <div class="prices">
+                    <span class="price actual-price" style="margin: 0px; font: normal 24px Roboto; line-height: 33.6px; color: #212121; margin-right: 5%">@Model.ProductPrice.Price</span>
+                    @if (!string.IsNullOrEmpty(Model.ProductPrice.OldPrice))
+                    {
+                        <span style="margin: 0px; font: normal 16px Roboto; line-height: 33.6px; color: #212121; font-weight: 400; text-decoration: line-through; text-decoration-thickness: 0px">@Model.ProductPrice.OldPrice</span>
+                    }
 
-                @if (Model.ProductPrice.DisplayTaxShippingInfo)
+                    @if (Model.ProductPrice.DisplayTaxShippingInfo)
+                    {
+                        var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+                        //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+                        //of course, you can modify appropriate locales to include VAT info there
+                        <span class="tax-shipping-info">
+                            @T(inclTax ? "Products.Price.TaxShipping.InclTax" : "Products.Price.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = await Html.GetTopicSeNameAsync("shippinginfo") }))
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ProductPrice.BasePricePAngV))
+                    {
+                        <div class="base-price-pangv">
+                            @Model.ProductPrice.BasePricePAngV
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="prices">
+                <span class="price">En Carrito:</span>
+                <span class="price">@Model.Details.CurrentProductQuantity</span>
+            </div>
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoMiddle, additionalData = Model })
+            <div class="buttons">
+                @*<button type="button" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = Model.SeName })')">@T("Products.Details")</button>*@
+                @if (!Model.ProductPrice.DisableBuyButton)
                 {
-                    var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
-                    //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
-                    //of course, you can modify appropriate locales to include VAT info there
-                    <span class="tax-shipping-info">
-                        @T(inclTax ? "Products.Price.TaxShipping.InclTax" : "Products.Price.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = await Html.GetTopicSeNameAsync("shippinginfo") }))
-                    </span>
+                    var addToCartText = T("ShoppingCart.AddToCart").Text;
+                    if (Model.ProductPrice.IsRental)
+                    {
+                        addToCartText = T("ShoppingCart.Rent").Text;
+                    }
+                    if (Model.ProductPrice.AvailableForPreOrder)
+                    {
+                        addToCartText = T("ShoppingCart.PreOrder").Text;
+                    }
+                    <button type="button" style="width:100%" class="button-2 product-box-add-to-cart-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">@(addToCartText)</button>
                 }
-                @if (!string.IsNullOrEmpty(Model.ProductPrice.BasePricePAngV))
+                @if (!Model.ProductPrice.DisableAddToCompareListButton)
                 {
-                    <div class="base-price-pangv">
-                        @Model.ProductPrice.BasePricePAngV
-                    </div>
+                    @*<button type="button" class="button-2 add-to-compare-list-button" title="@T("ShoppingCart.AddToCompareList")" onclick="AjaxCart.addproducttocomparelist('@addtocomparelink');return false;">@T("ShoppingCart.AddToCompareList")</button>*@
+                }
+                @if (!Model.ProductPrice.DisableWishlistButton)
+                {
+                    @*<button type="button" class="button-2 add-to-wishlist-button" title="@T("ShoppingCart.AddToWishlist")" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">@T("ShoppingCart.AddToWishlist")</button>*@
                 }
             </div>
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoAfter, additionalData = Model })
         </div>
-        <div class="prices">
-            <span class="price">En Carrito:</span>
-            <span class="price">@Model.Details.CurrentProductQuantity</span>
-        </div>
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoMiddle, additionalData = Model })
-        <div class="buttons">
-            @*<button type="button" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = Model.SeName })')">@T("Products.Details")</button>*@
-            @if (!Model.ProductPrice.DisableBuyButton)
-            {
-                var addToCartText = T("ShoppingCart.AddToCart").Text;
-                if (Model.ProductPrice.IsRental)
-                {
-                    addToCartText = T("ShoppingCart.Rent").Text;
-                }
-                if (Model.ProductPrice.AvailableForPreOrder)
-                {
-                    addToCartText = T("ShoppingCart.PreOrder").Text;
-                }
-                <button type="button" style="width:100%" class="button-2 product-box-add-to-cart-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">@(addToCartText)</button>
-            }
-            @if (!Model.ProductPrice.DisableAddToCompareListButton)
-            {
-                @*<button type="button" class="button-2 add-to-compare-list-button" title="@T("ShoppingCart.AddToCompareList")" onclick="AjaxCart.addproducttocomparelist('@addtocomparelink');return false;">@T("ShoppingCart.AddToCompareList")</button>*@
-            }
-            @if (!Model.ProductPrice.DisableWishlistButton)
-            {
-                @*<button type="button" class="button-2 add-to-wishlist-button" title="@T("ShoppingCart.AddToWishlist")" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">@T("ShoppingCart.AddToWishlist")</button>*@
-            }
-        </div>
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoAfter, additionalData = Model })
-    </div>
     </div>
 </div>
