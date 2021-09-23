@@ -689,7 +689,7 @@ namespace Nop.Services.Common
             doc.Add(totalsTable);
         }
 
-        protected virtual async Task PrintTotalsAsync1(int vendorId, Language lang, decimal subTotal, decimal subDiscount, Font font, Font titleFont, Document doc)
+        protected virtual async Task PrintTotalsAsync1(int vendorId, Language lang, decimal subTotal, decimal subDiscount, Store current_store,  Font font, Font titleFont, Document doc)
         {
             //vendors cannot see totals
             if (vendorId != 0)
@@ -742,8 +742,42 @@ namespace Nop.Services.Common
             pComission.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pComission);
 
+            var montoBono = current_store.MontoBono;
+            var total_antes_bono = subTotal - comission;
+            decimal total_despues_bono = 0;
+            decimal remainderBono = 0;
+
+            if (total_antes_bono <= montoBono)
+            {
+                remainderBono = montoBono - total_antes_bono;
+                total_despues_bono = 0;
+            }
+            else
+            {
+                remainderBono = 0;
+                total_despues_bono = total_antes_bono- montoBono;
+            }
+            current_store.MontoBono = remainderBono;
+            await _storeService.UpdateStoreAsync(current_store);
+
+            //descuento Bono
+            var bono = _currencyService.ConvertCurrency(montoBono-remainderBono, 1);
+            var bonoStr = await _priceFormatter.FormatPriceAsync(bono, true, "PES", false, languageId);
+            var pBono = GetPdfCell($"Descuento Bono: {bonoStr}", titleFont);
+            pBono.HorizontalAlignment = Element.ALIGN_RIGHT;
+            pBono.Border = Rectangle.NO_BORDER;
+            totalsTable.AddCell(pBono);
+
+
+
+            //Space between items and total
+            var space = GetPdfCell($"----------------------------------------------", font);
+            space.HorizontalAlignment = Element.ALIGN_RIGHT;
+            space.Border = Rectangle.NO_BORDER;
+            totalsTable.AddCell(space);
+            
             //order total
-            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(subTotal- comission, 1);
+            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(total_despues_bono, 1);
             var orderTotalStr = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, "PES", false, languageId);
 
             var pTotal = GetPdfCell($"{await _localizationService.GetResourceAsync("PDFInvoice.OrderTotal", languageId)} {orderTotalStr}", titleFont);
@@ -751,6 +785,17 @@ namespace Nop.Services.Common
             pTotal.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pTotal);
 
+            //Remainder Bono
+            if (remainderBono>0)
+            {
+                var remainderBonoCurr = _currencyService.ConvertCurrency(remainderBono, 1);
+                var remainderBonoStr = await _priceFormatter.FormatPriceAsync(remainderBonoCurr, true, "PES", false, languageId);
+                var pRemainderBono = GetPdfCell($"Bono Restante: {remainderBonoStr}", font);
+                pRemainderBono.HorizontalAlignment = Element.ALIGN_RIGHT;
+                pRemainderBono.Border = Rectangle.NO_BORDER;
+                totalsTable.AddCell(pRemainderBono);
+            }
+          
             doc.Add(totalsTable);
         }
 
@@ -1658,7 +1703,7 @@ namespace Nop.Services.Common
             //PrintCheckoutAttributes(vendorId, order, doc, lang, font);
 
             //totals
-            await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, font, titleFont, doc);
+            await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount,currentStore,font, titleFont, doc);
 
             //order notes
             //await PrintOrderNotesAsync(pdfSettingsByStore, order, lang, titleFont, doc, font);

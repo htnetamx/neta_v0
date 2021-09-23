@@ -102,7 +102,7 @@ namespace Nop.Services.Stores
         /// </returns>
         public virtual async Task<Store> GetStoreByIdAsync(int storeId)
         {
-            return await _storeRepository.GetByIdAsync(storeId, cache => default);
+            return await _storeRepository.GetByIdAsync(storeId);
         }
 
         /// <summary>
