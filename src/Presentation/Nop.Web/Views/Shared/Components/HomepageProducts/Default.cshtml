@@ -1,10 +1,10 @@
 ﻿@model Nop.Web.Models.Catalog.SearchModel
 @inject Nop.Core.IStoreContext storeContext
-    <div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh">
+@*<div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh">
         <a style="background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw" href="/newproducts">Haz click aqui para nuevos productos</a>
-        <a style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw "  href="/curiosities">Haz click y descubre curiosidades neta</a>
+        <a style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw " href="/curiosities">Haz click y descubre curiosidades neta</a>
     </div>
-    
+
     @if (Model.CatalogProductsModel.Products.Count > 0)
     {
         var store = storeContext.GetCurrentStore();
@@ -49,30 +49,38 @@
                 </div>
             }
         }
-    }
-    
+    }*@
 
-        <div class="product-grid home-page-product-grid">
-            <div class="title">
-                <strong>@T("Homepage.Products")</strong>
-            </div>
-            <div class="item-grid">
+<div>
+    @await Component.InvokeAsync("SearchBoxV2")
+</div>
+@if (Model.CatalogProductsModel.Promos.Count > 0)
+{
+    <div class="product-grid home-page-product-grid" style="margin: 0px">
+        <div style="text-align: left; margin-bottom: 15px">
+            <p style="margin: 0px; font: bold 18px Roboto; line-height: 25.2px;color: #212121"> @T("Homepage.Products")</p>
+        </div>
+        <div id="Descuentos-Dia" class="item-grid">
             @foreach (var item in Model.CatalogProductsModel.Promos.OrderBy(v => v.DisplayOrder))
             {
                 <div class="item-box">
                     @await Html.PartialAsync("_ProductBoxHomePage", item)
                 </div>
             }
-            </div>
         </div>
-    <div class="product-grid home-page-product-grid">
-        <div class="title">
-            <strong>Nuestra oferta de precios bajos!</strong>
+    </div>
+}
+
+@if (Model.CatalogProductsModel.Products.Count > 0)
+{
+    <div class="product-grid home-page-product-grid" style="margin: 0px">
+        <div style="text-align: left;margin-bottom:15px">
+            <p style="margin: 0px;font: bold 18px Roboto; line-height: 25.2px;color: #212121">  Nuestra oferta de precios bajos! </p>
         </div>
         @*Hide Order By and page size
-        @await Html.PartialAsync("_CatalogSelectors", Model.CatalogProductsModel)
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })*@
-        <div class="search-results">
+            @await Html.PartialAsync("_CatalogSelectors", Model.CatalogProductsModel)
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })*@
+        <div id="Oferta-Precios-Bajos" class="search-results" style="margin: 0px">
             @{
                 var catalogProductsViewData = new ViewDataDictionary(ViewData);
                 catalogProductsViewData["fetchUrl"] = Html.Raw(Url.Action("SearchProducts", "Catalog"));
@@ -81,70 +89,100 @@
             @await Html.PartialAsync("_CatalogProductsHome", Model.CatalogProductsModel, catalogProductsViewData)
         </div>
     </div>
-    <script>
-        scroller();
-        if (window.innerWidth < 575) {
-            productsInColumns(2);
-        }
-        function scroller() {
-            var queryString = window.location.search;
-            var urlParams = new URLSearchParams(queryString);
-            var current = urlParams.get('pagesize');
-            var newWidth = document.querySelector(".master-wrapper-content").scrollWidth;
-            var heightP = document.querySelector('.item-box').scrollHeight;
-            var widthP = document.querySelector('.item-box').scrollWidth;
-            var cantidadProductosFila = Math.floor((newWidth / widthP));
-            var increment = 0;
-            var end_sum= 1;
-            if (current == 0 || current==null) {
-                increment = 0;
-                current =@Model.CatalogProductsModel.StartingProducts;
-                end_sum = 0;
-            }
-            else {
-                increment =@Model.CatalogProductsModel.Increment;
-                current =@Model.CatalogProductsModel.Products.ToList().Count();
-                end_sum = 1;
-            }
+}
 
-            var product_Count_before = current - (increment);
-            var filas_anteriores = Math.ceil((product_Count_before / cantidadProductosFila));
-            var filas_actuales = Math.ceil((current / cantidadProductosFila));
-            var filas_a_restar = filas_actuales - filas_anteriores - end_sum;
-            var fila_final = (filas_actuales - filas_a_restar)*end_sum;
-            window.scrollTo(0, heightP * fila_final);
-        }
+<script>
+    scroller();
+    var cantxfilas = 1  ;
 
-        function productsInColumns(cantxfila) {
-            var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth-1;
-            console.log(clientWidth);
-            var err_percent = 5;
-            porcentaje_ancho = ((100 - err_percent) / cantxfila) / 100;
-            var ancho = (clientWidth * porcentaje_ancho);
-            ancho = Math.floor(ancho);
-            console.log(ancho);
-            var espacio_libre = clientWidth - ancho * cantxfila;
-            console.log(espacio_libre);
-            margen_izquierda = espacio_libre / (cantxfila - 1);
-            console.log(espacio_libre);
-            x = document.getElementsByClassName("item-box");
-            for (var i = 0; i < x.length; i++) {
-                x[i].style.width = ancho.toString() + "px";
-                if (i % cantxfila != 0) {
-                    x[i].style.marginLeft = margen_izquierda.toString() + "px";
-                }
-            }
-            
-            var x = document.getElementsByClassName("product-title");
-            var max = 0;
-            for (var i = 0; i < x.length; i++) {
-                if (x[i].clientHeight > max) {
-                    max = x[i].clientHeight;
-                }
-            }
-            for (var i = 0; i < x.length; i++) {
-                x[i].style.height = max.toString() + "px";
-            }
+    var hay_productos_descuentos =(@Model.CatalogProductsModel.Promos.Count > 0);
+    var hay_productos_ofertas = (@Model.CatalogProductsModel.Products.Count > 0);
+
+    if (window.innerWidth < 575) {
+        if (hay_productos_descuentos) {
+            productsInColumns("Descuentos-Dia", cantxfilas);
+        }
+        if (hay_productos_ofertas){
+            productsInColumns("Oferta-Precios-Bajos", cantxfilas);
+        }
+    }
+    if (hay_productos_descuentos) {
+        productTitleSizer("Descuentos-Dia");
+    }
+    if (hay_productos_ofertas) {
+        productTitleSizer("Oferta-Precios-Bajos");
+    }
+
+
+    function scroller() {
+        var queryString = window.location.search;
+        var urlParams = new URLSearchParams(queryString);
+        var current = urlParams.get('pagesize');
+        var newWidth = document.querySelector(".master-wrapper-content").scrollWidth;
+        var heightP = document.querySelector('.item-box').scrollHeight;
+        var widthP = document.querySelector('.item-box').scrollWidth;
+        var cantidadProductosFila = Math.floor((newWidth / widthP));
+        var increment = 0;
+        var end_sum= 1;
+        if (current == 0 || current==null) {
+            increment = 0;
+            current =@Model.CatalogProductsModel.StartingProducts;
+            end_sum = 0;
+        }
+        else {
+            increment =@Model.CatalogProductsModel.Increment;
+            current =@Model.CatalogProductsModel.Products.ToList().Count();
+            end_sum = 1;
         }
 
-    </script>
+        var product_Count_before = current - (increment);
+        var filas_anteriores = Math.ceil((product_Count_before / cantidadProductosFila));
+        var filas_actuales = Math.ceil((current / cantidadProductosFila));
+        var filas_a_restar = filas_actuales - filas_anteriores - end_sum;
+        var fila_final = (filas_actuales - filas_a_restar)*end_sum;
+        window.scrollTo(0, heightP * fila_final);
+    }
+    function productsInColumns(id,cantxfila) {
+        var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth-1;
+        var err_percent = 5;
+        porcentaje_ancho = ((100 - err_percent) / cantxfila) / 100;
+        var ancho = (clientWidth * porcentaje_ancho);
+        ancho = Math.floor(ancho);
+        var espacio_libre = clientWidth - ancho * cantxfila;
+        margen_izquierda = espacio_libre / (cantxfila - 1);
+        x = document.getElementById(id).getElementsByClassName("item-box");
+        for (var i = 0; i < x.length; i++) {
+            x[i].style.width = ancho.toString() + "px";
+            x[i].style.marginBottom = "40px";
+            if (i % cantxfila != 0) {
+                x[i].style.marginLeft = margen_izquierda.toString() + "px";
+            }
+        }
+    }
+    function productTitleSizer(id) {
+        var x = document.getElementById(id).getElementsByClassName("new-product-title");
+        var y = document.getElementById(id).getElementsByClassName("price-Qs");
+        var max = 0;
+        var maxy = 0;
+        var promedio = 0;
+        var promedioy = 0;
+        for (var i = 0; i < x.length; i++) {
+            if (x[i].clientHeight > max) {
+                max = x[i].clientHeight;
+            }
+            if (y[i].clientHeight > maxy) {
+                maxy = y[i].clientHeight;
+            }
+            promedio  = promedio  + x[i].clientHeight;
+            promedioy = promedioy + y[i].clientHeight;
+        }
+
+        promedio  = promedio  / x.length;
+        promedioy = promedioy / y.length;
+
+        for (var i = 0; i < x.length; i++) {
+            x[i].style.height = max.toString() + "px";
+            y[i].style.height = maxy.toString() + "px";
+        }
+    }
+</script>

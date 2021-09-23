@@ -69,6 +69,11 @@ namespace Nop.Core.Domain.Stores
         public decimal Longitud { get; set; }
 
         /// <summary>
+        /// Gets or sets Monto Bono
+        /// </summary>
+        public decimal MontoBono { get; set; }
+
+        /// <summary>
         /// Gets or sets the date and time of order creation
         /// </summary>
         public DateTime CreatedOnUtc { get; set; }

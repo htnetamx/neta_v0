@@ -55,6 +55,15 @@ namespace Nop.Web.Factories
         Task<HeaderLinksModel> PrepareHeaderLinksModelAsync();
 
         /// <summary>
+        /// Prepare the header Final model
+        /// </summary>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the header links model
+        /// </returns>
+        Task<HeaderFinalModel> PrepareHeaderFinalModelAsync();
+
+        /// <summary>
         /// Prepare the admin header links model
         /// </summary>
         /// <returns>

@@ -397,6 +397,65 @@ namespace Nop.Web.Factories
         }
 
         /// <summary>
+        /// Prepare the header Final model
+        /// </summary>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the header links model
+        /// </returns>
+        public virtual async Task<HeaderFinalModel> PrepareHeaderFinalModelAsync()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+
+            var unreadMessageCount = await GetUnreadPrivateMessagesAsync();
+            var unreadMessage = string.Empty;
+            var alertMessage = string.Empty;
+            if (unreadMessageCount > 0)
+            {
+                unreadMessage = string.Format(await _localizationService.GetResourceAsync("PrivateMessages.TotalUnread"), unreadMessageCount);
+
+                //notifications here
+                if (_forumSettings.ShowAlertForPM &&
+                    !await _genericAttributeService.GetAttributeAsync<bool>(customer, NopCustomerDefaults.NotifiedAboutNewPrivateMessagesAttribute, (await _storeContext.GetCurrentStoreAsync()).Id))
+                {
+                    await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.NotifiedAboutNewPrivateMessagesAttribute, true, (await _storeContext.GetCurrentStoreAsync()).Id);
+                    alertMessage = string.Format(await _localizationService.GetResourceAsync("PrivateMessages.YouHaveUnreadPM"), unreadMessageCount);
+                }
+            }
+
+            var model = new HeaderFinalModel
+            {
+                RegistrationType = _customerSettings.UserRegistrationType,
+                IsAuthenticated = await _customerService.IsRegisteredAsync(customer),
+                CustomerName = await _customerService.IsRegisteredAsync(customer) ? await _customerService.FormatUsernameAsync(customer) : string.Empty,
+                ShoppingCartEnabled = await _permissionService.AuthorizeAsync(StandardPermissionProvider.EnableShoppingCart),
+                WishlistEnabled = await _permissionService.AuthorizeAsync(StandardPermissionProvider.EnableWishlist),
+                AllowPrivateMessages = await _customerService.IsRegisteredAsync(customer) && _forumSettings.AllowPrivateMessages,
+                UnreadPrivateMessages = unreadMessage,
+                AlertMessage = alertMessage,
+            };
+
+            model.Store = await _storeContext.GetCurrentStoreAsync();
+
+            //performance optimization (use "HasShoppingCartItems" property)
+            if (customer.HasShoppingCartItems)
+            {
+                //model.ShoppingCartItems = (await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id))
+                //    .Sum(item => item.Quantity);
+
+                model.ShoppingCartItems = (await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id)).GroupBy(item => item.ProductId).Count();
+     
+                model.ShoppingCartTotal = (await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id))
+                    .Sum((item) => Convert.ToDecimal(Convert.ToDecimal(item.Quantity) * Convert.ToDecimal(_productService.GetProductByIdAsync(item.ProductId).Result.Price)));
+
+                model.WishlistItems = (await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist, (await _storeContext.GetCurrentStoreAsync()).Id))
+                    .Sum(item => item.Quantity);
+            }
+
+            return model;
+        }
+
+        /// <summary>
         /// Prepare the admin header links model
         /// </summary>
         /// <returns>
