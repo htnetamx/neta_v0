@@ -742,7 +742,7 @@ namespace Nop.Services.Common
             pComission.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pComission);
 
-            var montoBono = current_store.MontoBono;
+            var montoBono = current_store.NetaCoin;
             var total_antes_bono = subTotal - comission;
             decimal total_despues_bono = 0;
             decimal remainderBono = 0;
@@ -757,13 +757,13 @@ namespace Nop.Services.Common
                 remainderBono = 0;
                 total_despues_bono = total_antes_bono- montoBono;
             }
-            current_store.MontoBono = remainderBono;
+            current_store.NetaCoin = remainderBono;
             await _storeService.UpdateStoreAsync(current_store);
 
             //descuento Bono
             var bono = _currencyService.ConvertCurrency(montoBono-remainderBono, 1);
             var bonoStr = await _priceFormatter.FormatPriceAsync(bono, true, "PES", false, languageId);
-            var pBono = GetPdfCell($"Descuento Bono: {bonoStr}", titleFont);
+            var pBono = GetPdfCell($"Descuento NetaCoin: {bonoStr}", titleFont);
             pBono.HorizontalAlignment = Element.ALIGN_RIGHT;
             pBono.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pBono);
@@ -771,7 +771,7 @@ namespace Nop.Services.Common
 
 
             //Space between items and total
-            var space = GetPdfCell($"----------------------------------------------", font);
+            var space = GetPdfCell($"---------------------------------------------", font);
             space.HorizontalAlignment = Element.ALIGN_RIGHT;
             space.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(space);
@@ -790,7 +790,7 @@ namespace Nop.Services.Common
             {
                 var remainderBonoCurr = _currencyService.ConvertCurrency(remainderBono, 1);
                 var remainderBonoStr = await _priceFormatter.FormatPriceAsync(remainderBonoCurr, true, "PES", false, languageId);
-                var pRemainderBono = GetPdfCell($"Bono Restante: {remainderBonoStr}", font);
+                var pRemainderBono = GetPdfCell($"Saldo Restante NetaCoin: {remainderBonoStr}", font);
                 pRemainderBono.HorizontalAlignment = Element.ALIGN_RIGHT;
                 pRemainderBono.Border = Rectangle.NO_BORDER;
                 totalsTable.AddCell(pRemainderBono);

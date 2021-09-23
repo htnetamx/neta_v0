@@ -69,9 +69,9 @@ namespace Nop.Core.Domain.Stores
         public decimal Longitud { get; set; }
 
         /// <summary>
-        /// Gets or sets Monto Bono
+        /// Gets or sets NetaCoin
         /// </summary>
-        public decimal MontoBono { get; set; }
+        public decimal NetaCoin { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time of order creation
