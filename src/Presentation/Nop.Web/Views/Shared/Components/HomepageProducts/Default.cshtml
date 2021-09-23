@@ -63,7 +63,7 @@
         <div id="Descuentos-Dia" class="item-grid">
             @foreach (var item in Model.CatalogProductsModel.Promos.OrderBy(v => v.DisplayOrder))
             {
-                <div class="item-box">
+                <div class="item-box" style="margin-left: 0px; margin-right: 0px;">
                     @await Html.PartialAsync("_ProductBoxHomePage", item)
                 </div>
             }
@@ -93,26 +93,57 @@
 
 <script>
     scroller();
-    var cantxfilas = 2  ;
+    window.addEventListener('load', function () {
+        window.addEventListener("orientationchange", orientationChange);
+    });
+    
+    var decuentos_width = 0;
+    var oferta_width = 0;
+    var decuentos_width_ant = 0;
+    var oferta_width_ant = 0;
+    var cantxfilas = 2;
 
-    var hay_productos_descuentos =(@Model.CatalogProductsModel.Promos.Count > 0);
-    var hay_productos_ofertas = (@Model.CatalogProductsModel.Products.Count > 0);
-
-    if (window.innerWidth < 575) {
+    function homePageActions(cantxfilas, orientationChange) {
+        scroller();
+        var hay_productos_descuentos =(@Model.CatalogProductsModel.Promos.Count > 0);
+        var hay_productos_ofertas = (@Model.CatalogProductsModel.Products.Count > 0);
+        if (window.innerWidth < 575 || orientationChange) {
+            if (hay_productos_descuentos) {
+                decuentos_width_ant = decuentos_width.valueOf();
+                decuentos_width = productsInColumns("Descuentos-Dia", cantxfilas);
+            }
+            if (hay_productos_ofertas) {
+                oferta_width_ant = oferta_width.valueOf();
+                oferta_width = productsInColumns("Oferta-Precios-Bajos", cantxfilas);
+            }
+        }
         if (hay_productos_descuentos) {
-            productsInColumns("Descuentos-Dia", cantxfilas);
+            productTitleSizer("Descuentos-Dia");
         }
-        if (hay_productos_ofertas){
-            productsInColumns("Oferta-Precios-Bajos", cantxfilas);
+        if (hay_productos_ofertas) {
+            productTitleSizer("Oferta-Precios-Bajos");
         }
-    }
-    if (hay_productos_descuentos) {
-        productTitleSizer("Descuentos-Dia");
-    }
-    if (hay_productos_ofertas) {
-        productTitleSizer("Oferta-Precios-Bajos");
     }
 
+    function orientationChange() {
+        var max_width = Math.ceil(Math.max(parseInt(decuentos_width_ant.toString().replace("px", ""), 10), parseInt(oferta_width_ant.toString().replace("px", ""), 10)))+2;
+        var afterOrientationChange = function () {
+            var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
+            var cantxfila_orientacion;
+            var orientacion = event.target.screen.orientation.angle;
+            if (orientacion == 0) {
+                var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
+                cantxfila_orientacion = cantxfilas;
+            }
+            else {
+                var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
+                cantxfila_orientacion = Math.floor(clientWidth / max_width);
+            }
+            homePageActions(cantxfila_orientacion, true, clientWidth);
+            window.removeEventListener('resize', afterOrientationChange);
+        };
+        window.addEventListener('resize', afterOrientationChange);
+    }
 
     function scroller() {
         var queryString = window.location.search;
@@ -142,8 +173,8 @@
         var fila_final = (filas_actuales - filas_a_restar)*end_sum;
         window.scrollTo(0, heightP * fila_final);
     }
-    function productsInColumns(id,cantxfila) {
-        var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth-1;
+    function productsInColumns(id, cantxfila) {
+        var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
         var err_percent = 5;
         porcentaje_ancho = ((100 - err_percent) / cantxfila) / 100;
         var ancho = (clientWidth * porcentaje_ancho);
@@ -154,11 +185,14 @@
         for (var i = 0; i < x.length; i++) {
             x[i].style.width = ancho.toString() + "px";
             x[i].style.marginBottom = "40px";
+            x[i].style.marginLeft = 0;
             if (i % cantxfila != 0) {
                 x[i].style.marginLeft = margen_izquierda.toString() + "px";
             }
         }
+        return x[0].style.width;
     }
+
     function productTitleSizer(id) {
         var x = document.getElementById(id).getElementsByClassName("new-product-title");
         var y = document.getElementById(id).getElementsByClassName("price-Qs");

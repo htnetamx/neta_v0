@@ -38,62 +38,72 @@
     </div>
     @*@await Component.InvokeAsync("Footer")*@
     <script>
-        window.onresize = resizer();
+        resizer();
+        window.addEventListener('resize', resizer);
+
         function resizer() {
-            var mwc = document.getElementById("master-wrapper-cont");
-            var admin = document.getElementById("admin_hl");
-            var mwp = document.getElementById("headerV21");
-
-            var cartInfo = document.getElementById("cartInfo");
-            if (mwp != null) {
-                var padding = (mwp.clientWidth - mwc.clientWidth) / 2;
-                mwp.style.paddingLeft = padding.toString() + "px";
-                mwp.style.paddingRight = padding.toString() + "px";
-                if (cartInfo != null) {
-                    cartInfo.style.paddingLeft = padding.toString() + "px";
-                    cartInfo.style.paddingRight = padding.toString() + "px";
-                }
-            }
-
-            
-            if (mwc != null) {
-                
-                var cartInfoHeigth = 0
-                if (cartInfo != null) {
-                    cartInfoHeigth = cartInfo.clientHeight;
-                }
-                
-                var mwpHeight = 0
-                if (mwp != null) {
-                    mwpHeight = mwp.clientHeight;
-                }
-                
-                var adminHeight = 0
-                if (admin != null) {
-                    adminHeight = adminHeight.clientHeight;
-                }
-                var upp = cartInfoHeigth + mwpHeight + adminHeight + 15;
-                mwc.style.top = upp.toString() + "px";
-            }
-            var list = document.getElementById("auth_list");
-            if (list.innerText == "") {
-                list.style.display = "none";
-            }
-            var searchbar = document.getElementById("small-searchterms");
-            if (searchbar!=null) {
-                var lupa = document.getElementById("lupa_icon");
-                var left_diff = parseInt(lupa.style.left.toString().replace("px", ""), 10);
-                var diff = Math.ceil(lupa.clientWidth + left_diff * 2);
-                searchbar.style.paddingLeft = diff.toString() + "px";
-            }
             try {
-                
-               
+                basicResize();
+                homePageActions(cantxfilas, false);
             }
             catch {
                 console.log("Error Resizer");
             }
         }
+        function basicResize() {
+            try {
+                var mwc = document.getElementById("master-wrapper-cont");
+                var admin = document.getElementById("admin_hl");
+                var mwp = document.getElementById("headerV21");
+
+                var cartInfo = document.getElementById("cartInfo");
+                if (mwp != null) {
+                    var padding = (mwp.clientWidth - mwc.clientWidth) / 2;
+                    mwp.style.paddingLeft = padding.toString() + "px";
+                    mwp.style.paddingRight = padding.toString() + "px";
+                    if (cartInfo != null) {
+                        cartInfo.style.paddingLeft = padding.toString() + "px";
+                        cartInfo.style.paddingRight = padding.toString() + "px";
+                    }
+                }
+                if (mwc != null) {
+
+                    var cartInfoHeigth = 0
+                    if (cartInfo != null) {
+                        cartInfoHeigth = cartInfo.clientHeight;
+                    }
+
+                    var mwpHeight = 0
+                    if (mwp != null) {
+                        mwpHeight = mwp.clientHeight;
+                    }
+
+                    var adminHeight = 0
+                    if (admin != null) {
+                        adminHeight = admin.clientHeight;
+                    }
+                    var upp = cartInfoHeigth + mwpHeight + adminHeight + 15;
+                    mwc.style.top = upp.toString() + "px";
+                }
+                var list = document.getElementById("auth_list");
+                if (list.innerText == "") {
+                    list.style.display = "none";
+                }
+                var searchbar = document.getElementById("small-searchterms");
+                if (searchbar != null) {
+                    var lupa = document.getElementById("lupa_icon");
+                    var left_diff = parseInt(lupa.style.left.toString().replace("px", ""), 10);
+                    var diff = Math.ceil(lupa.clientWidth + left_diff * 2);
+                    searchbar.style.paddingLeft = diff.toString() + "px";
+                }
+
+            }
+            catch {
+                console.log("Error Basic Resize");
+            }
+        }
+
+
     </script>
 </div>
 @await Component.InvokeAsync("EuCookieLaw")
