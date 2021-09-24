@@ -24,7 +24,7 @@ namespace Nop.Services.Orders
         /// </returns>
         Task<Order> GetOrderByIdAsync(int orderId);
 
-        Task<int> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber);
+        Task<int[]> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber);
 
         /// <summary>
         /// Gets an order

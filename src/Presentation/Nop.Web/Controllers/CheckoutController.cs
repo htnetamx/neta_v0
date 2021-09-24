@@ -1924,7 +1924,7 @@ namespace Nop.Web.Controllers
 
                 //var appSettings = EngineContext.Current.Resolve<AppSettings>();
                 var qtyValidation = 5; //appSettings.CommonConfig.QtyPerEndClients;
-                var validQty = true;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
+                var validQty = false;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
                 if (validQty)
                 {
                     var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
@@ -1932,9 +1932,19 @@ namespace Nop.Web.Controllers
                     foreach (var item in cart)
                     {
                         var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber);
-                        if (qtyValidation > 0 && ((cnt+item.Quantity) > qtyValidation))
+                        if(cnt != null)
                         {
-                            throw new Exception($"Limite en cantidad de Compras. La suma de los asociados supera las {qtyValidation} unidades de cada uno.");
+                            if (cnt[0] + item.Quantity > qtyValidation * children.Count)
+                            {
+                                throw new Exception($"Limite en cantidad de Compras. La suma de los asociados supera las {qtyValidation} unidades de cada uno.");
+                            }
+                            else
+                            {
+                                if (qtyValidation > 0 && ((cnt[1] + item.Quantity) > qtyValidation))
+                                {
+                                    throw new Exception($"Limite en cantidad de Compras. Tu asociado ya compró {qtyValidation} unidades.");
+                                }
+                            }
                         }
                     }
                 }
