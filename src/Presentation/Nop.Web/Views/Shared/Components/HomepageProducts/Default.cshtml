@@ -97,46 +97,38 @@
         window.addEventListener("orientationchange", orientationChange);
     });
     
-    var decuentos_width = 0;
-    var oferta_width = 0;
     var cantxfilas = 3;
 
-    function homePageActions(cantxfilas, orientationChange) {
+    function homePageActions(cantxfilas) {
         scroller();
         var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
         cantxfilas = maxPerRow(clientWidth);
+  
         var hay_productos_descuentos =(@Model.CatalogProductsModel.Promos.Count > 0);
         var hay_productos_ofertas = (@Model.CatalogProductsModel.Products.Count > 0);
-        if (window.innerWidth < 575 || orientationChange) {
-            if (hay_productos_descuentos) {
-                decuentos_width = productsInColumns("Descuentos-Dia", cantxfilas);
-            }
-            if (hay_productos_ofertas) {
-                oferta_width = productsInColumns("Oferta-Precios-Bajos", cantxfilas);
-            }
-        }
+
         if (hay_productos_descuentos) {
+            decuentos_width = productsInColumns("Descuentos-Dia", cantxfilas);
             productTitleSizer("Descuentos-Dia");
         }
         if (hay_productos_ofertas) {
+            oferta_width = productsInColumns("Oferta-Precios-Bajos", cantxfilas);
             productTitleSizer("Oferta-Precios-Bajos");
         }
     }
 
     function orientationChange() {
-        var max_width = Math.ceil(Math.max(parseInt(decuentos_width.toString().replace("px", ""), 10), parseInt(oferta_width.toString().replace("px", ""), 10)))+2;
         var afterOrientationChange = function () {
             var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
             var cantxfila_orientacion;
             var orientacion = event.target.screen.orientation.angle;
-            var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
             if (orientacion == 0) {
                 cantxfila_orientacion = cantxfilas;
             }
             else {
-                cantxfila_orientacion = Math.floor(clientWidth / max_width);
+                cantxfila_orientacion = maxPerRow(clientWidth);
             }
-            homePageActions(cantxfila_orientacion, true, clientWidth);
+            homePageActions(cantxfila_orientacion);
             basicResize();
             window.removeEventListener('resize', afterOrientationChange);
         };
