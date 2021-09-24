@@ -43,17 +43,21 @@ namespace Nop.Services.Customers
                 if (orders != null)
                 {
                     var days = DateTime.UtcNow.Subtract(orders.CreatedOnUtc).Days;
-                    if (days >= 7)
+                    if (days >= 7 && days <= 22)
                     {
                         var customer = await _addressService.GetAddressByIdAsync(orders.BillingAddressId);
                         if(customer != null)
                         {
-                            if (string.IsNullOrWhiteSpace(customer.FirstName))
+                            if (!string.IsNullOrWhiteSpace(customer.FirstName))
                             {
                                 var rta = await Send(info,
-                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_end_clients",
-                                    customer.FirstName,
-                                    days.ToString());
+                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_end_clients_v2",
+                                    customer.FirstName.Split(" ")[0],
+                                    days.ToString(),
+                                    "https://forms.gle/MYr7Gh1y8M7kUjSt9");
+
+                                //TODO: Guardo el envio
+                                //TODO: La proxima vez, pregunto por envio (si dif es de 7 dias)
                             }
                         }
                     }

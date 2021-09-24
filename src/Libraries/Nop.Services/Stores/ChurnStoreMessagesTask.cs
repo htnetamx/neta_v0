@@ -46,12 +46,16 @@ namespace Nop.Services.Stores
                         if (orders != null)
                         {
                             var days = DateTime.UtcNow.Subtract(orders.CreatedOnUtc).Days;
-                            if (days >= 5)
+                            if (days >= 5 && days <= 15)
                             {
                                 var rta = await Send(info.CompanyPhoneNumber,
-                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_shops",
+                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn__shops_v2",
                                     info.Name,
-                                    days.ToString());
+                                    days.ToString(),
+                                    "https://forms.gle/VsEBH3hiWySeQNSAA");
+
+                                //TODO: Guardo el envio
+                                //TODO: La proxima vez, pregunto por envio (si dif es de 5 dias)
                             }
                         }
                     }

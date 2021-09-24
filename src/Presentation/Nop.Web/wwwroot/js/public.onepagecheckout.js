@@ -599,15 +599,19 @@ var ConfirmOrder = {
     },
 
     nextStep: function (response) {
-        if (response.error) {
-            if (typeof response.message === 'string') {
-                alert(response.message);
-            } else {
-                alert(response.message.join("\n"));
-            }
-
-            return false;
+      if (response.error) {
+        try {
+          if (typeof response.message === 'string') {
+            alert(response.message);
+          } else {
+            alert(response.message.join("\n"));
+          }
+          return false;
+        } catch (e) {
+          alert(response.message);
+          return false;
         }
+      }
 
         if (response.redirect) {
             ConfirmOrder.isSuccess = true;

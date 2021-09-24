@@ -157,7 +157,8 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Details(int orderId)
         {
             var order = await _orderService.GetOrderByIdAsync(orderId);
-            if (order == null || order.Deleted || (await _workContext.GetCurrentCustomerAsync()).Id != order.CustomerId)
+            //if (order == null || order.Deleted || (await _workContext.GetCurrentCustomerAsync()).Id != order.CustomerId)
+            if(order == null || order.Deleted)
                 return Challenge();
 
             var model = await _orderModelFactory.PrepareOrderDetailsModelAsync(order);
