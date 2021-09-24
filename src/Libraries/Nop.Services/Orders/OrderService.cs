@@ -240,10 +240,10 @@ namespace Nop.Services.Orders
             return await query.ToListAsync();
         }
 
-        public virtual async Task<int> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber)
+        public virtual async Task<int[]> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber)
         {
             if (addressId == 0 || productId == 0)
-                return -1;
+                return null;
 
             var currentAddress = await _addressService.GetAddressByIdAsync(addressId);
             var children = await _addressService.GetRelatedAddressByIdAsync(currentAddress.PhoneNumber);
@@ -251,21 +251,22 @@ namespace Nop.Services.Orders
             DateTime date = DateTime.UtcNow.AddHours(-5).Date;
 
             var total = 0;
+            var totalInd = 0;
             foreach(var child in children)
             {
                 var cnt = await (from o in _orderRepository.Table
                               join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                               join a in _addressRepository.Table on o.BillingAddressId equals a.Id
                               where oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.Date == date
-                              select o).CountAsync();
+                              select oi).SumAsync(v => v.Quantity);
                 if (child.PhoneNumber == phoneNumber)
                 {
-                    return cnt;
+                    totalInd = cnt;
                 }
                 total += cnt;
             }
 
-            return total;
+            return new int[] { total, totalInd };
         }
 
         /// <summary>
