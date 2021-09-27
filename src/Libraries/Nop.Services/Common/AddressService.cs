@@ -130,7 +130,8 @@ namespace Nop.Services.Common
                         orderby a.Id
                         select a;
             var addr = await query.FirstOrDefaultAsync();
-            if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
+            //if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
+            if (addr.Email.Contains("@"))
             {
                 var query1 = from a in _addressRepository.Table
                             where a.Id == addr.Id || (a.Email == addr.PhoneNumber || a.PhoneNumber == addr.PhoneNumber) && !a.Email.Contains("@")
@@ -142,7 +143,7 @@ namespace Nop.Services.Common
             else
             {
                 var query1 = from a in _addressRepository.Table
-                             where (a.Email == addr.Email || a.PhoneNumber == addr.Email)
+                             where (a.Email == addr.Email || a.PhoneNumber == addr.Email) && a.Email.Contains("@")
                              orderby a.Id
                              select a;
                 var addr1 = query1.ToList().First();

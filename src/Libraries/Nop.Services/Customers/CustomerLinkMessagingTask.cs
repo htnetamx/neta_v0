@@ -46,16 +46,19 @@ namespace Nop.Services.Customers
             var init = 0;
             var end = orders.Count;
             var rndList = new List<int>();
-            for(var i = 0; i < (orders.Count > 200 ? 200 : orders.Count); i++)
+            while(rndList.Count < 1000)
             {
                 var rndNumber = new Random().Next(init, end);
                 if (!rndList.Contains(rndNumber))
                 {
                     rndList.Add(rndNumber);
+                    orders.RemoveAt(rndNumber);
+
+                    end = orders.Count;
                 }
             }
 
-            foreach(var position in rndList)
+            foreach (var position in rndList)
             {
                 var customer = orders[position];
 

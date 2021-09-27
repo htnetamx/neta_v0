@@ -7,22 +7,30 @@ using System.Threading.Tasks;
 using Nop.Services.Tasks;
 using Nop.Services.Catalog;
 using Nop.Services.Orders;
+using Nop.Services.Common;
+using Nop.Services.Stores;
 
-namespace Nop.Services.Stores
+namespace Nop.Services.Customers
 {
-    public class ChurnStoreMessagesTask : IScheduleTask
+    class CustomerPromoTask : IScheduleTask
     {
         #region Fields
-        private readonly IStoreService _storeService;
+        private readonly IAddressService _addressService;
         private readonly IOrderService _orderService;
+        private readonly IStoreService _storeService;
+        private readonly IProductService _productService;
+        private readonly IStoreMappingService _storeMapping;
         #endregion
 
         #region Ctor
 
-        public ChurnStoreMessagesTask(IStoreService storeService, IOrderService orderService)
+        public CustomerPromoTask(IAddressService addressService, IOrderService orderService, IStoreService storeService, IProductService productService, IStoreMappingService storeMapping)
         {
-            _storeService = storeService;
+            _addressService = addressService;
             _orderService = orderService;
+            _storeService = storeService;
+            _productService = productService;
+            _storeMapping = storeMapping;
         }
 
         #endregion
@@ -34,29 +42,31 @@ namespace Nop.Services.Stores
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            var stores = await _storeService.GetAllStoresAsync();
-            foreach (var info in stores)
+            var phoneNumberList = await _addressService.GetAllAddressesAsync();
+            foreach (var info in phoneNumberList)
             {
-                if (info.DisplayOrder == 1 || info.DisplayOrder == 2 || info.DisplayOrder == 3)
+                var orders = (await _orderService.GetOrdersByPhoneNumberAsync(info))
+                    .OrderByDescending(v => v.CreatedOnUtc).FirstOrDefault();
+                if (orders != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
+                    var store = await _storeService.GetStoreByIdAsync(orders.StoreId);
+                    var customer = await _addressService.GetAddressByIdAsync(orders.BillingAddressId);
+                    if (customer != null)
                     {
-                        var orders = (await _orderService.GetOrdersByStoreIdsAsync(info.Id))
-                                .OrderByDescending(v => v.CreatedOnUtc).FirstOrDefault();
-                        if (orders != null)
+                        if (!string.IsNullOrWhiteSpace(customer.FirstName))
                         {
-                            var days = DateTime.UtcNow.Subtract(orders.CreatedOnUtc).Days;
-                            if (days >= 5 && days <= 15)
-                            {
-                                var rta = await Send(info.CompanyPhoneNumber,
-                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn__shops_v2",
-                                    info.Name,
-                                    days.ToString(),
-                                    "https://forms.gle/VsEBH3hiWySeQNSAA");
+                            var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == store.Id);
+                            var products = (await _productService.GetAllProductsAsync()).Where(v =>
+                            prodMap.Any(x => x.EntityId == v.Id)).OrderByDescending(v => v.OldPrice - v.Price).Take(4);
 
-                                //TODO: Guardo el envio
-                                //TODO: La proxima vez, pregunto por envio (si dif es de 5 dias)
-                            }
+                            var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
+
+                            var rta = await Send(info,
+                                "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",
+                                prodList,
+                                store.Name,
+                                store.Url,
+                                "5");
                         }
                     }
                 }
