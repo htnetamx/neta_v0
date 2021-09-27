@@ -1924,7 +1924,7 @@ namespace Nop.Web.Controllers
 
                 //var appSettings = EngineContext.Current.Resolve<AppSettings>();
                 var qtyValidation = 5; //appSettings.CommonConfig.QtyPerEndClients;
-                var validQty = false;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
+                var validQty = true;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
                 if (validQty)
                 {
                     var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
@@ -1940,7 +1940,7 @@ namespace Nop.Web.Controllers
                             }
                             else
                             {
-                                if (qtyValidation > 0 && ((cnt[1] + item.Quantity) > qtyValidation))
+                                if (cnt[1] + item.Quantity > qtyValidation)
                                 {
                                     throw new Exception($"Limite en cantidad de Compras. Tu asociado ya compró {qtyValidation} unidades.");
                                 }

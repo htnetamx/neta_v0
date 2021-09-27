@@ -257,7 +257,7 @@ namespace Nop.Services.Orders
                 var cnt = await (from o in _orderRepository.Table
                               join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                               join a in _addressRepository.Table on o.BillingAddressId equals a.Id
-                              where oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.Date == date
+                              where o.Deleted == false && oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.Date == date
                               select oi).SumAsync(v => v.Quantity);
                 if (child.PhoneNumber == phoneNumber)
                 {
