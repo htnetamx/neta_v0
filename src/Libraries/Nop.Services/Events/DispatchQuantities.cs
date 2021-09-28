@@ -167,7 +167,7 @@ namespace Nop.Services.Events
                              join p in _productRepository.Table
                              on oi.ProductId equals p.Id
                              orderby s2d.GMV descending, s2d.StoreId ascending,s2d.CreatedOnUtc ascending
-                             select new NineToNineOpsStoresDispatchDecision { StoreId = s2d.StoreId, StoreName=s2d.StoreName, GMV = s2d.GMV, OrderId = s2d.OrderId,  CreatedOnUtc = s2d.CreatedOnUtc, OrderTotal=s2d.OrderTotal, Sku=p.Sku, ProductName=p.Name, ProductQuantity=oi.Quantity,BatchPrice=oi.PriceInclTax, PerTaraRatio=p.PerTaras, CantidadTaras= (oi.Quantity * (1 / p.PerTaras)) }).ToList();
+                             select new NineToNineOpsStoresDispatchDecision { StoreId = s2d.StoreId, StoreName=s2d.StoreName, GMV = s2d.GMV, OrderId = s2d.OrderId,  CreatedOnUtc = s2d.CreatedOnUtc, OrderTotal=s2d.OrderTotal, Sku=p.Sku, ProductName=p.Name, ProductQuantity=oi.Quantity,BatchPrice=oi.PriceInclTax, PerTaraRatio=p.PerTaras, CantidadTaras= (p.PerTaras==0 ? 0 : (oi.Quantity * (1 / p.PerTaras))) }).ToList();
             
             var dispatch_orders=(from dor in dispatch
                                  group dor by new { dor.StoreId,dor.OrderId,dor.OrderTotal,dor.GMV } into agg_dispatch

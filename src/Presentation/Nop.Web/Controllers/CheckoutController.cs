@@ -1924,7 +1924,7 @@ namespace Nop.Web.Controllers
 
                 //var appSettings = EngineContext.Current.Resolve<AppSettings>();
                 var qtyValidation = 5; //appSettings.CommonConfig.QtyPerEndClients;
-                var validQty = false;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
+                var validQty = true;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
                 if (validQty)
                 {
                     var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
