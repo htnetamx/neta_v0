@@ -34,6 +34,7 @@ namespace Nop.Services.Common
         /// <returns>A task that represents the asynchronous operation</returns>
         Task PrintOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
 
+        Task PrintEndClientAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
         Task PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
 
         /// <summary>

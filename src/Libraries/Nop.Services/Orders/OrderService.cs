@@ -240,7 +240,7 @@ namespace Nop.Services.Orders
             return await query.ToListAsync();
         }
 
-        public virtual async Task<int[]> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber)
+        public virtual async Task<int[]> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber, int customerId)
         {
             if (addressId == 0 || productId == 0)
                 return null;
@@ -266,7 +266,13 @@ namespace Nop.Services.Orders
                 total += cnt;
             }
 
-            return new int[] { total, totalInd };
+            var cntTotal = await (from o in _orderRepository.Table
+                             join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
+                             join a in _addressRepository.Table on o.BillingAddressId equals a.Id
+                             where o.Deleted == false && oi.ProductId == productId && o.CustomerId == customerId && o.CreatedOnUtc.Date == date
+                             select oi).SumAsync(v => v.Quantity);
+
+            return new int[] { cntTotal, totalInd };
         }
 
         /// <summary>

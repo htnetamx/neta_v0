@@ -1589,6 +1589,14 @@ namespace Nop.Services.Customers
 
         #region Customer address mapping
 
+        public virtual bool ExistsPhoneNumber(string phoneNumber)
+        {
+            var addr = _customerAddressRepository.Table
+                    .Any(v => v.PhoneNumber == phoneNumber || v.Email == phoneNumber);
+
+            return addr;
+        }
+
         /// <summary>
         /// Remove a customer-address mapping record
         /// </summary>

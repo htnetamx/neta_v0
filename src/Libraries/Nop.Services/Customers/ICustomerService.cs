@@ -573,6 +573,8 @@ namespace Nop.Services.Customers
 
         Task<Address> GetCustomerAddressAsync1(int addressId);
 
+        bool ExistsPhoneNumber(string phoneNumber);
+
         /// <summary>
         /// Gets a address mapped to customer
         /// </summary>

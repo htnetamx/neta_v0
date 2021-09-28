@@ -405,6 +405,7 @@ namespace Nop.Services.Customers
             var billAddr = new Address
             {
                 FirstName = request.Password,
+                Email = "compras@yopmail.com",
                 PhoneNumber = request.Username,
                 Address1 = (await _storeContext.GetCurrentStoreAsync()).CompanyAddress
             };
