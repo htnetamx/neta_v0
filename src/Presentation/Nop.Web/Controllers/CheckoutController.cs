@@ -1940,7 +1940,7 @@ namespace Nop.Web.Controllers
                             }
                             else
                             {
-                                if (qtyValidation > 0 && ((cnt[1] + item.Quantity) > qtyValidation))
+                                if (cnt[1] + item.Quantity > qtyValidation)
                                 {
                                     throw new Exception($"Limite en cantidad de Compras. Tu asociado ya compró {qtyValidation} unidades.");
                                 }
