@@ -51,7 +51,7 @@ namespace Nop.Web.Infrastructure
                 builder.Append("api_token=59cFxxN0bAFnGtRviXp51ac4irjFDv&");
                 builder.Append($"session={number}&");
                 builder.Append($"message={message}&");
-                builder.Append("channel_id=10&");
+                builder.Append("channel_id=5&");
                 builder.Append("language=es_MX");
 
                 var response = await client.PostAsync(url + builder.ToString(), null);

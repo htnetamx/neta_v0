@@ -1620,121 +1620,6 @@ namespace Nop.Services.Common
             doc.Close();
         }
 
-        public virtual async Task PrintEndClientAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
-        {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-
-            if (orders == null)
-                throw new ArgumentNullException(nameof(orders));
-
-            var pageSize = PageSize.A4;
-
-            if (_pdfSettings.LetterPageSizeEnabled)
-                pageSize = PageSize.Letter;
-
-            var doc = new Document(pageSize);
-            var pdfWriter = PdfWriter.GetInstance(doc, stream);
-            doc.Open();
-
-            //fonts
-            var titleFont = GetFont();
-            titleFont.SetStyle(Font.BOLD);
-            titleFont.Color = BaseColor.Black;
-            var font = GetFont();
-            var attributesFont = GetFont();
-            attributesFont.SetStyle(Font.ITALIC);
-
-            var lang = await _languageService.GetLanguageByIdAsync(languageId);
-            if (lang == null || !lang.Published)
-                lang = await _workContext.GetWorkingLanguageAsync();
-
-            var qtyLimit = new Dictionary<string, Dictionary<string, OrderStoreTotal>>();
-
-            var ordCount = orders.Count;
-            var ordNum = 0;
-
-            foreach (var order in orders)
-            {
-                var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
-                var address = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
-                if (!qtyLimit.ContainsKey(address.PhoneNumber))
-                {
-                    qtyLimit.Add(address.PhoneNumber, new Dictionary<string, OrderStoreTotal>());
-                }
-                foreach (var orderItem in orderItems)
-                {
-                    var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
-                    var name = await _localizationService.GetLocalizedAsync(product, x => x.Name, lang.Id);
-                    if (!qtyLimit[address.PhoneNumber].ContainsKey(name))
-                    {
-                        qtyLimit[address.PhoneNumber].Add(name, new OrderStoreTotal());
-                    }
-
-                    if (orderItem.Quantity <= 5)
-                    {
-                        qtyLimit[address.PhoneNumber][name].Name = address.FirstName;
-                        qtyLimit[address.PhoneNumber][name].Price = orderItem.UnitPriceExclTax;
-                        qtyLimit[address.PhoneNumber][name].Quantity += orderItem.Quantity;
-                        qtyLimit[address.PhoneNumber][name].Discount += orderItem.DiscountAmountExclTax;
-                    }
-                }
-
-                if (order.OrderDiscount != 0)
-                {
-                    var name = "Descuento de Orden";
-                    if (!qtyLimit[address.PhoneNumber].ContainsKey(name))
-                    {
-                        qtyLimit[address.PhoneNumber].Add(name, new OrderStoreTotal());
-                    }
-                    qtyLimit[address.PhoneNumber][name].Price = 0;
-                    qtyLimit[address.PhoneNumber][name].Quantity += 1;
-                    qtyLimit[address.PhoneNumber][name].Discount += order.OrderDiscount;
-                }
-            }
-
-            foreach(var phoneKey in qtyLimit.Keys)
-            {
-                var phone = qtyLimit[phoneKey];
-                var sumDiscount = phone.Sum(p => p.Value.Discount);
-                var sumTotal = phone.Sum(p => (p.Value.Quantity * p.Value.Price) - p.Value.Discount);
-
-                //by default _pdfSettings contains settings for the current active store
-                //and we need PdfSettings for the store which was used to place an order
-                //so let's load it based on a store of the current order
-                var pdfSettingsByStore = await _settingService.LoadSettingAsync<PdfSettings>(1);
-
-                var currentStore = await _storeService.GetStoreByIdAsync(orders.First().StoreId);
-
-                //header
-                await PrintHeaderAsync1(pdfSettingsByStore, lang, currentStore.Name, font, titleFont, doc);
-
-                //addresses
-                await PrintAddressesAsync1(vendorId, lang, titleFont, new Store { Name= phone.Values.First().Name,CompanyPhoneNumber= phoneKey, CompanyAddress= currentStore.CompanyAddress }, font, doc);
-
-                //products
-                await PrintProductsAsync1(vendorId, lang, titleFont, doc, phone, font, attributesFont);
-
-                //checkout attributes
-                //PrintCheckoutAttributes(vendorId, order, doc, lang, font);
-
-                //totals
-                await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, currentStore, font, titleFont, doc);
-
-                //order notes
-                //await PrintOrderNotesAsync(pdfSettingsByStore, order, lang, titleFont, doc, font);
-
-                //footer
-                PrintFooter(pdfSettingsByStore, pdfWriter, pageSize, lang, font);
-
-                ordNum++;
-                if (ordNum < ordCount)
-                    doc.NewPage();
-            }
-
-            doc.Close();
-        }
-
         public virtual async Task PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
         {
             if (stream == null)
@@ -1764,18 +1649,10 @@ namespace Nop.Services.Common
             if (lang == null || !lang.Published)
                 lang = await _workContext.GetWorkingLanguageAsync();
 
-            var qtyLimit = new Dictionary<string, Dictionary<string, int>>();
-
-
             var products = new Dictionary<string, OrderStoreTotal>();
             foreach (var order in orders)
             {
                 var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
-                var address = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
-                if (!qtyLimit.ContainsKey(address.PhoneNumber))
-                {
-                    qtyLimit.Add(address.PhoneNumber, new Dictionary<string, int>());
-                }
                 foreach (var orderItem in orderItems)
                 {
                     var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
@@ -1785,26 +1662,9 @@ namespace Nop.Services.Common
                         products.Add(name, new OrderStoreTotal());
                     }
 
-                    if (!qtyLimit[address.PhoneNumber].ContainsKey(product.Sku))
-                    {
-                        qtyLimit[address.PhoneNumber].Add(product.Sku, orderItem.Quantity);
-                        if (orderItem.Quantity <= 5)
-                        {
-                            products[name].Price = orderItem.UnitPriceExclTax;
-                            products[name].Quantity += orderItem.Quantity;
-                            products[name].Discount += orderItem.DiscountAmountExclTax;
-                        }
-                    }
-                    else
-                    {
-                        var qty = qtyLimit[address.PhoneNumber][product.Sku];
-                        if (orderItem.Quantity + qty <= 5)
-                        {
-                            products[name].Price = orderItem.UnitPriceExclTax;
-                            products[name].Quantity += orderItem.Quantity;
-                            products[name].Discount += orderItem.DiscountAmountExclTax;
-                        }
-                    }
+                    products[name].Price = orderItem.UnitPriceExclTax;
+                    products[name].Quantity += orderItem.Quantity;
+                    products[name].Discount += orderItem.DiscountAmountExclTax;
                 }
 
                 if (order.OrderDiscount != 0)
@@ -2233,7 +2093,6 @@ namespace Nop.Services.Common
 
     public class OrderStoreTotal
     {
-        public string Name { get; set; }
         public string Product { get; set; }
         public int Quantity { get; set; } = 0;
         public decimal Price { get; set; } = 0;

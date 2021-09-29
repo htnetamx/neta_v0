@@ -335,7 +335,7 @@ namespace Nop.Web.Controllers
                 "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion",
                 form["code_generated"]);
 
-            //NetaAuronixMessaging.Send_SMS_VerificationCode(form["Password"], "");
+            //NetaAuronixMessaging.Send_SMS_VerificationCode(form["Password"], $"Hola! Tu código de confirmación de cuenta es *{form["code_generated"]}*, regresa a tu compra y confirma tu número para continuar");
 
             return Content("{'rta': true }", "application/json");
         }
