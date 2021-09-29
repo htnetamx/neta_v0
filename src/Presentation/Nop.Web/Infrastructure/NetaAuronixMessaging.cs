@@ -40,6 +40,24 @@ namespace Nop.Web.Infrastructure
                 string result = await response.Content.ReadAsStringAsync();
             }
         }
+
+        public static async void Send_SMS_VerificationCode(string number, string message)
+        {
+            using (var client = new HttpClient())
+            {
+                var url = "https://netamx.calixtachat.com/api/v1/chats?";
+
+                var builder = new StringBuilder();
+                builder.Append("api_token=59cFxxN0bAFnGtRviXp51ac4irjFDv&");
+                builder.Append($"session={number}&");
+                builder.Append($"message={message}&");
+                builder.Append("channel_id=5&");
+                builder.Append("language=es_MX");
+
+                var response = await client.PostAsync(url + builder.ToString(), null);
+                string result = await response.Content.ReadAsStringAsync();
+            }
+        }
     }
 
     public class MessageRequest

@@ -331,10 +331,12 @@ namespace Nop.Web.Controllers
 
         public virtual async Task<IActionResult> PostVerifyMessage(IFormCollection form)
         {
-            NetaAuronixMessaging.Send(form["Password"], 
-                "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion", 
+            NetaAuronixMessaging.Send(form["Password"],
+                "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion",
                 form["code_generated"]);
-            
+
+            //NetaAuronixMessaging.Send_SMS_VerificationCode(form["Password"], $"Hola! Tu código de confirmación de cuenta es *{form["code_generated"]}*, regresa a tu compra y confirma tu número para continuar");
+
             return Content("{'rta': true }", "application/json");
         }
 
@@ -1453,6 +1455,27 @@ namespace Nop.Web.Controllers
                                 });
                             }
                         }
+                        if (_customerService.ExistsPhoneNumber(newAddress.PhoneNumber.Trim()))
+                        {
+                            ModelState.AddModelError("", "El Nro de Teléfono ya esta siendo usado, no es posible volver a asociarlo");
+                            if (!ModelState.IsValid)
+                            {
+                                //model is not valid. redisplay the form with errors
+                                var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart,
+                                    selectedCountryId: newAddress.CountryId,
+                                    overrideAttributesXml: customAttributes);
+                                billingAddressModel.NewAddressPreselected = true;
+                                return Json(new
+                                {
+                                    update_section = new UpdateSectionJsonModel
+                                    {
+                                        name = "billing",
+                                        html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
+                                    },
+                                    wrong_billing_address = true,
+                                });
+                            }
+                        }
                     }
 
                     //validate model
@@ -1931,7 +1954,7 @@ namespace Nop.Web.Controllers
                     var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
                     foreach (var item in cart)
                     {
-                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber);
+                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
                         if(cnt != null)
                         {
                             if (cnt[0] + item.Quantity > qtyValidation * children.Count)

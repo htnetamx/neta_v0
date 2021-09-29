@@ -50,23 +50,26 @@ namespace Nop.Services.Customers
                 if (orders != null)
                 {
                     var store = await _storeService.GetStoreByIdAsync(orders.StoreId);
-                    var customer = await _addressService.GetAddressByIdAsync(orders.BillingAddressId);
-                    if (customer != null)
+                    if(store != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(customer.FirstName))
+                        var customer = await _addressService.GetAddressByIdAsync(orders.BillingAddressId);
+                        if (customer != null)
                         {
-                            var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == store.Id);
-                            var products = (await _productService.GetAllProductsAsync()).Where(v =>
-                            prodMap.Any(x => x.EntityId == v.Id)).OrderByDescending(v => v.OldPrice - v.Price).Take(4);
+                            if (!string.IsNullOrWhiteSpace(customer.FirstName))
+                            {
+                                var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == store.Id);
+                                var products = (await _productService.GetAllProductsAsync()).Where(v =>
+                                prodMap.Any(x => x.EntityId == v.Id)).OrderByDescending(v => v.OldPrice - v.Price).Take(4);
 
-                            var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
+                                var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
 
-                            var rta = await Send(info,
-                                "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",
-                                prodList,
-                                store.Name,
-                                store.Url,
-                                "5");
+                                var rta = await Send(info,
+                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",
+                                    prodList,
+                                    store.Name,
+                                    store.Url,
+                                    "5");
+                            }
                         }
                     }
                 }

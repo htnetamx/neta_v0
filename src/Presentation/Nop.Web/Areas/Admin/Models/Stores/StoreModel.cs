@@ -56,7 +56,7 @@ namespace Nop.Web.Areas.Admin.Models.Stores
         [NopResourceDisplayName("Admin.Configuration.Stores.Fields.CompanyVat")]
         public string CompanyVat { get; set; }
 
-        [DisplayName("Saldo NetaCoin")]
+        [DisplayName("Saldo NetaBono")]
         public decimal NetaCoin { get; set; }
 
         public IList<StoreLocalizedModel> Locales { get; set; }
