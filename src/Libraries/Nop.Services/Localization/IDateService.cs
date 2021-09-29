@@ -22,15 +22,30 @@ namespace Nop.Services.Localization
         }
         public static DateTime ChangeUTCToMX(DateTime dateTime)
         {
-            var mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time (Mexico)");
+            TimeZoneInfo mxTimeZone;
+            try
+            {
+                mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time (Mexico)");
+            }
+            catch
+            {
+                mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Mexico_City");
+            }
             return TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.Utc, mxTimeZone);
 
         }
         public static DateTime ChangeMXToUTC(DateTime dateTime)
         {
-            var mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time (Mexico)");
+            TimeZoneInfo mxTimeZone;
+            try
+            {
+                mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time (Mexico)");
+            }
+            catch
+            {
+                mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Mexico_City");
+            }
             return TimeZoneInfo.ConvertTime(dateTime, mxTimeZone, TimeZoneInfo.Utc);
-
         }
     }
 }
