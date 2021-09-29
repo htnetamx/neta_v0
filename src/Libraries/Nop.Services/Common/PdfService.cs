@@ -763,7 +763,7 @@ namespace Nop.Services.Common
             //descuento Bono
             var bono = _currencyService.ConvertCurrency(montoBono - remainderBono, 1);
             var bonoStr = await _priceFormatter.FormatPriceAsync(bono, true, "PES", false, languageId);
-            var pBono = GetPdfCell($"Descuento NetaCoin: {bonoStr}", titleFont);
+            var pBono = GetPdfCell($"Descuento NetaBono: {bonoStr}", titleFont);
             pBono.HorizontalAlignment = Element.ALIGN_RIGHT;
             pBono.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pBono);
@@ -790,7 +790,7 @@ namespace Nop.Services.Common
             {
                 var remainderBonoCurr = _currencyService.ConvertCurrency(remainderBono, 1);
                 var remainderBonoStr = await _priceFormatter.FormatPriceAsync(remainderBonoCurr, true, "PES", false, languageId);
-                var pRemainderBono = GetPdfCell($"Saldo Restante NetaCoin: {remainderBonoStr}", font);
+                var pRemainderBono = GetPdfCell($"Saldo Restante NetaBono: {remainderBonoStr}", font);
                 pRemainderBono.HorizontalAlignment = Element.ALIGN_RIGHT;
                 pRemainderBono.Border = Rectangle.NO_BORDER;
                 totalsTable.AddCell(pRemainderBono);

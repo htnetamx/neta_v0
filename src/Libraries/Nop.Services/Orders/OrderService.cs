@@ -248,7 +248,8 @@ namespace Nop.Services.Orders
             var currentAddress = await _addressService.GetAddressByIdAsync(addressId);
             var children = await _addressService.GetRelatedAddressByIdAsync(currentAddress.PhoneNumber);
 
-            DateTime date = DateTime.UtcNow.AddHours(-5).Date;
+            //DateTime date = DateTime.UtcNow.AddHours(-5).Date;
+            DateTime date = DateTime.UtcNow.Date;
 
             var total = 0;
             var totalInd = 0;
