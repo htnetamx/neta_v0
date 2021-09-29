@@ -22,15 +22,16 @@ namespace Nop.Services.Localization
         }
         public static DateTime ChangeUTCToMX(DateTime dateTime)
         {
+
             TimeZoneInfo mxTimeZone;
             try
             {
-                mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time (Mexico)");
+                mxTimeZone=TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time (Mexico)");
             }
-            catch
-            {
+            catch {
                 mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Mexico_City");
             }
+            
             return TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.Utc, mxTimeZone);
 
         }
