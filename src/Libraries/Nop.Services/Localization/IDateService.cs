@@ -47,7 +47,6 @@ namespace Nop.Services.Localization
                 mxTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Mexico_City");
             }
             return TimeZoneInfo.ConvertTime(dateTime, mxTimeZone, TimeZoneInfo.Utc);
-
         }
     }
 }
