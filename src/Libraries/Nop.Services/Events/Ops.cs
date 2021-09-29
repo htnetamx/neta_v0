@@ -76,9 +76,11 @@ namespace Nop.Services.Events
                 DateTime before_yesterday_mx = yesterday_mx.Subtract(new TimeSpan(days_to_subract, 0, 0, 0));
                 DateTime yesterday = IDateService.ChangeMXToUTC(yesterday_mx);
                 DateTime before_yesterday = IDateService.ChangeMXToUTC(before_yesterday_mx);
+                DateTime order_date_limit = before_yesterday.Subtract(new TimeSpan(21, 0, 0, 0));
                 var stores_orders = (from o in _orderRepository.Table
                                      join s in _storeRepository.Table
                                      on o.StoreId equals s.Id
+                                     where order_date_limit <= o.CreatedOnUtc
                                      select new NineToNineOps()
                                      {
                                          Store = s,
@@ -231,8 +233,8 @@ namespace Nop.Services.Events
                     range = "A:H";
                     var deleteResponse = GoogleAPI.DeleteSpreadSheetContent(spreadsheetId, sheet, range);
                     range = "A:H";
-                    datesMX = new List<object> { "", "MX -Información entre:", firstOrder_MX.ToString("dd/MM/yyyy HH:mm:ss"), "y", nowDate_MX.ToString("dd/MM/yyyy HH:mm:ss") };
-                    datesUTC = new List<object> { "", "UTC-Información entre:", firstOrder.ToString("dd/MM/yyyy HH:mm:ss"), "y", nowDate.ToString("dd/MM/yyyy HH:mm:ss") };
+                    datesMX = new List<object> { "", "MX -Información entre:", IDateService.ChangeUTCToMX(order_date_limit).ToString("dd/MM/yyyy HH:mm:ss"), "y", nowDate_MX.ToString("dd/MM/yyyy HH:mm:ss") };
+                    datesUTC = new List<object> { "", "UTC-Información entre:", order_date_limit.ToString("dd/MM/yyyy HH:mm:ss"), "y", nowDate.ToString("dd/MM/yyyy HH:mm:ss") };
 
                     var appendResponse = GoogleAPI.AppendOnSpreadSheet929Ops(spreadsheetId, sheet, range, stores_orders, datesMX, datesUTC);
                 }
