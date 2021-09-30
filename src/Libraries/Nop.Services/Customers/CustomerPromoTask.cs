@@ -59,20 +59,40 @@ namespace Nop.Services.Customers
                             {
                                 var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == store.Id);
                                 var products = (await _productService.GetAllProductsAsync()).Where(v =>
-                                prodMap.Any(x => x.EntityId == v.Id)).OrderByDescending(v => v.OldPrice - v.Price).Take(4);
+                                prodMap.Any(x => x.EntityId == v.Id)).OrderByDescending(v => v.OldPrice - v.Price).Take(3);
 
-                                var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
+                                var prodList = string.Join("\n", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")}").ToArray());
 
-                                var rta = await Send(info,
-                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",
-                                    prodList,
-                                    store.Name,
-                                    store.Url,
-                                    "5");
+                                Send_SMS(info, 
+                                    $"¡No te pierdas las promos de hoy en NetaMx!\n\n{prodList}\nCompra y recoge en {store.Name} haciendo clic en la liga\n{store.Url}\n\nBaja los precios reenviando este mensaje a {"5"} contactos");
+
+                                //var rta = await Send(info,
+                                //    "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",
+                                //    prodList,
+                                //    store.Name,
+                                //    store.Url,
+                                //    "5");
                             }
                         }
                     }
                 }
+            }
+        }
+
+        private static async void Send_SMS(string number, string message)
+        {
+            using (var client = new HttpClient())
+            {
+                var url = "https://netamx.calixtachat.com/api/v1/chats?";
+
+                var builder = new StringBuilder();
+                builder.Append("api_token=59cFxxN0bAFnGtRviXp51ac4irjFDv&");
+                builder.Append($"session={number}&");
+                builder.Append($"message={message}&");
+                builder.Append("channel_id=5");
+
+                var response = await client.PostAsync(url + builder.ToString(), null);
+                string result = await response.Content.ReadAsStringAsync();
             }
         }
 

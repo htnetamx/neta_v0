@@ -54,6 +54,11 @@
 <div>
     @await Component.InvokeAsync("SearchBoxV2")
 </div>
+<div class="product-grid home-page-product-grid">
+    <div class="title">
+        <strong>Solo se puede pedir 5 unidad por cliente al día</strong>
+    </div>
+</div>
 @if (Model.CatalogProductsModel.Promos.Count > 0)
 {
     <div class="product-grid home-page-product-grid" style="margin: 0px">
@@ -96,14 +101,14 @@
     window.addEventListener('load', function () {
         window.addEventListener("orientationchange", orientationChange);
     });
-    
+
     var cantxfilas = 3;
 
     function homePageActions(cantxfilas) {
         scroller();
         var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
         cantxfilas = maxPerRow(clientWidth);
-  
+
         var hay_productos_descuentos =(@Model.CatalogProductsModel.Promos.Count > 0);
         var hay_productos_ofertas = (@Model.CatalogProductsModel.Products.Count > 0);
 
@@ -178,7 +183,7 @@
             if (i % cantxfila != 0) {
                 x[i].style.marginLeft = margen_izquierda.toString() + "px";
             }
- 
+
         }
         return x[0].style.width;
     }

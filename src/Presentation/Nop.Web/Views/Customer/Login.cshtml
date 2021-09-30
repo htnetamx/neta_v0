@@ -199,7 +199,7 @@
                                 <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
                             </div>
                             <div style="text-align: center">
-                                <label>Escribe código que te enviamos por whatsapp</label>
+                                <label>Escribe código que te enviamos por mensaje de texto</label>
                             </div>
                             <div class="inputs reversed" style="display: none">
                                 <input asp-for="RememberMe" checked="checked" />
@@ -272,7 +272,7 @@
             $("#formVerifData").on("submit", (e) => {
                 var cod = $("codeVerif").val();
                 if (cod === '') {
-                    alert("Revisa tu whatsapp y copia el código que te enviamos para poder terminar tu compra.");
+                    alert("Revisa tu móvil y copia el código que te enviamos para poder terminar tu compra.");
                     return false;
                 }
             });

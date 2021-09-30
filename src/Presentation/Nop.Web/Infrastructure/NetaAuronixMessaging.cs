@@ -41,7 +41,7 @@ namespace Nop.Web.Infrastructure
             }
         }
 
-        public static async void Send_SMS_VerificationCode(string number, string message)
+        public static async void Send_SMS(string number, string message)
         {
             using (var client = new HttpClient())
             {
@@ -51,8 +51,7 @@ namespace Nop.Web.Infrastructure
                 builder.Append("api_token=59cFxxN0bAFnGtRviXp51ac4irjFDv&");
                 builder.Append($"session={number}&");
                 builder.Append($"message={message}&");
-                builder.Append("channel_id=5&");
-                builder.Append("language=es_MX");
+                builder.Append("channel_id=5");
 
                 var response = await client.PostAsync(url + builder.ToString(), null);
                 string result = await response.Content.ReadAsStringAsync();

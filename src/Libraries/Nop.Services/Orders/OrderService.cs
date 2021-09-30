@@ -248,8 +248,8 @@ namespace Nop.Services.Orders
             var currentAddress = await _addressService.GetAddressByIdAsync(addressId);
             var children = await _addressService.GetRelatedAddressByIdAsync(currentAddress.PhoneNumber);
 
-            //DateTime date = DateTime.UtcNow.AddHours(-5).Date;
-            DateTime date = DateTime.UtcNow.Date;
+            DateTime date = DateTime.UtcNow.AddHours(-5).Date;
+            //DateTime date = DateTime.UtcNow.Date;
 
             var total = 0;
             var totalInd = 0;
@@ -258,7 +258,7 @@ namespace Nop.Services.Orders
                 var cnt = await (from o in _orderRepository.Table
                               join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                               join a in _addressRepository.Table on o.BillingAddressId equals a.Id
-                              where o.Deleted == false && oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.Date == date
+                              where o.Deleted == false && oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.AddHours(-5).Date == date
                               select oi).SumAsync(v => v.Quantity);
                 if (child.PhoneNumber == phoneNumber)
                 {
@@ -270,7 +270,7 @@ namespace Nop.Services.Orders
             var cntTotal = await (from o in _orderRepository.Table
                              join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                              join a in _addressRepository.Table on o.BillingAddressId equals a.Id
-                             where o.Deleted == false && oi.ProductId == productId && o.CustomerId == customerId && o.CreatedOnUtc.Date == date
+                             where o.Deleted == false && oi.ProductId == productId && o.CustomerId == customerId && o.CreatedOnUtc.AddHours(-5).Date == date
                              select oi).SumAsync(v => v.Quantity);
 
             return new int[] { cntTotal, totalInd };

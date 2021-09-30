@@ -50,11 +50,14 @@ namespace Nop.Services.Customers
                         {
                             if (!string.IsNullOrWhiteSpace(customer.FirstName))
                             {
-                                var rta = await Send(info,
-                                    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_end_clients_v2",
-                                    customer.FirstName.Split(" ")[0],
-                                    days.ToString(),
-                                    "https://forms.gle/MYr7Gh1y8M7kUjSt9");
+                                //var rta = await Send(info,
+                                //    "02c89181_e473_461e_9e66_8f6b75af9b5e:churn_end_clients_v2",
+                                //    customer.FirstName.Split(" ")[0],
+                                //    days.ToString(),
+                                //    "https://forms.gle/MYr7Gh1y8M7kUjSt9");
+
+                                Send_SMS(info,
+                                    $"¡Hola {customer.FirstName.Split(" ")[0]}! Te hablamos de NetaMx, los de las promos del día.\nVimos que tu último pedido fue hace {days.ToString()} días y nos gustaría saber porque no has vuelto a pedir.\n¿Podrías ayudarnos a mejorar contestando esta encuesta?\n{"https://forms.gle/MYr7Gh1y8M7kUjSt9"}\n\nEsperamos tenerte devuelta muy pronto");
 
                                 //TODO: Guardo el envio
                                 //TODO: La proxima vez, pregunto por envio (si dif es de 7 dias)
@@ -62,6 +65,23 @@ namespace Nop.Services.Customers
                         }
                     }
                 }
+            }
+        }
+
+        private static async void Send_SMS(string number, string message)
+        {
+            using (var client = new HttpClient())
+            {
+                var url = "https://netamx.calixtachat.com/api/v1/chats?";
+
+                var builder = new StringBuilder();
+                builder.Append("api_token=59cFxxN0bAFnGtRviXp51ac4irjFDv&");
+                builder.Append($"session={number}&");
+                builder.Append($"message={message}&");
+                builder.Append("channel_id=5");
+
+                var response = await client.PostAsync(url + builder.ToString(), null);
+                string result = await response.Content.ReadAsStringAsync();
             }
         }
 
