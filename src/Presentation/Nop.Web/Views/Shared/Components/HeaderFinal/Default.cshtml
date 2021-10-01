@@ -53,13 +53,13 @@
             <div id="headerV21">
                 <nav class="navbar navbar-expand-lg navbar-light bg-light">
                     <div class="container-fluid" style="padding: 0px">
-                        <a class="navbar-brand" href="/" style="display:flex">
-                            <img src="images/header2/logo_Neta.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
-                            <p id="storeName" style="margin:0px;margin-left:4vw">@Model.Store.Name</p>
+                        <a class="navbar-brand" href="/" style="display: flex ">
+                            <img src="images/header2/Logo_Neta.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                            <p id="storeName" style="margin: 0px; margin-left: 4vw; max-width: 65vw; overflow: hidden; text-overflow: ellipsis;">@Model.Store.Name</p>
                         </a>
                         <div class="navbar-nav" style="position:relative">
                             <a href="@Url.RouteUrl("ShoppingCart")" style="height: 100%;width:100%">
-                                <img src="images/header2/Carrito.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                                <img src="images/header2/Shopping-cart.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
                             </a>
                             <span style="background-color: #FE4C4B;width: 18px;height: 18px;border-radius: 50%;display:inline-block;position:absolute;left:20px;top:13px;text-align:center;color:white;align-items:center;justify-content:center;display:flex;font-size: 12px">@Model.ShoppingCartItems.ToString("N0")</span>
                         </div>
