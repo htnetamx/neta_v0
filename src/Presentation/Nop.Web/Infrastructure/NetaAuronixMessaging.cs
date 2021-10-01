@@ -8,7 +8,7 @@ namespace Nop.Web.Infrastructure
 {
     public class NetaAuronixMessaging
     {
-        public static async void Send(string number, string template, params object[] data)
+        public static async void Send(string number, string template, int channelId=10, params object[] data)
         {
             using (var client = new HttpClient())
             {
@@ -33,7 +33,7 @@ namespace Nop.Web.Infrastructure
                         builder.Append($"vars[]={item}&");
                     }
                 }
-                builder.Append("channel_id=10&");
+                builder.Append($"channel_id={channelId}&");
                 builder.Append("language=es_MX");
 
                 var response = await client.PostAsync(url + builder.ToString(), null);
