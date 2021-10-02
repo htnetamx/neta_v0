@@ -42,6 +42,7 @@ namespace Nop.Services.Customers
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
+            int cnt = 0;
             var phoneNumberList = await _addressService.GetAllAddressesAsync();
             foreach (var info in phoneNumberList)
             {
@@ -63,15 +64,20 @@ namespace Nop.Services.Customers
 
                                 var prodList = string.Join("\n", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")}").ToArray());
 
-                                Send_SMS(info, 
-                                    $"¡No te pierdas las promos de hoy en NetaMx!\n\n{prodList}\nCompra y recoge en {store.Name} haciendo clic en la liga\n{store.Url}\n\nBaja los precios reenviando este mensaje a {"5"} contactos");
+                                //Send_SMS(info, 
+                                //    $"¡No te pierdas las promos de hoy en NetaMx!\n\n{prodList}\nCompra y recoge en {store.Name} haciendo clic en la liga\n{store.Url}\n\nBaja los precios reenviando este mensaje a {"5"} contactos");
 
-                                //var rta = await Send(info,
-                                //    "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",
-                                //    prodList,
-                                //    store.Name,
-                                //    store.Url,
-                                //    "5");
+                                if(cnt <= 1000)
+                                {
+                                    var rta = await Send(info,
+                                        "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",
+                                        "14",
+                                        prodList,
+                                        store.Name,
+                                        store.Url,
+                                        "5");
+                                    cnt++;
+                                }
                             }
                         }
                     }
@@ -96,7 +102,7 @@ namespace Nop.Services.Customers
             }
         }
 
-        private async Task<string> Send(string number, string template, params object[] data)
+        private async Task<string> Send(string number, string template, string channelId, params object[] data)
         {
             using (var client = new HttpClient())
             {
@@ -121,7 +127,7 @@ namespace Nop.Services.Customers
                         builder.Append($"vars[]={item}&");
                     }
                 }
-                builder.Append("channel_id=10&");
+                builder.Append($"channel_id={channelId}&");
                 builder.Append("language=es_MX");
 
                 var response = await client.PostAsync(url + builder.ToString(), null);

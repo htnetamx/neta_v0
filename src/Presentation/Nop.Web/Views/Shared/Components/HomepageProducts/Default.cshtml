@@ -141,33 +141,39 @@
     }
 
     function scroller() {
-        var queryString = window.location.search;
-        var urlParams = new URLSearchParams(queryString);
-        var current = urlParams.get('pagesize');
-        var newWidth = document.querySelector(".master-wrapper-content").scrollWidth;
-        var heightP = document.querySelector('.item-box').scrollHeight;
-        var widthP = document.querySelector('.item-box').scrollWidth;
-        var cantidadProductosFila = Math.floor((newWidth / widthP));
-        var increment = 0;
-        var end_sum= 1;
-        if (current == 0 || current==null) {
-            increment = 0;
-            current =@Model.CatalogProductsModel.StartingProducts;
-            end_sum = 0;
-        }
-        else {
-            increment =@Model.CatalogProductsModel.Increment;
-            current =@Model.CatalogProductsModel.Products.ToList().Count();
-            end_sum = 1;
-        }
+        try {
+            var queryString = window.location.search;
+            var urlParams = new URLSearchParams(queryString);
+            var current = urlParams.get('pagesize');
+            var newWidth = document.querySelector(".master-wrapper-content").scrollWidth;
+            var heightP = document.querySelector('.item-box').scrollHeight;
+            var widthP = document.querySelector('.item-box').scrollWidth;
+            var cantidadProductosFila = Math.floor((newWidth / widthP));
+            var increment = 0;
+            var end_sum= 1;
+            if (current == 0 || current==null) {
+                increment = 0;
+                current =@Model.CatalogProductsModel.StartingProducts;
+                end_sum = 0;
+            }
+            else {
+                increment =@Model.CatalogProductsModel.Increment;
+                current =@Model.CatalogProductsModel.Products.ToList().Count();
+                end_sum = 1;
+            }
 
-        var product_Count_before = current - (increment);
-        var filas_anteriores = Math.ceil((product_Count_before / cantidadProductosFila));
-        var filas_actuales = Math.ceil((current / cantidadProductosFila));
-        var filas_a_restar = filas_actuales - filas_anteriores - end_sum;
-        var fila_final = (filas_actuales - filas_a_restar)*end_sum;
-        window.scrollTo(0, heightP * fila_final);
+            var product_Count_before = current - (increment);
+            var filas_anteriores = Math.ceil((product_Count_before / cantidadProductosFila));
+            var filas_actuales = Math.ceil((current / cantidadProductosFila));
+            var filas_a_restar = filas_actuales - filas_anteriores - end_sum;
+            var fila_final = (filas_actuales - filas_a_restar)*end_sum;
+            window.scrollTo(0, heightP * fila_final);
+        }
+        catch (e) {
+
+        }
     }
+
     function productsInColumns(id, cantxfila) {
         var clientWidth = document.getElementsByClassName("master-column-wrapper")[0].clientWidth - 1;
         var err_percent = 5;
