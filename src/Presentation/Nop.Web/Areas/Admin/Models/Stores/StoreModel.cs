@@ -53,6 +53,11 @@ namespace Nop.Web.Areas.Admin.Models.Stores
         [NopResourceDisplayName("Admin.Configuration.Stores.Fields.CompanyPhoneNumber")]
         public string CompanyPhoneNumber { get; set; }
 
+        [DisplayName("Longitud")]
+        public string Longitud { get; set; }
+        [DisplayName("Latitud")]
+        public string Latitud { get; set; }
+     
         [NopResourceDisplayName("Admin.Configuration.Stores.Fields.CompanyVat")]
         public string CompanyVat { get; set; }
 
