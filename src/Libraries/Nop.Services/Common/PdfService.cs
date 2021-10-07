@@ -743,7 +743,7 @@ namespace Nop.Services.Common
             totalsTable.AddCell(pComission);
 
             var montoBono = current_store.NetaCoin;
-            var total_antes_bono = subTotal - comission;
+            var total_antes_bono = subTotal - comission - subDiscount;
             decimal total_despues_bono = 0;
             decimal remainderBono = 0;
 
