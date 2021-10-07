@@ -333,7 +333,7 @@ namespace Nop.Web.Controllers
         {
             NetaAuronixMessaging.Send(form["Password"],
                 "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion",
-                12, form["code_generated"]);
+                11, form["code_generated"]);
             
             //NetaAuronixMessaging.Send_SMS(form["Password"], $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar");
 
@@ -1180,7 +1180,7 @@ namespace Nop.Web.Controllers
                     }
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes", 12,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes", 11,
                         "*" + name + "*",
                         "\r" + string.Join("\r", list.ToArray()) + "\r",
                         "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
@@ -2020,7 +2020,7 @@ namespace Nop.Web.Controllers
                         name = customer.FirstName;
                     }
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes", 12,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes", 11,
                         "*" + name + "*",
                         "\r" + string.Join("\r", list.ToArray()) + "\r",
                         "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
