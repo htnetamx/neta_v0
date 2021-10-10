@@ -29,7 +29,7 @@ namespace Nop.Web.Infrastructure
             else
             {
                 var stores = await _storeService.GetAllStoresAsync();
-                var store = stores.Where(v => v.Hosts.Contains(httpContext.Request.Host.Host)).Any();
+                var store = stores.Where(v => v.Hosts.Contains(httpContext.Request.Host.Host) && v.DisplayOrder != 0).Any();
                 if (!store)
                 {
                     httpContext.Response.Redirect("https://api.whatsapp.com/send/?phone=525574174213&text=Hola%21+Cu%C3%A1l+es+la+nueva+liga+de+netamx&app_absent=0");

@@ -1179,14 +1179,27 @@ namespace Nop.Web.Controllers
                         name = customer.FirstName;
                     }
 
+                    var buscar = "mañana,";
+                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    if (refDate.DayOfWeek == DayOfWeek.Saturday)
+                    {
+                        buscar = "el lunes,";
+                    }
+                    else
+                    {
+                        if (refDate.Hour > 21)
+                            buscar = "pasado mañana,";
+                    }
+
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes", 11,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra",11,
                         "*" + name + "*",
-                        "\r" + string.Join("\r", list.ToArray()) + "\r",
+                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "/orderdetails/" + orders.First().Id + "\r",
                         "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
+                        buscar,
                         "*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*",
                         //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
-                        "5pm", (orders.Count + 1).ToString(),
+                        "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
 
                     //NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,
@@ -2019,14 +2032,28 @@ namespace Nop.Web.Controllers
                         var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
                         name = customer.FirstName;
                     }
+
+                    var buscar = "mañana,";
+                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    if (refDate.DayOfWeek == DayOfWeek.Saturday)
+                    {
+                        buscar = "el lunes,";
+                    }
+                    else
+                    {
+                        if (refDate.Hour > 21)
+                            buscar = "pasado mañana,";
+                    }
+
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:orden_20clientes", 11,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 11,
                         "*" + name + "*",
-                        "\r" + string.Join("\r", list.ToArray()) + "\r",
+                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "/orderdetails/" + orders.First().Id + "\r",
                         "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
+                        buscar,
                         "*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*",
                         //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
-                        "5pm", (orders.Count + 1).ToString(),
+                        "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
 
                     //NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,

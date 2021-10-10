@@ -737,13 +737,13 @@ namespace Nop.Services.Common
             var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
             var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
 
-            var pComission = GetPdfCell($"Descuento Neta (10%): {orderComissionStr}", titleFont);
+            var pComission = GetPdfCell($"Tus ganancias con Neta: {orderComissionStr}", titleFont);
             pComission.HorizontalAlignment = Element.ALIGN_RIGHT;
             pComission.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pComission);
 
             var montoBono = current_store.NetaCoin;
-            var total_antes_bono = subTotal - comission;
+            var total_antes_bono = subTotal - comission - subDiscount;
             decimal total_despues_bono = 0;
             decimal remainderBono = 0;
 
