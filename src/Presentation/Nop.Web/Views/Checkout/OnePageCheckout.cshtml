@@ -89,9 +89,9 @@
                         }
                     </script>
                     <div class="buttons" id="billing-buttons-container">
-                        @if (children.Count <= 7)
+                        @if (children.Count <= 5)
                         {
-                        <button id="new-address-button" type="button" class="button-1" onclick="Billing.resetBillingForm(); Billing.newAddress(true); return false;">Dar de Alta un Amigo</button>
+                            <button id="new-address-button" type="button" class="button-1" onclick="Billing.resetBillingForm(); Billing.newAddress(true); return false;">Dar de Alta un Amigo</button>
                         }
 
                         @*<button id="edit-address-button" type="button" class="button-1" onclick="Billing.editAddress('@(storeLocation)checkout/GetAddressById/'); return false;">@T("Common.Edit")</button>*@

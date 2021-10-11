@@ -153,7 +153,7 @@ namespace Nop.Services.Common
                              orderby a.Id
                              select a;
 
-                return (await query2.ToListAsync()).Distinct(addressComp).ToList();
+                return (await query2.ToListAsync()).Distinct(addressComp).Take(5).ToList();
             }
         }
 

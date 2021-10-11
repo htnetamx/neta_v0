@@ -1959,8 +1959,10 @@ namespace Nop.Web.Controllers
                 //if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
+                var store = await _storeContext.GetCurrentStoreAsync();
+
                 //var appSettings = EngineContext.Current.Resolve<AppSettings>();
-                var qtyValidation = 5; //appSettings.CommonConfig.QtyPerEndClients;
+                var qtyValidation = store.DisplayOrder == 1 || store.DisplayOrder == 2 ? 2 : 5; //appSettings.CommonConfig.QtyPerEndClients;
                 var validQty = true;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
                 if (validQty)
                 {
