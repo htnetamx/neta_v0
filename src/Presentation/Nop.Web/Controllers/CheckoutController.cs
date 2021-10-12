@@ -1962,26 +1962,70 @@ namespace Nop.Web.Controllers
                 var store = await _storeContext.GetCurrentStoreAsync();
 
                 //var appSettings = EngineContext.Current.Resolve<AppSettings>();
-                var qtyValidation = store.DisplayOrder == 1 || store.DisplayOrder == 2 ? 2 : 5; //appSettings.CommonConfig.QtyPerEndClients;
-                var validQty = true;  //appSettings.CommonConfig.ValidateQtyPerEndClients;
+                var qtyValidationMain = 0;
+                var qtyValidationSubAccounts = 0;
+                var validQty = true;
+                switch (store.DisplayOrder)
+                {
+                    case 1:
+                        qtyValidationMain = 2;
+                        qtyValidationSubAccounts = 2;
+                        validQty = true;
+                        break;
+
+                    case 2:
+                        qtyValidationMain = 2;
+                        qtyValidationSubAccounts = 2;
+                        validQty = true;
+                        break;
+
+                    case 3:
+                        qtyValidationMain = 5;
+                        qtyValidationSubAccounts = 2;
+                        validQty = true;
+                        break;
+
+                    default:
+                        qtyValidationMain = 0;
+                        qtyValidationSubAccounts = 1;
+                        validQty = false;
+                        break;
+                }
+                //appSettings.CommonConfig.QtyPerEndClients;
+                //appSettings.CommonConfig.ValidateQtyPerEndClients;
                 if (validQty)
                 {
                     var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                    
+
                     var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
                     foreach (var item in cart)
                     {
                         var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
                         if(cnt != null)
                         {
-                            if (cnt[0] + item.Quantity > qtyValidation * children.Count)
+                            var qtyValidation=(qtyValidationMain) + qtyValidationSubAccounts * (children.Count() - 1);
+                            if (cnt[0] + item.Quantity > qtyValidation)
                             {
-                                throw new Exception($"Limite en cantidad de Compras. La suma de los asociados supera las {qtyValidation} unidades de cada uno.");
+                                throw new Exception($"Limite en cantidad de Compras. La cuenta principal con sus asociados superan las {qtyValidation} unidades. " +
+                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades y " +
+                                    $"cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
                             }
                             else
                             {
+                                qtyValidation = (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@") ? qtyValidationMain : qtyValidationSubAccounts);
                                 if (cnt[1] + item.Quantity > qtyValidation)
                                 {
-                                    throw new Exception($"Limite en cantidad de Compras. Tu asociado ya compró {qtyValidation} unidades.");
+                                    if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
+                                    {
+                                        throw new Exception($"Limite en cantidad de Compras. Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades y quiere comprar {item.Quantity}. " +
+                                            $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
+                                    }
+                                    else
+                                    {
+                                        throw new Exception($"Limite en cantidad de Compras. Tu asociado {addr.FirstName} ya compró {cnt[1]} unidades y quiere comprar {item.Quantity}. " +
+                                            $"Recuerda que cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
+                                    }
                                 }
                             }
                         }
