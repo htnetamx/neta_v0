@@ -54,11 +54,11 @@
 <div>
     @await Component.InvokeAsync("SearchBoxV2")
 </div>
-<div class="product-grid home-page-product-grid">
+@*<div class="product-grid home-page-product-grid">
     <div class="title">
         <strong>Solo se puede pedir 5 unidad por cliente al día</strong>
     </div>
-</div>
+</div>*@
 @if (Model.CatalogProductsModel.Promos.Count > 0)
 {
     <div class="product-grid home-page-product-grid" style="margin: 0px">

@@ -1979,7 +1979,7 @@ namespace Nop.Web.Controllers
                         break;
 
                     case 3:
-                        qtyValidationMain = 5;
+                        qtyValidationMain = 10;
                         qtyValidationSubAccounts = 1;
                         validQty = true;
                         break;
