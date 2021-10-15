@@ -43,7 +43,7 @@ namespace Nop.Services.Customers
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
             int cnt = 0;
-            var phoneNumberList = await _addressService.GetAllAddressesAsync();
+            var phoneNumberList = (await _addressService.GetAllAddressesAsync()).OrderBy(v => v);
             foreach (var info in phoneNumberList)
             {
                 var orders = (await _orderService.GetOrdersByPhoneNumberAsync(info))
@@ -67,7 +67,7 @@ namespace Nop.Services.Customers
                                 //Send_SMS(info, 
                                 //    $"¡No te pierdas las promos de hoy en NetaMx!\n\n{prodList}\nCompra y recoge en {store.Name} haciendo clic en la liga\n{store.Url}\n\nBaja los precios reenviando este mensaje a {"5"} contactos");
 
-                                if(cnt <= 1000)
+                                if(cnt >1000 && cnt <= 2000)
                                 {
                                     var rta = await Send(info,
                                         "02c89181_e473_461e_9e66_8f6b75af9b5e:end_client_promos2",

@@ -228,8 +228,7 @@ namespace Nop.Services.Discounts
             //that's why let's access the database only once
             var discounts = (await _discountRepository.GetAllAsync(query =>
             {
-                    query = query.Where(discount => discount.AdminComment == storeId.ToString());
-
+                //query = query.Where(discount => discount.AdminComment == storeId.ToString());
                 return query;
             })).AsQueryable();
 

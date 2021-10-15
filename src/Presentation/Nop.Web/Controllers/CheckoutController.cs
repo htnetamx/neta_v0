@@ -331,11 +331,11 @@ namespace Nop.Web.Controllers
 
         public virtual async Task<IActionResult> PostVerifyMessage(IFormCollection form)
         {
-            NetaAuronixMessaging.Send(form["Password"],
-                "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion",
-                11, form["code_generated"]);
+            //NetaAuronixMessaging.Send(form["Password"],
+            //    "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion",
+            //    12, form["code_generated"]);
 
-            //NetaAuronixMessaging.Send_SMS(form["Password"], $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar");
+            NetaAuronixMessaging.Send_SMS(form["Password"], $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar");
 
             return Content("{'rta': true }", "application/json");
         }
@@ -420,9 +420,8 @@ namespace Nop.Web.Controllers
                     customer.BillingAddressId = parent.First().Id;
                     await _customerService.UpdateCustomerAsync(customer);
 
-
-                    address.Email = "";
-                    address.PhoneNumber = "";
+                    address.Email = $"_{address.Email}_";
+                    address.PhoneNumber = $"_{address.PhoneNumber}_";
                     await _addressService.UpdateAddressAsync(address);
                 }
 
@@ -1193,9 +1192,9 @@ namespace Nop.Web.Controllers
                     }
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra",11,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 12,
                         "*" + name + "*",
-                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "/orderdetails/" + orders.First().Id + "\r",
+                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
                         "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
                         buscar,
                         "*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*",
@@ -1203,8 +1202,8 @@ namespace Nop.Web.Controllers
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
 
-    //                NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,
-    //$"Gracias {name} por comprar en NetaMx, tu orden es la siguiente, {"\r" + string.Join("\r", list.ToArray()) + "\r"} Tu total es de ${placeOrderResult.PlacedOrder.OrderTotal.ToString()};pasa mañana a {(await _storeContext.GetCurrentStoreAsync()).Name}, después de las {"5pm"}. Eres el cliente {(orders.Count + 1).ToString()} del pedido, recuerda que tenemos que llegar a 20 clientes para poder despachar. Comparte las promos y juntos lleguemos al mínimo de pedidos: {(await _storeContext.GetCurrentStoreAsync()).Url}");
+                    //NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,
+                    //    $"Gracias {name} por comprar en NetaMx, tu orden es la siguiente, {"\r" + string.Join("\r", list.ToArray()) + "\r"} Tu total es de ${placeOrderResult.PlacedOrder.OrderTotal.ToString()};pasa mañana a {(await _storeContext.GetCurrentStoreAsync()).Name}, después de las {"5pm"}. Eres el cliente {(orders.Count + 1).ToString()} del pedido, recuerda que tenemos que llegar a 20 clientes para poder despachar. Comparte las promos y juntos lleguemos al mínimo de pedidos: {(await _storeContext.GetCurrentStoreAsync()).Url}");
 
                     return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
                 }
@@ -2093,9 +2092,9 @@ namespace Nop.Web.Controllers
                     }
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 11,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 12,
                         "*" + name + "*",
-                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "/orderdetails/" + orders.First().Id + "\r",
+                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
                         "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
                         buscar,
                         "*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*",

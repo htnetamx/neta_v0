@@ -35,7 +35,8 @@ namespace Nop.Services.Tasks
 
         static TaskThread()
         {
-            _scheduleTaskUrl = $"{EngineContext.Current.Resolve<IStoreContext>().GetCurrentStoreAsync().Result.Url.TrimEnd('/')}/{NopTaskDefaults.ScheduleTaskPath}";
+            //_scheduleTaskUrl = $"{EngineContext.Current.Resolve<IStoreContext>().GetCurrentStoreAsync().Result.Url.TrimEnd('/')}/{NopTaskDefaults.ScheduleTaskPath}";
+            _scheduleTaskUrl = $"https://esperanza.netamx.app/{NopTaskDefaults.ScheduleTaskPath}";
             _timeout = EngineContext.Current.Resolve<AppSettings>().CommonConfig.ScheduleTaskRunTimeout;
         }
 
@@ -68,9 +69,17 @@ namespace Nop.Services.Tasks
                     if (_timeout.HasValue)
                         client.Timeout = TimeSpan.FromMilliseconds(_timeout.Value);
 
+                    var serviceScopeFactory = EngineContext.Current.Resolve<IServiceScopeFactory>();
+                    using var scope = serviceScopeFactory.CreateScope();
+                    var logger = EngineContext.Current.Resolve<ILogger>(scope);
+                    await logger.InformationAsync("Url - Clear Cache: " + _scheduleTaskUrl);
+
                     //send post data
                     var data = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>(nameof(taskType), taskType) });
-                    await client.PostAsync(_scheduleTaskUrl, data);
+                    var response = await client.PostAsync(_scheduleTaskUrl, data);
+                    var body = await response.Content.ReadAsStringAsync();
+
+                    await logger.InformationAsync($"Response: {response.StatusCode} - {body}");
                 }
                 catch (Exception ex)
                 {
