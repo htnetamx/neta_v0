@@ -1,0 +1,386 @@
+﻿@model LoginModel
+@using Nop.Core
+@using Nop.Core.Domain.Customers
+@using Nop.Services.Helpers
+
+@inject IWebHelper webHelper
+@inject IStoreContext storeConext
+@inject IUserAgentHelper userAgentHelper
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Login").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-login-page mobile-layout");
+
+    //register URL with return URL (if specified)
+    var registerUrl = Url.RouteUrl("Register", new { returnUrl = this.Context.Request.Query["returnUrl"] }, webHelper.GetCurrentRequestProtocol());
+
+    Random random = new Random();
+    var codeRandom = random.Next(1000, 9000);
+}
+@if (Model.IsCodeVerif)
+{
+    <script asp-location="Footer">
+        $(".verification-popup").addClass('active');
+    </script>
+}
+<div class="mobile-top h-lg">
+    <h2>Iniciar Sesión</h2><a href="/">X</a>
+</div>
+
+<div class="page login-page">
+    <div class="page-title mb-h">
+        <h1>@T("Account.Login.Welcome")</h1>
+    </div>
+    @await Html.PartialAsync("_ExternalAuthentication.Errors")
+    <div class="page-body">
+
+        @{
+            string absoluteurl = Context.Request.Path;
+            string qs = Context.Request.QueryString.ToString();
+        }
+        @if (absoluteurl.Contains("admin") || qs.Contains("admin"))
+        {
+            <div class="customer-blocks" style="padding-top: 90px">
+                @if (Model.RegistrationType == UserRegistrationType.Disabled)
+                {
+                    @*<div class="new-wrapper">
+                            <div class="title">
+                                @T("Account.Register")
+                            </div>
+                            <div class="text">
+                                @T("Account.Register.Result.Disabled")
+                            </div>
+                        </div>*@
+                }
+                else if (Model.CheckoutAsGuest)
+                {
+                    @*<div class="new-wrapper checkout-as-guest-or-register-block">
+                            <div class="title">
+                                <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
+                            </div>
+                            <div class="text">
+                                @await Component.InvokeAsync("TopicBlock", new { systemName = "CheckoutAsGuestOrRegister" })
+                            </div>
+                            <div class="buttons">
+                                <button type="button" class="button-1 checkout-as-guest-button" onclick="location.href='@Url.RouteUrl("Checkout")'">@T("Account.Login.CheckoutAsGuest")</button>
+                                <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                            </div>
+                        </div>*@
+                }
+                else
+                {
+                    @*<div class="new-wrapper register-block">
+                            <div class="title">
+                                <strong>@T("Account.Login.NewCustomer")</strong>
+                            </div>
+                            <div class="text">
+                                @T("Account.Login.NewCustomerText")
+                            </div>
+                            <div class="buttons">
+                                <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                            </div>
+                        </div>*@
+                }
+                <div class="returning-wrapper fieldset">
+                    <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+                        <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
+                        <div class="title">
+                            <strong>@T("Account.Login.ReturningCustomer")</strong>
+                        </div>
+                        <div class="form-fields">
+                            @if (Model.UsernamesEnabled)
+                            {
+                                <div class="inputs">
+                                    <label asp-for="Username" asp-postfix=":"></label>
+                                    <input asp-for="Username" class="username" autofocus="autofocus" />
+                                    <span asp-validation-for="Username"></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="inputs">
+                                    <label asp-for="Email" asp-postfix=":"></label>
+                                    <input asp-for="Email" type="email" class="text" autofocus="autofocus" />
+                                    <span asp-validation-for="Email"></span>
+                                </div>
+                            }
+                            <div class="inputs">
+                                <label asp-for="Password" asp-postfix=":"></label>
+                                <input asp-for="Password" type="password" class="text" />
+                                <span asp-validation-for="Password"></span>
+                            </div>
+                            <div class="inputs reversed">
+                                <input asp-for="RememberMe" checked="checked" />
+                                <label asp-for="RememberMe"></label>
+                            </div>
+                            <input type="hidden" name="backoffice" value="backoffice" />
+                            @if (Model.DisplayCaptcha)
+                            {
+                                <nop-captcha />
+                            }
+                        </div>
+                        <div class="buttons">
+                            <button type="submit" class="button-1 login-button">@T("Account.Login.LoginButton")</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="external-authentication">
+                @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
+            </div>
+            @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })
+        }
+        else
+        {
+            <div class="customer-blocks" style="padding-top: 90px">
+                @if (Model.RegistrationType == UserRegistrationType.Disabled)
+                {
+                    @*<div class="new-wrapper">
+                            <div class="title">
+                                @T("Account.Register")
+                            </div>
+                            <div class="text">
+                                @T("Account.Register.Result.Disabled")
+                            </div>
+                        </div>*@
+                }
+                else if (Model.CheckoutAsGuest)
+                {
+                    @*<div class="new-wrapper checkout-as-guest-or-register-block">
+                            <div class="title">
+                                <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
+                            </div>
+                            <div class="text">
+                                @await Component.InvokeAsync("TopicBlock", new { systemName = "CheckoutAsGuestOrRegister" })
+                            </div>
+                            <div class="buttons">
+                                <button type="button" class="button-1 checkout-as-guest-button" onclick="location.href='@Url.RouteUrl("Checkout")'">@T("Account.Login.CheckoutAsGuest")</button>
+                                <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                            </div>
+                        </div>*@
+                }
+                else
+                {
+                    @*<div class="new-wrapper register-block">
+                            <div class="title">
+                                <strong>@T("Account.Login.NewCustomer")</strong>
+                            </div>
+                            <div class="text">
+                                @T("Account.Login.NewCustomerText")
+                            </div>
+                            <div class="buttons">
+                                <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                            </div>
+                        </div>*@
+                }
+                <div class="returning-wrapper fieldset">
+                    <form id="formVerifData" asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+                        @*<div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>*@
+                        <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                        <div class="title">
+                            <strong>Necesitamos tu datos</strong>
+                        </div>
+                        <div class="form-fields">
+                            @if (Model.UsernamesEnabled)
+                            {
+                                <div class="inputs">
+                                    <label asp-for="Username" asp-postfix=":"></label>
+                                    <input asp-for="Username" class="username" autofocus="autofocus" />
+                                    <span asp-validation-for="Username"></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="inputs">
+                                    <label>Nombre Completo:</label>
+                                    <input asp-for="Username" type="text" class="text" autofocus="autofocus" />
+                                    <span asp-validation-for="Username"></span>
+                                </div>
+                            }
+                            <div class="inputs">
+                                <label>Teléfono:</label>
+                                <input asp-for="Password" type="text" class="text" />
+                                <span asp-validation-for="Password"></span>
+                            </div>
+                            @if (!userAgentHelper.IsMobileDevice())
+                            {
+                                <div class="inputs" id="codeVerifContainer" style="display: none">
+                                    <label>Código:</label>
+                                    <input id="codeVerif" name="codeVerif" type="text" class="text" required />
+                                </div>
+                            }
+                            <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
+                            <div class="mb-h" style="text-align: center">
+                                <label>Escribe código que te enviamos por mensaje de texto</label>
+                            </div>
+                            <div class="whatsapp-info h-lg">
+                                <span class="icon"></span>
+                                <label>Escribe código que te enviamos por mensaje de texto</label>
+                            </div>
+                            <div class="inputs reversed" style="display: none">
+                                <input asp-for="RememberMe" checked="checked" />
+                                <label asp-for="RememberMe"></label>
+                                <span class="forgot-password">
+                                    <a asp-route="PasswordRecovery">@T("Account.Login.ForgotPassword")</a>
+                                </span>
+                            </div>
+                            @if (Model.DisplayCaptcha)
+                            {
+                                <nop-captcha />
+                            }
+                            <div class="term-login h-lg">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                    <label class="custom-control-label" for="customCheck1">Acepto los <b id="show-term-popup">Terminos y Condiciones</b> de Neta.mx para crear una nueva cuenta</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons button-fix">
+                            <button id="btnCodeVerif" type="button" class="button-1 login-button btn-black">Enviar código a Whatsapp</button>
+                            @if (!userAgentHelper.IsMobileDevice())
+                            {
+                                <button id="btnLogin" style="display: none" type="submit" class="button-1 login-button">@T("Account.Login.LoginButton")</button>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="external-authentication">
+                @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
+            </div>
+            @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })
+        }
+    </div>
+
+    @*Verification popup*@
+    @if (userAgentHelper.IsMobileDevice())
+    {
+        <form id="formVerifData" asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+            <div class="verification-popup h-lg">
+                <div class="mobile-top h-lg">
+                    <h2>Verificación</h2><a class="close-popup">X</a>
+                </div>
+                <div class="ver-content">
+                    <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                    @*<div class="code">
+                            <input />
+                            <input />
+                            <input />
+                            <input />
+                        </div>*@
+                <div class="code-verfication-input">
+                    <input id="codeVerif" name="codeVerif" type="text" class="text" required />
+                    <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
+                    <input type="hidden" id="hidUsername" name="Username" />
+                    <input type="hidden" id="hidPassword" name="Password" />
+                </div>
+                    <p>Ingresa el codigo de verificatin que<br /> enviamos al <b id="inputMobile"></b></p>
+                    <a class="link" onclick="$('#btnCodeVerif').click()">Enviar de nuevo</a>
+                </div>
+                <div class="buttons button-fix">
+                    <button id="btnLogin" type="submit" class="button-1 login-button btn-black">@T("Account.Login.LoginButton")</button>
+                </div>
+            </div>
+        </form>
+    }
+    @*Term and condition popup*@
+    <div class="term-popup h-lg">
+        <div class="mobile-top h-lg">
+            <h2>Terminos y Condiciones</h2><a class="close-popup">X</a>
+        </div>
+        <div class="content-data">
+            <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+            <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+        </div>
+    </div>
+
+    <script asp-location="Footer">
+        $(document).ready(function () {
+            //Show term and condition popup
+            $("#show-term-popup").on("click", function () {
+                $(".term-popup").addClass('active');
+            });
+
+            //Hide term and condition popup
+            $(".close-popup", '.term-popup').on("click", function () {
+                $(".term-popup").removeClass('active');
+            });
+
+            //Hide verification popup
+            $(".close-popup", '.verification-popup').on("click", function () {
+                $(".verification-popup").removeClass('active');
+                $("#btnCodeVerif").show();
+            });
+        });
+    </script>
+
+
+    <script asp-location="Footer">
+
+        try {
+        $(document).ready(function () {
+            $("#btnCodeVerif").click(() => {
+                const searchRegExp = /\s/g;
+                const replaceWith = '';
+
+                try {
+                    $("#Password").val($("#Password").val().toString().replaceAll(" ", ""));
+                } catch (e) {
+                    try {
+                        $("#Password").val($("#Password").val().toString().split(" ").join(""));
+                    } catch (e1) {
+                        try {
+                            $("#Password").val($("#Password").val().toString().replace(searchRegExp, replaceWith));
+                        } catch (e2) {}
+                    }
+                }
+                try {
+                $.ajax({
+                    cache: false,
+                    url: "@(storeConext.GetCurrentStore().Url)checkout/PostVerifyMessage/",
+                    data: $("#formVerifData").serialize(),
+                    type: 'POST',
+                    success: function (response) {
+                        $("#hidUsername").val($("#Username").val());
+                        $("#hidPassword").val($("#Password").val());
+                        $("#inputMobile").text($("#Password").val());
+                        $("#btnLogin").show();
+                        $("#codeVerifContainer").show();
+                        $("#btnCodeVerif").hide();
+                        $(".verification-popup").addClass('active');
+                    },
+                    error: function (err) {
+                    },
+                    complete: function (jqXHR, textStatus) {
+                        $("#hidUsername").val($("#Username").val());
+                        $("#hidPassword").val($("#Password").val());
+                        $("#inputMobile").text($("#Password").val());
+                        $("#btnLogin").show();
+                        $("#codeVerifContainer").show();
+                        $("#btnCodeVerif").hide();
+                        $(".verification-popup").addClass('active');
+                    }
+                });
+                } catch (e) {
+                }
+            });
+
+            $("#formVerifData").on("submit", (e) => {
+                var cod = $("codeVerif").val();
+                if (cod === '') {
+                    alert("Revisa tu móvil y copia el código que te enviamos para poder terminar tu compra.");
+                    return false;
+                }
+            });
+        });
+
+        } catch (e) {
+        }
+
+
+    </script>
+
+</div>

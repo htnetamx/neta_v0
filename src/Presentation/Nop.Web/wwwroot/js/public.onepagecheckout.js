@@ -120,16 +120,18 @@ var Billing = {
   },
 
   newAddress: function(isNew) { 
-    $('#save-address-button').hide();
-
+      $('#save-address-button').hide();
+      $("#AddNewAddressback").show();
     if (isNew) {
       $('#save-address-button').show();
-      $('#billing-new-address-form').show();
+        $('#billing-new-address-form').show();
+        $(".select-billing-address", "#co-billing-form").hide();
       $('#new-address-button').hide();
       $('#edit-address-button').hide();
       $('#delete-address-button').hide();
     } else {
-      $('#billing-new-address-form').hide();
+        $('#billing-new-address-form').hide();
+        $(".select-billing-address", "#co-billing-form").show();
       if (this.guest) {
         $('#edit-address-button').show();
         $('#delete-address-button').show();
@@ -231,7 +233,8 @@ var Billing = {
           });
       },
       complete: function(jqXHR, textStatus) {
-        $('#billing-new-address-form').show();
+          $('#billing-new-address-form').show();
+          $(".select-billing-address", "#co-billing-form").hide();
         $('#edit-address-button').hide();
         $('#delete-address-button').hide();
         $('#save-address-button').show();
@@ -262,10 +265,7 @@ var Billing = {
     });
   },
 
-  deleteAddress: function (url, id, name) {
-    var rta = window.confirm("Seguro que deseas eliminar a "+name+" de tu lista de amigos?");
-    if (!rta) return;
-
+  deleteAddress: function (url, id) {
     $.ajax({
       cache: false,
       type: "GET",
