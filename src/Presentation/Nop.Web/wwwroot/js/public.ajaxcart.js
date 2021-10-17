@@ -80,7 +80,9 @@ var AjaxCart = {
     success_process: function (response) {
         if (response.updatetopcartsectionhtml) {
           $(AjaxCart.topcartselector).html(response.updatetopcartsectionhtml);
-          window.location.reload();
+          //window.location.reload();
+          $("#headerV21").load(" #headerV21");
+          $("#cartInfo").load(" #cartInfo");
         }
         if (response.updatetopwishlistsectionhtml) {
             $(AjaxCart.topwishlistselector).html(response.updatetopwishlistsectionhtml);
