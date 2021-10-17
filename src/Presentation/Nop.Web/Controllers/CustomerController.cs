@@ -451,8 +451,11 @@ namespace Nop.Web.Controllers
             if (form["code_generated"] != form["codeVerif"])
             {
                 ModelState.AddModelError("", "Escribiste un código equivocado, por favor inténtalo de nuevo, escribe otra vez tu teléfono para confirmarlo y escribe el número que te mandemos por whatsapp.");
-                model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
-                return View(model);
+                var newmodel = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
+                newmodel.Username = model.Username;
+                newmodel.Password = model.Password;
+                newmodel.IsCodeVerif = true;
+                return View(newmodel);
             }
 
             var loginResult = await _customerRegistrationService.ValidateCustomerAsync1(model.Password);
