@@ -26,7 +26,7 @@ var AjaxCart = {
     },
 
     //add a product to the cart/wishlist from the catalog pages
-    addproducttocart_catalog: function (urladd) {
+    addproducttocart_catalog: function (urladd,sender_element) {
         if (this.loadWaiting !== false) {
             return;
         }
@@ -36,6 +36,7 @@ var AjaxCart = {
             cache: false,
             url: urladd,
             type: "POST",
+            indexValue: { ItemQuantityBox: sender_element },
             success: this.success_process,
             complete: this.resetLoadWaiting,
             error: this.ajaxFailure
@@ -89,6 +90,9 @@ var AjaxCart = {
         }
         if (response.updateflyoutcartsectionhtml) {
             $(AjaxCart.flyoutcartselector).replaceWith(response.updateflyoutcartsectionhtml);
+        }
+        if (response.newQuantity && this.indexValue.ItemQuantityBox) {
+            this.indexValue.ItemQuantityBox.innerText = response.newQuantity
         }
         if (response.message) {
             //display notification

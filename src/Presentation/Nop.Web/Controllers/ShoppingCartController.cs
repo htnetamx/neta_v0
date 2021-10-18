@@ -701,7 +701,8 @@ namespace Nop.Web.Controllers
                             success = true,
                             message = string.Format(await _localizationService.GetResourceAsync("Products.ProductHasBeenAddedToTheCart.Link"), Url.RouteUrl("ShoppingCart")),
                             updatetopcartsectionhtml,
-                            updateflyoutcartsectionhtml
+                            updateflyoutcartsectionhtml,
+                            newQuantity = quantityToValidate
                         });
                     }
             }
