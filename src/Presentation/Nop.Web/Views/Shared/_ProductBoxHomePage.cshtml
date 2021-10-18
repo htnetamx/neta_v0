@@ -95,7 +95,7 @@
             </div>
             <div class="prices">
                 <span class="price">En Carrito:</span>
-                <span class="price">@Model.Details.CurrentProductQuantity</span>
+                <span class="price quantity">@Model.Details.CurrentProductQuantity</span>
             </div>
             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoMiddle, additionalData = Model })
             <div class="buttons">
@@ -111,7 +111,7 @@
                     {
                         addToCartText = T("ShoppingCart.PreOrder").Text;
                     }
-                    <button type="button" style="width:100%" class="button-2 product-box-add-to-cart-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">@(addToCartText)</button>
+                    <button type="button" style="width:100%" class="button-2 product-box-add-to-cart-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink',this.parentElement.parentElement.getElementsByClassName('quantity')[0]);return false;">@(addToCartText)</button>
                 }
                 @if (!Model.ProductPrice.DisableAddToCompareListButton)
                 {
