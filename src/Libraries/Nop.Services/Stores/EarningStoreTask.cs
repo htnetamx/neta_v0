@@ -10,7 +10,7 @@ using Nop.Services.Orders;
 
 namespace Nop.Services.Stores
 {
-    class EarningStoreTask
+    class EarningStoreTask : IScheduleTask
     {
         #region Fields
 
