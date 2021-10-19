@@ -188,7 +188,7 @@
                             {
                                 <div class="inputs">
                                     <label asp-for="Username" asp-postfix=":"></label>
-                                    <input asp-for="Username" class="username" autofocus="autofocus" />
+                                    <input asp-for="Username" class="username" autofocus="autofocus" required data-msg-required="se requiere el nombre completo" />
                                     <span asp-validation-for="Username"></span>
                                 </div>
                             }
@@ -196,20 +196,20 @@
                             {
                                 <div class="inputs">
                                     <label>Nombre Completo:</label>
-                                    <input asp-for="Username" type="text" class="text" autofocus="autofocus" />
+                                    <input asp-for="Username" type="text" class="text" autofocus="autofocus" required data-msg-required="se requiere el nombre completo" />
                                     <span asp-validation-for="Username"></span>
                                 </div>
                             }
                             <div class="inputs">
                                 <label>Teléfono:</label>
-                                <input asp-for="Password" type="text" class="text" />
+                                <input asp-for="Password" type="text" class="text" required data-msg-required="se requiere el número de móvil" />
                                 <span asp-validation-for="Password"></span>
                             </div>
                             @if (!userAgentHelper.IsMobileDevice())
                             {
                                 <div class="inputs" id="codeVerifContainer" style="display: none">
                                     <label>Código:</label>
-                                    <input id="codeVerif" name="codeVerif" type="text" class="text" required />
+                                    <input id="codeVerif" name="codeVerif" type="password" class="text" required />
                                 </div>
                             }
                             <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
@@ -231,12 +231,24 @@
                             {
                                 <nop-captcha />
                             }
-                            <div class="term-login h-lg">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheck1">
-                                    <label class="custom-control-label" for="customCheck1">Acepto los <b id="show-term-popup">Terminos y Condiciones</b> de Neta.mx para crear una nueva cuenta</label>
+                            @if (userAgentHelper.IsMobileDevice())
+                            {
+                                <div class="term-login h-lg">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                        <label class="custom-control-label" for="customCheck1">Acepto los <b id="show-term-popup">Terminos y Condiciones</b> de Neta.mx para crear una nueva cuenta</label>
+                                    </div>
                                 </div>
-                            </div>
+                            }
+                            else
+                            {
+                                <div class="term-login">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                        <label class="custom-control-label" for="customCheck1">Acepto los <b id="show-term-popupdesk">Terminos y Condiciones</b> de Neta.mx para crear una nueva cuenta</label>
+                                    </div>
+                                </div>
+                            }
                         </div>
                         <div class="buttons button-fix">
                             <button id="btnCodeVerif" type="button" class="button-1 login-button btn-black">Enviar código a Whatsapp</button>
@@ -253,56 +265,94 @@
             </div>
             @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })
         }
-    </div>
 
-    @*Verification popup*@
-    @if (userAgentHelper.IsMobileDevice())
-    {
-        <form id="formVerifData" asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
-            <div class="verification-popup h-lg">
-                <div class="mobile-top h-lg">
-                    <h2>Verificación</h2><a class="close-popup">X</a>
-                </div>
-                <div class="ver-content">
-                    <div asp-validation-summary="ModelOnly" class="message-error"></div>
-                    @*<div class="code">
-                            <input />
-                            <input />
-                            <input />
-                            <input />
-                        </div>*@
-                <div class="code-verfication-input">
-                    <input id="codeVerif" name="codeVerif" type="text" class="text" required />
-                    <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
-                    <input type="hidden" id="hidUsername" name="Username" />
-                    <input type="hidden" id="hidPassword" name="Password" />
-                </div>
-                    <p>Ingresa el codigo de verificatin que<br /> enviamos al <b id="inputMobile"></b></p>
-                    <a class="link" onclick="$('#btnCodeVerif').click()">Enviar de nuevo</a>
-                </div>
-                <div class="buttons button-fix">
-                    <button id="btnLogin" type="submit" class="button-1 login-button btn-black">@T("Account.Login.LoginButton")</button>
+        <div class="confirm-popup" id="tandc">
+            <div class="content">
+                <h2>Terminos y Condiciones</h2>
+                <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                <div class="conf-btn">
+                    <a onclick="closepopup()">cerrar</a>
                 </div>
             </div>
-        </form>
-    }
-    @*Term and condition popup*@
-    <div class="term-popup h-lg">
-        <div class="mobile-top h-lg">
-            <h2>Terminos y Condiciones</h2><a class="close-popup">X</a>
         </div>
-        <div class="content-data">
-            <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
-            <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+
+        @*Verification popup*@
+        @if (userAgentHelper.IsMobileDevice())
+        {
+            <form id="formVerifData" asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+                <div class="verification-popup h-lg">
+                    <div class="mobile-top h-lg">
+                        <h2>Verificación</h2><a class="close-popup">X</a>
+                    </div>
+                    <div class="ver-content">
+                        <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                        @*<div class="code">
+                                <input />
+                                <input />
+                                <input />
+                                <input />
+                            </div>*@
+                        <div class="code-verfication-input">
+                            <input id="codeVerif" name="codeVerif" type="password" class="text" required />
+                            <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
+                            <input type="hidden" id="hidUsername" name="Username" />
+                            <input type="hidden" id="hidPassword" name="Password" />
+                        </div>
+                        <p>Ingresa el codigo de verificatin que<br /> enviamos al <b id="inputMobile"></b></p>
+                        <a class="link" onclick="$('#btnCodeVerif').click()">Enviar de nuevo</a>
+                    </div>
+                    <div class="buttons button-fix">
+                        <button id="btnLogin" type="submit" class="button-1 login-button btn-black">@T("Account.Login.LoginButton")</button>
+                    </div>
+                </div>
+            </form>
+        }
+        @*Term and condition popup*@
+        <div class="term-popup h-lg">
+            <div class="mobile-top h-lg">
+                <h2>Terminos y Condiciones</h2><a class="close-popup">X</a>
+            </div>
+            <div class="content-data">
+                <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+            </div>
+        </div>
+
+    </div>
+    <div class="confirm-popup" id="tandcrequired">
+        <div class="content">
+            <p>
+                requerido para aceptar Terminos y Condiciones
+            </p>
+            <div class="conf-btn">
+                <a onclick="closepopup()">cerrar</a>
+            </div>
         </div>
     </div>
+    <div class="confirm-overlayer"></div>
 
     <script asp-location="Footer">
         $(document).ready(function () {
+            $("#formVerifData").validate({
+                rules: {
+                    Username: "required",
+                    Password: "required",
+                },
+                messages: {
+                    Username: "se requiere el nombre completo",
+                    Password: "se requiere el número de móvil"
+                }
+            })
             //Show term and condition popup
             $("#show-term-popup").on("click", function () {
                 $(".term-popup").addClass('active');
             });
+            $("#show-term-popupdesk").on("click", function () {
+                $("#tandc").addClass("active");
+                $(".confirm-overlayer").addClass("active");
+            });
+
 
             //Hide term and condition popup
             $(".close-popup", '.term-popup').on("click", function () {
@@ -319,55 +369,76 @@
 
 
     <script asp-location="Footer">
+        function closepopup() {
+            $("#tandcrequired").removeClass("active");
+            $("#tandc").removeClass("active");
+            $(".confirm-overlayer").removeClass("active");
+        }
 
         try {
         $(document).ready(function () {
             $("#btnCodeVerif").click(() => {
-                const searchRegExp = /\s/g;
-                const replaceWith = '';
-
-                try {
-                    $("#Password").val($("#Password").val().toString().replaceAll(" ", ""));
-                } catch (e) {
-                    try {
-                        $("#Password").val($("#Password").val().toString().split(" ").join(""));
-                    } catch (e1) {
-                        try {
-                            $("#Password").val($("#Password").val().toString().replace(searchRegExp, replaceWith));
-                        } catch (e2) {}
-                    }
+                if ($("#customCheck1").prop('checked') == false) {
+                    $("#tandcrequired").addClass("active");
+                    $(".confirm-overlayer").addClass("active");
                 }
-                try {
-                $.ajax({
-                    cache: false,
-                    url: "@(storeConext.GetCurrentStore().Url)checkout/PostVerifyMessage/",
-                    data: $("#formVerifData").serialize(),
-                    type: 'POST',
-                    success: function (response) {
-                        $("#hidUsername").val($("#Username").val());
-                        $("#hidPassword").val($("#Password").val());
-                        $("#inputMobile").text($("#Password").val());
-                        $("#btnLogin").show();
-                        $("#codeVerifContainer").show();
-                        $("#btnCodeVerif").hide();
-                        $(".verification-popup").addClass('active');
-                    },
-                    error: function (err) {
-                    },
-                    complete: function (jqXHR, textStatus) {
-                        $("#hidUsername").val($("#Username").val());
-                        $("#hidPassword").val($("#Password").val());
-                        $("#inputMobile").text($("#Password").val());
-                        $("#btnLogin").show();
-                        $("#codeVerifContainer").show();
-                        $("#btnCodeVerif").hide();
-                        $(".verification-popup").addClass('active');
+                else {
+                    if ($("#formVerifData").valid())
+                    {
+                        const searchRegExp = /\s/g;
+                        const replaceWith = '';
+
+                        try {
+                            $("#Password").val($("#Password").val().toString().replaceAll(" ", ""));
+                        } catch (e) {
+                            try {
+                                $("#Password").val($("#Password").val().toString().split(" ").join(""));
+                            } catch (e1) {
+                                try {
+                                    $("#Password").val($("#Password").val().toString().replace(searchRegExp, replaceWith));
+                                } catch (e2) { }
+                            }
+                        }
+                        try {
+                            $.ajax({
+                                cache: false,
+                                url: "@(storeConext.GetCurrentStore().Url)checkout/PostVerifyMessage/",
+                                data: $("#formVerifData").serialize(),
+                                type: 'POST',
+                                success: function (response) {
+                                    $("#hidUsername").val($("#Username").val());
+                                    $("#hidPassword").val($("#Password").val());
+                                    $("#inputMobile").text($("#Password").val());
+                                    $("#btnLogin").show();
+                                    $("#codeVerifContainer").show();
+                                    $("#btnCodeVerif").hide();
+                                    $(".verification-popup").addClass('active');
+                                },
+                                error: function (err) {
+                                },
+                                complete: function (jqXHR, textStatus) {
+                                    $("#hidUsername").val($("#Username").val());
+                                    $("#hidPassword").val($("#Password").val());
+                                    $("#inputMobile").text($("#Password").val());
+                                    $("#btnLogin").show();
+                                    $("#codeVerifContainer").show();
+                                    $("#btnCodeVerif").hide();
+                                    $(".verification-popup").addClass('active');
+                                }
+                            });
+                        } catch (e) {
+                        }
                     }
-                });
-                } catch (e) {
                 }
             });
 
+            $("#formVerifData").on("submit", (e) => {
+                var cod = $("codeVerif").val();
+                if (cod === '') {
+                    alert("Revisa tu móvil y copia el código que te enviamos para poder terminar tu compra.");
+                    return false;
+                }
+            });
             $("#formVerifData").on("submit", (e) => {
                 var cod = $("codeVerif").val();
                 if (cod === '') {
