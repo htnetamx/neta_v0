@@ -6579,7 +6579,9 @@ pre {
 
 .order-completed .page-title{border:none;}
 .order-completed .checked-icon{width:64px;height:64px;background:url('../images/checked.png')no-repeat center center;margin:0 auto 40px;}
-
+.term-popup{position:fixed;left:0;top:0;width:100%;height:100%;background:#fff;z-index:101010;overflow:auto;display:none;}
+.term-popup.active{display:block;}
+#tandc{left:25%;right:25%;top:25%;}
 
 @media all and (max-width: 769px)
 {
