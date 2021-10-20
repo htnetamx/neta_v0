@@ -94,7 +94,7 @@ namespace Nop.Services.Stores
             
             if (nameFilter != null && nameFilter != "")
             {   
-                result = await result.Where(s => (s.Name.Trim().ToLower().Contains(nameFilter.Trim().ToLower())) || (CalculateSimilarity(RemoveSpecialCharacters(s.Name.Trim(), true),RemoveSpecialCharacters(nameFilter.Trim(), true))>0.6)).ToListAsync();
+                result = await result.Where(s => (RemoveSpecialCharacters(s.Name.Trim(), true).Contains(RemoveSpecialCharacters(nameFilter.Trim(), true))) || (CalculateSimilarity(RemoveSpecialCharacters(s.Name.Trim(), true),RemoveSpecialCharacters(nameFilter.Trim(), true))>0.6)).ToListAsync();
             }
             return result;
         }
