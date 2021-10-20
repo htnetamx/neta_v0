@@ -57,7 +57,7 @@
                             <img src="images/header2/Logo_Neta.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
                             <p id="storeName" style="margin: 0px; margin-left: 4vw; max-width: 65vw; overflow: hidden; text-overflow: ellipsis;">@Model.Store.Name</p>
                         </a>
-                        <div class="navbar-nav" style="position:relative">
+                        <div id="CartProductQuantity" class="navbar-nav" style="position:relative">
                             <a href="@Url.RouteUrl("ShoppingCart")" style="height: 100%;width:100%">
                                 <img src="images/header2/Shopping-cart.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
                             </a>
@@ -67,7 +67,7 @@
                 </nav>
             </div>
             <div id="cartInfo" style="background-color: #05796B; height: 6vh; width: 100vw; display: flex; align-items: center; justify-content: space-between">
-                <p style="font: normal 16px Roboto; color: #FFFFFF; margin: 0px;line-height: 22.4px">Total: <strong>$@Model.ShoppingCartTotal.ToString("N2")</strong></p>
+                <p style="font: normal 16px Roboto; color: #FFFFFF; margin: 0px;line-height: 22.4px">Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></p>
                 <a href="@Url.RouteUrl("ShoppingCart")">
                     <p style="font: normal 16px Roboto; color: #FFFFFF; margin: 0px; line-height: 22.4px">Finaliza tu pedido ></p>
                 </a>
