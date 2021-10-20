@@ -93,7 +93,7 @@
                     @if (children.Count <= 5)
                     {
                         <div class="new-btn">
-                            <a id="new-address-button" class="btn-link" onclick="Billing.resetBillingForm(); Billing.newAddress(true); return false;">Dar de Alta un Amigo</a>
+                            <a id="new-address-button" class="btn-link" onclick="Billing.resetBillingForm(); Billing.newAddress(true); return false;">agregar una cuenta</a>
                         </div>
                     }
                     <div class="buttons checkout-button-fix" id="billing-buttons-container">
@@ -242,6 +242,7 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpcContentAfter })
     </div>
     <script asp-location="Footer">
+       
         Accordion.init('checkout-steps', '.step-title', true);
         Accordion.openSection('#opc-billing');
         Checkout.init('@(storeLocation)cart/');
