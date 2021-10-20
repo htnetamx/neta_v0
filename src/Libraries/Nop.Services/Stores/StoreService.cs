@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Nop.Core.Domain.Stores;
 using Nop.Data;
@@ -82,16 +83,79 @@ namespace Nop.Services.Stores
         /// A task that represents the asynchronous operation
         /// The task result contains the stores
         /// </returns>
-        public virtual async Task<IList<Store>> GetAllStoresAsync()
+        /// 
+        //
+        public virtual async Task<IList<Store>> GetAllStoresAsync(string nameFilter=null)
         {
             var result = await _storeRepository.GetAllAsync(query =>
             {
                 return from s in query orderby s.DisplayOrder, s.Id select s;
             }, cache => default);
-
+            
+            if (nameFilter != null && nameFilter != "")
+            {   
+                result = await result.Where(s => (s.Name.Trim().ToLower().Contains(nameFilter.Trim().ToLower())) || (CalculateSimilarity(RemoveSpecialCharacters(s.Name.Trim(), true),RemoveSpecialCharacters(nameFilter.Trim(), true))>0.6)).ToListAsync();
+            }
             return result;
         }
+        public static string RemoveSpecialCharacters(string str, bool lowercase)
+        {
+            var newstr = Regex.Replace(str, "[^a-zA-Z0-9_.]+", "", RegexOptions.Compiled);
+            return lowercase ? newstr.ToLower() : newstr;
+        }
+        private int ComputeLevenshteinDistance(string source, string target)
+        {
+            if ((source == null) || (target == null))
+                return 0;
+            if ((source.Length == 0) || (target.Length == 0))
+                return 0;
+            if (source == target)
+                return source.Length;
 
+            int sourceWordCount = source.Length;
+            int targetWordCount = target.Length;
+
+            // Step 1
+            if (sourceWordCount == 0)
+                return targetWordCount;
+
+            if (targetWordCount == 0)
+                return sourceWordCount;
+
+            int[,] distance = new int[sourceWordCount + 1, targetWordCount + 1];
+
+            // Step 2
+            for (int i = 0; i <= sourceWordCount; distance[i, 0] = i++)
+                ;
+            for (int j = 0; j <= targetWordCount; distance[0, j] = j++)
+                ;
+
+            for (int i = 1; i <= sourceWordCount; i++)
+            {
+                for (int j = 1; j <= targetWordCount; j++)
+                {
+                    // Step 3
+                    int cost = (target[j - 1] == source[i - 1]) ? 0 : 1;
+
+                    // Step 4
+                    distance[i, j] = Math.Min(Math.Min(distance[i - 1, j] + 1, distance[i, j - 1] + 1), distance[i - 1, j - 1] + cost);
+                }
+            }
+
+            return distance[sourceWordCount, targetWordCount];
+        }
+        private double CalculateSimilarity(string source, string target)
+        {
+            if ((source == null) || (target == null))
+                return 0.0;
+            if ((source.Length == 0) || (target.Length == 0))
+                return 0.0;
+            if (source == target)
+                return 1.0;
+
+            int stepsToSame = ComputeLevenshteinDistance(source, target);
+            return (1.0 - ((double)stepsToSame / (double)Math.Max(source.Length, target.Length)));
+        }
         /// <summary>
         /// Gets a store 
         /// </summary>
