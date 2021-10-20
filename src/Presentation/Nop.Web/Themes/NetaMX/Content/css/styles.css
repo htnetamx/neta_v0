@@ -6613,6 +6613,9 @@ pre {
     padding-left: 0px;
     padding-top: 8px;
   }
+  .cart-collaterals{margin-bottom:0;}
+  .cart-collaterals > div{margin-bottom:0;}
+  .cart-footer{margin-bottom:0;}
 }
 
 
