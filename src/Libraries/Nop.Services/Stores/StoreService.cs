@@ -100,8 +100,12 @@ namespace Nop.Services.Stores
         }
         public static string RemoveSpecialCharacters(string str, bool lowercase)
         {
-            var newstr = Regex.Replace(str, "[^a-zA-Z0-9_.]+", "", RegexOptions.Compiled);
-            return lowercase ? newstr.ToLower() : newstr;
+            var newstr = lowercase ? str.ToLower() : str;
+            byte[] tempBytes;
+            tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(newstr);
+            newstr= System.Text.Encoding.UTF8.GetString(tempBytes);
+            newstr = Regex.Replace(newstr, "[^a-zA-Z0-9_. ]+", "", RegexOptions.Compiled);
+            return newstr;
         }
         private int ComputeLevenshteinDistance(string source, string target)
         {
