@@ -2000,6 +2000,7 @@ namespace Nop.Web.Controllers
                     var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
                     foreach (var item in cart)
                     {
+                        qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
                         var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
                         if(cnt != null)
                         {
