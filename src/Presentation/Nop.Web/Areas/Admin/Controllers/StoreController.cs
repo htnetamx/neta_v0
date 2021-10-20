@@ -99,7 +99,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public virtual async Task<IActionResult> List(StoreSearchModel searchModel)
+        public virtual async Task<IActionResult> StoreList(StoreSearchModel searchModel)
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageStores))
                 return await AccessDeniedDataTablesJson();
