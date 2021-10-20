@@ -44,9 +44,19 @@ namespace Nop.Services.Stores
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
+                    var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == info.Id);
+                    var products = (await _productService.GetAllProductsAsync()).Where(v =>
+                    prodMap.Any(x => x.EntityId == v.Id) && v.Sku.EndsWith("F1")).OrderByDescending(v => v.OldPrice - v.Price).Take(4);
+
+                    var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
+
                     var rta = await Send(info.CompanyPhoneNumber,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f1",
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:shop_promos_f1_v2",
+                        products.First().Name,
+                        products.First().Price.ToString("N2"),
+                        products.First().OldPrice.ToString("N2"),
                         info.Name,
+                        8,
                         info.Url);
                 }
             }
@@ -64,7 +74,7 @@ namespace Nop.Services.Stores
 
                     var rta = await Send(info.CompanyPhoneNumber,
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2",
-                        info.Url, 
+                        info.Url,
                         info.Name,
                         prodList + " *y muchas promos más!!*");
                 }
