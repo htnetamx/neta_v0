@@ -46,10 +46,10 @@ namespace Nop.Services.Stores
                 var orderExists = (await _orderService.GetOrdersByStoreIdsAsync(store.Id)).Any();
                 if (orderExists)
                 {
-                    if (store.DisplayOrder == 1)
-                        store.DisplayOrder = 2;
-                    else if (store.DisplayOrder == 2)
-                        store.DisplayOrder = 3;
+                    //if (store.DisplayOrder == 1)
+                    //    store.DisplayOrder = 2;
+                    //else if (store.DisplayOrder == 2)
+                    //    store.DisplayOrder = 3;
 
                     //at this point there is no store with phase 1, and at least one order exists in the store. Evaluate if phase 2 can move up to phase 3
 
@@ -67,15 +67,15 @@ namespace Nop.Services.Stores
                     var orderValueGMV = (await _orderService.GetOrdersByStoreIdsAsync(store.Id)).Select(x => x.OrderTotal).Sum();
 
                     //Case1
-                    if (store.DisplayOrder == 2 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6  )
+                    if (store.DisplayOrder == 1 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6  )
                     {
-                        store.DisplayOrder = 3;
+                        store.DisplayOrder = 2;
                     }
                     
                     //Case2
-                    else if (store.DisplayOrder == 2 && disntinctCustomersCounter > 5 && orderValueGMV > 400)
+                    else if (store.DisplayOrder == 1 && disntinctCustomersCounter > 5 && orderValueGMV > 400)
                     {
-                        store.DisplayOrder = 3;
+                        store.DisplayOrder = 2;
                     }                    
                     await _storeService.UpdateStoreAsync(store);
                 }
