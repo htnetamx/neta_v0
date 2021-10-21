@@ -2000,15 +2000,17 @@ namespace Nop.Web.Controllers
                     var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
                     foreach (var item in cart)
                     {
+                        qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
                         var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
                         if(cnt != null)
                         {
                             var qtyValidation=(qtyValidationMain) + qtyValidationSubAccounts * (children.Count() - 1);
                             if (cnt[0] + item.Quantity > qtyValidation)
                             {
-                                throw new Exception($"Limite en cantidad de Compras. La cuenta principal con sus asociados superan las {qtyValidation} unidades. " +
-                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades y " +
-                                    $"cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
+                                throw new Exception($"Haz comprado más de lo permitido, por favor ajusta las cantidades para poder finalizar tu pedido. " +
+                                    $"La cuenta principal con sus asociados superan las {qtyValidation} unidades. " +
+                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades " +
+                                    $"y cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
                             }
                             else
                             {
@@ -2017,13 +2019,15 @@ namespace Nop.Web.Controllers
                                 {
                                     if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
                                     {
-                                        throw new Exception($"Limite en cantidad de Compras. Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades y quiere comprar {item.Quantity}. " +
+                                        throw new Exception($"Haz llegado al límite de compra de este producto. " +
+                                            $"Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades " +
+                                            $"y quiere comprar {item.Quantity}. " +
                                             $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
                                     }
                                     else
                                     {
-                                        throw new Exception($"Limite en cantidad de Compras. Tu asociado {addr.FirstName} ya compró {cnt[1]} unidades y quiere comprar {item.Quantity}. " +
-                                            $"Recuerda que cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
+                                        throw new Exception($"El límite de unidades por subcuenta es de 1 unidad. " +
+                                            $"Si {addr.FirstName} quiere comprar más, dile que se registre!"); 
                                     }
                                 }
                             }

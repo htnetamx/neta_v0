@@ -23,7 +23,7 @@ namespace Nop.Services.Stores
         /// A task that represents the asynchronous operation
         /// The task result contains the stores
         /// </returns>
-        Task<IList<Store>> GetAllStoresAsync();
+        Task<IList<Store>> GetAllStoresAsync(string nameFilter = null);
 
         /// <summary>
         /// Gets a store 

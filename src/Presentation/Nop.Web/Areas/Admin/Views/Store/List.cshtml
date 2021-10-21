@@ -21,46 +21,74 @@
 </div>
 
 <section class="content">
-    <div class="container-fluid">
-    <div class="form-horizontal">
-        <div class="cards-group">
-            <div class="card card-default">
-                <div class="card-body">
-                    <nop-doc-reference asp-string-resource="@T("Admin.Documentation.Reference.MultiStore", Docs.MultiStore + Utm.OnAdmin)" />
-
-                    @await Html.PartialAsync("Table", new DataTablesModel
-                    {
-                        Name = "stores-grid",
-                        UrlRead = new DataUrl("List", "Store", null),
-                        Length = Model.PageSize,
-                        LengthMenu = Model.AvailablePageSizes,
-                        ColumnCollection = new List<ColumnProperty>
-                        {
-                            new ColumnProperty(nameof(StoreModel.Name))
-                            {
-                                Title = T("Admin.Configuration.Stores.Fields.Name").Text
-                            },
-                            new ColumnProperty(nameof(StoreModel.Url))
-                            {
-                                Title = T("Admin.Configuration.Stores.Fields.Url").Text
-                            },
-                            new ColumnProperty(nameof(StoreModel.DisplayOrder))
-                            {
-                                Title = T("Admin.Configuration.Stores.Fields.DisplayOrder").Text,
-                                ClassName =  NopColumnClassDefaults.CenterAll
-                            },
-                            new ColumnProperty(nameof(StoreModel.Id))
-                            {
-                                Title = T("Admin.Common.Edit").Text,
-                                Width = "100",
-                                ClassName =  NopColumnClassDefaults.Button,
-                                Render = new RenderButtonEdit(new DataUrl("Edit"))
-                            }
-                        }
-                    })
+    <div class="row">
+        <div class="col-md-9">
+            <div class="form-group row">
+                <div class="col-md-1" style="align-items: center;align-content: center;display: flex;">
+                    <label for="SearchName">Tienda:</label>
+                </div>
+                <div class="col-md-4" style="align-items: center;align-content: center;display: flex;">
+                    <input type="text" id="SearchName" name="SearchName" style="width: 100%" />
+                </div>
+                <div class="col-md-4">
+                    <button type="button" id="search-stores" class="btn btn-primary btn-search" style="margin-top:0px;">
+                        <i class="fas fa-search"></i>
+                        @T("Admin.Common.Search")
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    <br />
+    <div class="container-fluid">
+        <div class="form-horizontal">
+            <div class="cards-group">
+                <div class="card card-default">
+                    <div class="card-body">
+                        <nop-doc-reference asp-string-resource="@T("Admin.Documentation.Reference.MultiStore", Docs.MultiStore + Utm.OnAdmin)" />
+
+                        @{
+                            var gridModel = new DataTablesModel
+                            {
+                                Name = "stores-grid",
+                                UrlRead = new DataUrl("StoreList", "Store", null),
+                                SearchButtonId = "search-stores",
+                                Length = Model.PageSize,
+                                LengthMenu = Model.AvailablePageSizes,
+                                Filters = new List<FilterParameter>
+                                    {
+                                    new FilterParameter(nameof(Model.SearchName))
+                                    }
+                            };
+
+                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(StoreModel.Name))
+                            {
+                                Title = T("Admin.Configuration.Stores.Fields.Name").Text
+                            });
+
+                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(StoreModel.Url))
+                            {
+                                Title = T("Admin.Configuration.Stores.Fields.Url").Text
+                            });
+
+                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(StoreModel.DisplayOrder))
+                            {
+                                Title = T("Admin.Configuration.Stores.Fields.DisplayOrder").Text,
+                                ClassName = NopColumnClassDefaults.CenterAll
+                            });
+
+                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(StoreModel.Id))
+                            {
+                                Title = T("Admin.Common.Edit").Text,
+                                Width = "100",
+                                ClassName = NopColumnClassDefaults.Button,
+                                Render = new RenderButtonEdit(new DataUrl("Edit"))
+                            });
+                        }
+                        @await Html.PartialAsync("Table", gridModel)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Nop.Core.Domain.Stores;
 using Nop.Services.Localization;
@@ -75,7 +76,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(searchModel));
 
             //get stores
-            var stores = (await _storeService.GetAllStoresAsync()).ToPagedList(searchModel);
+            var stores = (await _storeService.GetAllStoresAsync(searchModel.SearchName)).ToPagedList(searchModel);
 
             //prepare list model
             var model = new StoreListModel().PrepareToGrid(searchModel, stores, () =>

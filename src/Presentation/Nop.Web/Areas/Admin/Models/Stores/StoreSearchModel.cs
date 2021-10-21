@@ -1,4 +1,6 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Stores
 {
@@ -7,5 +9,6 @@ namespace Nop.Web.Areas.Admin.Models.Stores
     /// </summary>
     public partial record StoreSearchModel : BaseSearchModel
     {
+        public string SearchName { get; set; }
     }
 }
