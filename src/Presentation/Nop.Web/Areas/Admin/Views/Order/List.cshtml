@@ -354,12 +354,14 @@
                                     Title = T("Admin.Orders.Fields.Customer").Text,
                                     Render = new RenderLink(new DataUrl("~/Admin/Customer/Edit", nameof(OrderModel.CustomerId)))
                                 });
+
                                 gridModel.ColumnCollection.Add(new ColumnProperty(nameof(OrderModel.StoreName))
                                 {
                                     Title = T("Admin.Orders.Fields.Store").Text,
                                     Width = "100",
                                     Visible = (await storeService.GetAllStoresAsync()).Count > 1
                                 });
+
                                 gridModel.ColumnCollection.Add(new ColumnProperty(nameof(OrderModel.CreatedOn))
                                 {
                                     Title = T("Admin.Orders.Fields.CreatedOn").Text,
@@ -421,7 +423,7 @@
                                 var postData = {
                                     StartDate: $('#@Html.IdFor(model => model.StartDate)').val(),
                                     EndDate: $('#@Html.IdFor(model => model.EndDate)').val(),
-                                    .: $('#@Html.IdFor(model => model.OrderStatusIds)').val(),
+                                    OrderStatusIds: $('#@Html.IdFor(model => model.OrderStatusIds)').val(),
                                     PaymentStatusIds: $('#@Html.IdFor(model => model.PaymentStatusIds)').val(),
                                     ShippingStatusIds: $('#@Html.IdFor(model => model.ShippingStatusIds)').val(),
                                     StoreId: $('#@Html.IdFor(model => model.StoreId)').val(),
