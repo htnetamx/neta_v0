@@ -5,7 +5,8 @@
         <div class="billing-info-wrap">
             <div class="billing-info">
                 <div class="title">
-                    <strong>@T("Order.BillingAddress.Name")</strong>
+                    @*<strong>@T("Order.BillingAddress.Name")</strong>*@
+                    <strong>Este pedido es para:</strong>
                 </div>
                 <ul class="info-list">
                     <li class="name">
@@ -37,7 +38,8 @@
             </div>
             <div class="payment-method-info">
                 <div class="title">
-                    <strong>@T("Order.BillingAddress")</strong>
+                    @*<strong>@T("Order.BillingAddress")</strong>*@
+                    <strong>Tu pedido llegará a:</strong>
                 </div>
                 <ul class="info-list">
                     @if (Model.BillingAddress.CompanyEnabled && !string.IsNullOrEmpty(Model.BillingAddress.Company))

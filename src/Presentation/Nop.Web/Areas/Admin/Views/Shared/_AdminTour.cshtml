@@ -17,7 +17,15 @@
         {
             case TourStep.GeneralSettings:
                 Html.AddScriptParts("~/js/admintour/admin.tour.generalsettings.js");
-                entityId = (await storeService.GetAllStoresAsync()).FirstOrDefault()?.Id ?? 0;
+
+                try
+                {
+                    entityId = (await storeService.GetAllStoresAsync()).FirstOrDefault()?.Id ?? 0;
+                }
+                catch (Exception)
+                {
+                    entityId = 0;
+                }
 
                 <script>
                     var localized_data = {
