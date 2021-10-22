@@ -4,7 +4,15 @@
 @inject IStoreService storeService
 
 @{
-    var stores = await storeService.GetAllStoresAsync();
+    var stores = new List<Nop.Core.Domain.Stores.Store>();
+    try
+    {
+        stores = (await storeService.GetAllStoresAsync()).ToList();
+    }
+    catch (Exception)
+    {
+
+    }
 
     //page title
     ViewBag.PageTitle = T("Admin.Promotions.newsLetterSubscriptions").Text;

@@ -3,7 +3,15 @@
 @inject IStoreService storeService
 @using Nop.Services.Stores
 @{
-    var stores = await storeService.GetAllStoresAsync();
+    var stores = new List<Nop.Core.Domain.Stores.Store>();
+    try
+    {
+        stores = (await storeService.GetAllStoresAsync()).ToList();
+    }
+    catch (Exception)
+    {
+
+    }
 }
 <script>
     $(document).ready(function() {

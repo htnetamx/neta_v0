@@ -16,6 +16,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <!--When true, compiles and emits the Razor assembly as part of publishing the project-->
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <MvcBuildViews>false</MvcBuildViews>
   </PropertyGroup>
 
   <ItemGroup>

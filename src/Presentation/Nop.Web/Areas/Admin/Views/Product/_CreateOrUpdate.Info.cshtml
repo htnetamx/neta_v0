@@ -6,8 +6,15 @@
 @using Nop.Services
 @using Nop.Services.Stores
 
-@{
-    var stores = await storeService.GetAllStoresAsync();
+@{            
+    var stores = new List<Nop.Core.Domain.Stores.Store>();
+    try
+    {
+        stores = (await storeService.GetAllStoresAsync()).ToList();
+    } catch(Exception)
+    {
+
+    }
 
     //resources for product tags input
     Html.AppendCssFileParts("~/lib_npm/jquery-tageditor/jquery.tag-editor.css");

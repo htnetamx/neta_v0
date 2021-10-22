@@ -181,7 +181,7 @@
                         @*<div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>*@
                         <div asp-validation-summary="ModelOnly" class="message-error"></div>
                         <div class="title">
-                            <strong>Necesitamos tu datos</strong>
+                            <strong>Necesitamos tus datos para que tu tiendita pueda reconocerte</strong>
                         </div>
                         <div class="form-fields">
                             @if (Model.UsernamesEnabled)
@@ -251,7 +251,7 @@
                             }
                         </div>
                         <div class="buttons button-fix">
-                            <button id="btnCodeVerif" type="button" class="button-1 login-button btn-black">Enviar código a Whatsapp</button>
+                            <button id="btnCodeVerif" type="button" class="button-1 login-button btn-black">Enviar código</button>
                             @if (!userAgentHelper.IsMobileDevice())
                             {
                                 <button id="btnLogin" style="display: none" type="submit" class="button-1 login-button">@T("Account.Login.LoginButton")</button>
