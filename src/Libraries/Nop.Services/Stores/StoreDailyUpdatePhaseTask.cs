@@ -34,54 +34,50 @@ namespace Nop.Services.Stores
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            //Define at what time we want his to be running, for testing <5 BEFORE 5 AM
-            if (DateTime.UtcNow.Hour < 5)
-                return;
-
             var stores = (await _storeService.GetAllStoresAsync())
-                .Where(s => s.DisplayOrder != 3);
+                .Where(s => s.DisplayOrder > 0);
 
             foreach (var store in stores)
             {
                 var orderExists = (await _orderService.GetOrdersByStoreIdsAsync(store.Id)).Any();
                 if (orderExists)
                 {
-                    if (store.DisplayOrder == 1)
+                    //Make sure old phase 3 values are updated to new phase 2 (growth phase)
+                    if (store.DisplayOrder == 3)
                         store.DisplayOrder = 2;
-                    else if (store.DisplayOrder == 2)
-                        store.DisplayOrder = 3;
 
-                    //at this point there is no store with phase 1, and at least one order exists in the store. Evaluate if phase 2 can move up to phase 3
+                    //All stores are in the new phase scheme now
+                    //At least one order exists in the store.
+                    //Evaluate if phase 1 (initial) stores can move up to phase 2 (growth)
 
-                    //CONDITIONS
+                    //CONDITIONS to move from display order 1 (Initial Phase) to 2 (Growth Phase)
                     // case1 : 7 days after first order or 
                     // case2 : 500 GMV, 5 distinct customers
 
-                    var firstOrderDate = (await _orderService.GetOrdersByStoreIdsAsync(store.Id)).Select(x  =>x.CreatedOnUtc).Min();
+                   var ordersFromStore = (await _orderService.GetOrdersByStoreIdsAsync(store.Id));
+                   var firstOrderDate = ordersFromStore.Select(x => x.CreatedOnUtc).Min();
 
-                    //evaluate if there are 5 distinct clients
-                    var disntinctCustomers = (await _orderService.GetOrdersByStoreIdsAsync(store.Id)).Select(x => x.CustomerId).Distinct();
+                    ////evaluate if there are 5 distinct clients
+                    var disntinctCustomers = ordersFromStore.Select(x => x.CustomerId).Distinct();
                     var disntinctCustomersCounter = disntinctCustomers.Count();
 
-                    //SUM of order total value (all)
-                    var orderValueGMV = (await _orderService.GetOrdersByStoreIdsAsync(store.Id)).Select(x => x.OrderTotal).Sum();
+                    ////SUM of order total value (all)
+                    var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
 
                     //Case1
-                    if (store.DisplayOrder == 2 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6  )
+                    if (store.DisplayOrder == 1 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
                     {
-                        store.DisplayOrder = 3;
+                        store.DisplayOrder = 2;
                     }
-                    
-                    //Case2
-                    else if (store.DisplayOrder == 2 && disntinctCustomersCounter > 5 && orderValueGMV > 400)
+
+                    ////Case2 500 GMV, 5 distinct customers
+                    else if (store.DisplayOrder == 1 && disntinctCustomersCounter > 5 && orderValueGMV > 500)
                     {
-                        store.DisplayOrder = 3;
-                    }                    
+                        store.DisplayOrder = 2;
+                    }
                     await _storeService.UpdateStoreAsync(store);
                 }
             }
-
-            //Update database?
         }
 
         #endregion
