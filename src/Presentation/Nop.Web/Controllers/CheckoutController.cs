@@ -1994,7 +1994,7 @@ namespace Nop.Web.Controllers
                     var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
                     foreach (var item in cart)
                     {
-                        qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
+                        if(store.DisplayOrder==2) qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
                         var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
                         if(cnt != null)
                         {
@@ -2020,7 +2020,7 @@ namespace Nop.Web.Controllers
                                     }
                                     else
                                     {
-                                        throw new Exception($"El límite de unidades por subcuenta es de 1 unidad. " +
+                                        throw new Exception($"El límite de unidades por subcuenta es de {qtyValidation} unidades. " +
                                             $"Si {addr.FirstName} quiere comprar más, dile que se registre!"); 
                                     }
                                 }
