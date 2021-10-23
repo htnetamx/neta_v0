@@ -73,16 +73,16 @@ namespace Nop.Web.Components
             var fase = await _storeContext.GetCurrentStoreAsync();
             if (fase.DisplayOrder == 1)
             {
-                products = products.Where(v => v.Sku.EndsWith("F1")).ToList();
+                products = products.Where(v => v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1")).ToList();
             }
             else if (fase.DisplayOrder == 2)
             {
-                products = products.Where(v => v.Sku.EndsWith("F2")).ToList();
+                products = products.Where(v => !(v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1"))).ToList();
             }
-            else
-            {
-                products = products.Where(v => !(v.Sku.EndsWith("F1") || v.Sku.EndsWith("F2"))).ToList();
-            }
+            //else
+            //{
+            //    products = products.Where(v => !(v.Sku.EndsWith("F1") || v.Sku.EndsWith("F2"))).ToList();
+            //}
 
             if (!products.Any())
                 return Content("");
@@ -187,7 +187,7 @@ namespace Nop.Web.Components
             command.OrderBy = Convert.ToInt32(orderBy);
 
             var modelList = (await _productModelFactory.PrepareProductOverviewModelsAsync1(products, true, true, productThumbPictureSize, discounts: discProducts,command: command));
-            model.CatalogProductsModel.Products = (await _productModelFactory.PrepareProductOverviewModelsAsync(modelList)).ToList();
+            model.CatalogProductsModel.Products = (await _productModelFactory.PrepareProductOverviewModelsAsync(modelList.Where(v => !v.MarkAsNew))).ToList();
 
             var modelList1 = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true, productThumbPictureSize, discounts: discProducts));
             model.CatalogProductsModel.Promos = modelList1.Where(v => v.MarkAsNew).ToList();

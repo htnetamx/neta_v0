@@ -10,7 +10,7 @@
             <div class="stock">
                 <span class="value">@Model.CurrentStoreName</span>
             </div>
-            @if ((Model.AvailableEndDate ?? DateTime.MinValue) > DateTime.UtcNow)
+            @if ((Model.AvailableStartDate ?? DateTime.MinValue) < DateTime.UtcNow && (Model.AvailableEndDate ?? DateTime.MinValue) > DateTime.UtcNow)
             {
                 <div id="counterCtrl-@Model.Id">
                     <div class="stock">

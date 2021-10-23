@@ -1244,6 +1244,7 @@ namespace Nop.Web.Factories
                         StockAvailability = await _productService.FormatStockMessageAsync(product, string.Empty),
                         HasSampleDownload = product.IsDownload && product.HasSampleDownload,
                         DisplayDiscontinuedMessage = !product.Published && _catalogSettings.DisplayDiscontinuedMessageForUnpublishedProducts,
+                        AvailableStartDate = product.AvailableStartDateTimeUtc,
                         AvailableEndDate = product.AvailableEndDateTimeUtc,
                         VisibleIndividually = product.VisibleIndividually,
                         StockQuantity = product.MaxNumberOfDownloads, //product.StockQuantity,
