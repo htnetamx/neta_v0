@@ -64,14 +64,15 @@ namespace Nop.Services.Stores
                     ////SUM of order total value (all)
                     var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
 
-                    //Case1
-                    if (store.DisplayOrder == 1 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
+                    ////Case1 500 GMV, 5 distinct customers
+                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 5 && orderValueGMV > 500)
                     {
                         store.DisplayOrder = 2;
+                        store.NetaCoin = 100;
                     }
 
-                    ////Case2 500 GMV, 5 distinct customers
-                    else if (store.DisplayOrder == 1 && disntinctCustomersCounter > 5 && orderValueGMV > 500)
+                    //Case2
+                    else if (store.DisplayOrder == 1 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
                     {
                         store.DisplayOrder = 2;
                     }
