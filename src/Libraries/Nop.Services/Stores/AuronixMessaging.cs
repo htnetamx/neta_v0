@@ -76,7 +76,7 @@ namespace Nop.Services.Stores
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2",
                         info.Url,
                         info.Name,
-                        prodList + " *y muchas promos más!!*");
+                        prodList + " y muchas promos más!!");
                 }
             }
         }
