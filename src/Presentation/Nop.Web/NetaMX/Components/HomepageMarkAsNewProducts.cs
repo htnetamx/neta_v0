@@ -50,8 +50,8 @@ namespace Nop.Web.Components
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task<IViewComponentResult> InvokeAsync(int? productThumbPictureSize)
         {
-            var currentUser = (await _workContext.GetCurrentCustomerAsync()).Username;
-            bool isLoggedIn = string.IsNullOrWhiteSpace(currentUser) ? false : (currentUser == "admin@neta.mx" || currentUser == "admin@yourstore.com");
+            //var currentUser = (await _workContext.GetCurrentCustomerAsync()).Username;
+            //bool isLoggedIn = string.IsNullOrWhiteSpace(currentUser) ? false : (currentUser == "admin@neta.mx" || currentUser == "admin@yourstore.com");
 
             var products = await (await _productService.GetAllProductsDisplayedOnHomepageWithMarkAsNewAsync())
             //ACL and store mapping
@@ -62,22 +62,18 @@ namespace Nop.Web.Components
             .Where(p => p.VisibleIndividually).ToListAsync();
 
             //availability dates
-            products = products.Where(p => isLoggedIn || _productService.ProductIsAvailable(p)).ToList();
+            //products = products.Where(p => isLoggedIn || _productService.ProductIsAvailable(p)).ToList();
 
             var fase = await _storeContext.GetCurrentStoreAsync();
             if (fase.DisplayOrder == 1)
             {
-                products = products.Where(v => v.Sku.EndsWith("F1")).ToList();
+                products = products.Where(v => v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1")).ToList();
             }
             else if (fase.DisplayOrder == 2)
             {
-                products = products.Where(v => v.Sku.EndsWith("F2")).ToList();
+                products = products.Where(v => !(v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1"))).ToList();
             }
-            else
-            {
-                products = products.Where(v => !(v.Sku.EndsWith("F1") || v.Sku.EndsWith("F2"))).ToList();
-            }
-
+            
             if (!products.Any())
                 return Content("");
 
