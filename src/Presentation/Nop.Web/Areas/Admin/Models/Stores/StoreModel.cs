@@ -57,7 +57,9 @@ namespace Nop.Web.Areas.Admin.Models.Stores
         public string Longitud { get; set; }
         [DisplayName("Latitud")]
         public string Latitud { get; set; }
-     
+        [DisplayName("ZipCode")]
+        public string ZipCode { get; set; }
+
         [NopResourceDisplayName("Admin.Configuration.Stores.Fields.CompanyVat")]
         public string CompanyVat { get; set; }
 

@@ -77,5 +77,10 @@ namespace Nop.Core.Domain.Stores
         /// Gets or sets the date and time of order creation
         /// </summary>
         public DateTime CreatedOnUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the zipcode
+        /// </summary>
+        public string ZipCode { get; set; }
     }
 }
