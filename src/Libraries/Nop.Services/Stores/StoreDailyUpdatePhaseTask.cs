@@ -64,8 +64,8 @@ namespace Nop.Services.Stores
                     ////SUM of order total value (all)
                     var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
 
-                    ////Case1 500 GMV, 5 distinct customers
-                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 5 && orderValueGMV > 500)
+                    ////Case1 500 GMV, 8 distinct customers
+                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 8 && orderValueGMV > 500)
                     {
                         store.DisplayOrder = 2;
                         store.NetaCoin = 100;
