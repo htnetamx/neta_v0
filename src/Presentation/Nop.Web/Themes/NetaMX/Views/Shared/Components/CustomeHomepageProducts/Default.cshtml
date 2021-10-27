@@ -1,0 +1,53 @@
+﻿@model IList<ProductOverviewModel>
+@if (Model.Count > 0)
+{
+    <div class="product-grid home-page-product-grid">
+        <div style="text-align: left; margin-bottom: 15px">
+            <p style="margin: 0px; font: bold 18px Roboto; line-height: 25.2px;color: #212121">@T("Homepage.Products")</p>
+        </div>
+        <div id="HomePage_Product" class="item-grid">
+            @await Html.PartialAsync("_HomePageProduct", Model)
+        </div>
+    </div>
+    <div>
+        <img src="~/icons/icons_0/product-loader.gif" id="loading" style="display: none; padding-left: 50%;" />
+    </div>    
+    <div id="Pagination_Buttons">
+        <input type="hidden" id="hidPageNumber" value="1" />
+        <div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; border-top-width: 1px; border-top-color: black; border-top-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh;flex-direction:column;align-items: center;margin-top: 3vh">
+            <button id="More_Products" style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw; width: 40vw" onclick=LoadMoreHomePageProduct()>Haz click para ver más productos!</button>
+        </div>
+    </div>
+
+    <script asp-location="Footer">
+            function LoadMoreHomePageProduct() {
+                var postData = {
+                    pageIndex: $("#hidPageNumber").val()
+                };
+
+                addAntiForgeryToken(postData);
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("LoadMoreProductOnHomePage", "CustomProduct"))",
+                    data: postData,
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#loading").show();
+                    },
+                    success: function (response) {
+                        $("#HomePage_Product").append(response.html);
+                        $("#hidPageNumber").val(response.pageNumber)
+
+                    },
+                    failure: function (response) {
+                        alert(response);
+                    },
+                    complete: function () {
+                        $("#loading").hide();
+                    },
+                });
+            }
+    </script>
+
+}

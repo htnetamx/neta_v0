@@ -1,0 +1,8 @@
+﻿@model IList<ProductOverviewModel>
+
+@foreach (var item in Model)
+{
+    <div class="item-box" style="margin-left: 0px; margin-right: 0px;">
+        @await Html.PartialAsync("_ProductBoxHomePage", item)
+    </div>
+}
