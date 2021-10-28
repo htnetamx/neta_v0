@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain;
+using Nop.Core.Domain.Orders;
 using Nop.Services.Catalog;
+using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Web.Factories;
@@ -20,6 +23,9 @@ namespace Nop.Web.Controllers
         private readonly IStoreMappingService _storeMappingService;
         private readonly IStoreContext _storeContext;
         private readonly CustomeSetting _customeSetting;
+
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IWorkContext _workContext;
         #endregion
 
         #region Ctor
@@ -28,7 +34,9 @@ namespace Nop.Web.Controllers
             IProductService productService,
             IStoreMappingService storeMappingService,
             IStoreContext storeContext,
-            CustomeSetting customeSetting)
+            CustomeSetting customeSetting,
+            IShoppingCartService shoppingCartService,
+            IWorkContext workContext)
         {
             _aclService = aclService;
             _productModelFactory = productModelFactory;
@@ -36,6 +44,9 @@ namespace Nop.Web.Controllers
             _storeMappingService = storeMappingService;
             _storeContext = storeContext;
             _customeSetting = customeSetting;
+            _shoppingCartService = shoppingCartService;
+            _workContext = workContext;
+
         }
         #endregion
 
@@ -59,6 +70,23 @@ namespace Nop.Web.Controllers
                 html = await RenderPartialViewToStringAsync("_HomePageProduct", model),
                 pageNumber = pageIndex
             });
+        }
+
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
+        public virtual async Task<IActionResult> GetTotalSaving()
+        {
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
+            var totalSaving = decimal.Zero;
+            foreach (var sci in cart)
+            {
+                var product = await _productService.GetProductByIdAsync(sci.ProductId);
+                var productSaving = (product.OldPrice - product.Price) * sci.Quantity;
+                totalSaving += productSaving;
+                totalSaving = Math.Round(totalSaving, 2);
+            }
+
+            return Json(new { totalSaving = totalSaving });
         }
         #endregion
     }

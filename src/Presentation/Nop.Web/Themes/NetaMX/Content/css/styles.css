@@ -157,6 +157,7 @@ label, label + * {
   z-index: 0;
   width: 90%;
   margin: 0 auto;
+  top:160px !important;
 }
 
 .master-column-wrapper {
@@ -1501,7 +1502,7 @@ label, label + * {
 
 
 .breadcrumb {
-  margin: 0 0 50px;
+  margin: 20px 0 50px;
   background-color: #f6f6f6;
   padding: 5px 10px;
 }
@@ -4679,6 +4680,7 @@ label, label + * {
 
 .checkout-page .cart-footer {
   border-top: none;
+  margin-top:30px;
 }
 
 .checkout-page .total-info {
@@ -6582,6 +6584,13 @@ pre {
 .term-popup{position:fixed;left:0;top:0;width:100%;height:100%;background:#fff;z-index:101010;overflow:auto;display:none;}
 .term-popup.active{display:block;}
 #tandc{left:25%;right:25%;top:25%;}
+.customer-saving {
+    text-align: center;
+    color: #000;
+    background: #d6ebdacc !important;
+    padding: 10px 0;
+}
+.cart-total .customer-saving{border-radius:10px;}
 
 @media all and (max-width: 769px)
 {
@@ -8251,7 +8260,7 @@ pre {
 
 
   .breadcrumb {
-    margin: 0 0 20px;
+    margin: 20px 0 20px;
   }
 
   .item-box .buttons {

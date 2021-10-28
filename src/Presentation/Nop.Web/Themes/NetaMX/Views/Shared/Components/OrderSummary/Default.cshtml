@@ -384,6 +384,7 @@
             </div>
             <div class="cart-footer">
                 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
+                
                 @if (Model.IsEditable)
                 {
                     <div class="cart-collaterals">
