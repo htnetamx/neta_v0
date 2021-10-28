@@ -26,7 +26,7 @@ var AjaxCart = {
     },
 
     //add a product to the cart/wishlist from the catalog pages
-    addproducttocart_catalog: function (urladd,sender_element) {
+    addproducttocart_catalog: function (urladd, sender_element) {
         if (this.loadWaiting !== false) {
             return;
         }
@@ -79,9 +79,10 @@ var AjaxCart = {
     },
 
     success_process: function (response) {
+        GetSavingTotal();
         if (response.updatetopcartsectionhtml) {
-          $("#CartProductQuantity").load(" #CartProductQuantity");
-          $("#CartTotalValue").load(" #CartTotalValue");
+            $("#CartProductQuantity").load(" #CartProductQuantity");
+            $("#CartTotalValue").load(" #CartTotalValue");
         }
         if (response.updatetopwishlistsectionhtml) {
             $(AjaxCart.topwishlistselector).html(response.updatetopwishlistsectionhtml);
@@ -131,3 +132,4 @@ var AjaxCart = {
         alert(this.localized_data.AjaxCartFailure);
     }
 };
+
