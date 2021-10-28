@@ -14,6 +14,14 @@
 <div class="total-info">
     <table class="cart-total">
         <tbody>
+            <tr>
+                <td colspan="2">@T("Cart.Footer.OrderTotal")</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @await Component.InvokeAsync("CustomerSaving")
+                </td>
+            </tr>
             <tr class="order-subtotal">
                 <td class="cart-total-left">
                     <label>@T("ShoppingCart.Totals.SubTotal"):</label>

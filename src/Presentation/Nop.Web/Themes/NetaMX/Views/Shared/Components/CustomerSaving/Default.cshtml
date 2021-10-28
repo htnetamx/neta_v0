@@ -1,0 +1,28 @@
+﻿@model decimal
+@{
+    var resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model + "</b>");
+}
+<div class="customer-saving">
+    <span>@Html.Raw(resource)</span>
+</div>
+
+<script>
+    function GetSavingTotal() {
+        var postData = {};
+        addAntiForgeryToken(postData);
+        $.ajax({
+            cache: false,
+            type: "POST",
+            data: postData,
+            url: "@(Url.Action("GetTotalSaving", "CustomProduct"))",
+            dataType: 'json',
+            success: function (response) {
+                $("#customer-saving").text("$" + response.totalSaving);
+
+            },
+            failure: function (response) {
+
+            }
+        });
+    };
+</script>
