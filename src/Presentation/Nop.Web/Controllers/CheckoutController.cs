@@ -1969,13 +1969,13 @@ namespace Nop.Web.Controllers
                     case 1:
                         qtyValidationMain = 2;
                         qtyValidationSubAccounts = 2;
-                        validQty = true;
+                        validQty = false;
                         break;
 
                     case 2:
                         qtyValidationMain = 10;
                         qtyValidationSubAccounts = 1;
-                        validQty = true;
+                        validQty = false;
                         break;
 
                     default:
