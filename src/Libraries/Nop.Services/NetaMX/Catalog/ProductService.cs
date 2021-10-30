@@ -56,7 +56,7 @@ namespace Nop.Services.Catalog
             {
                 productsQuery = productsQuery.Where(v => !(v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1")));
             }
-
+            pageSize = 20;
             return await productsQuery.ToPagedListAsync(pageIndex, pageSize);
 
         }
