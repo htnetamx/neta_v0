@@ -47,6 +47,7 @@ namespace Nop.Web.Models.Catalog
         public partial record ProductPriceModel : BaseNopModel
         {
             public string OldPrice { get; set; }
+            public string TotalSavingOnProduct { get; set; }
             public string Price { get; set; }
             public decimal PriceValue { get; set; }
             /// <summary>

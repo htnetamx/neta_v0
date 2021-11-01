@@ -2,8 +2,8 @@
 @if (Model.Count > 0)
 {
     <div class="product-grid home-page-product-grid">
-        <div style="text-align: left; margin-bottom: 15px">
-            <p style="margin: 0px; font: bold 18px Roboto; line-height: 25.2px;color: #212121">Nuestra oferta de precios bajos!</p>
+        <div class="prd-title">
+            <h2>Nuestra oferta de precios bajos!</h2>
         </div>
         <div id="HomePage_Product" class="item-grid">
             @await Html.PartialAsync("_HomePageProduct", Model)
