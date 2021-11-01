@@ -513,7 +513,7 @@ namespace Nop.Web.Controllers
         [HttpPost]
         [IgnoreAntiforgeryToken]
         public virtual async Task<IActionResult> AddProductToCart_Catalog(int productId, int shoppingCartTypeId,
-            int quantity, bool forceredirection = false)
+            int quantity, bool forceredirection = false,bool isMinusQty = false)
         {
             var cartType = (ShoppingCartType)shoppingCartTypeId;
 
@@ -536,14 +536,17 @@ namespace Nop.Web.Controllers
             }
 
             //products with "minimum order quantity" more than a specified qty
-            if (product.OrderMinimumQuantity > quantity)
+            if (!isMinusQty)
             {
-                //we cannot add to the cart such products from category pages
-                //it can confuse customers. That's why we redirect customers to the product details page
-                return Json(new
+                if (product.OrderMinimumQuantity > quantity)
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
-                });
+                    //we cannot add to the cart such products from category pages
+                    //it can confuse customers. That's why we redirect customers to the product details page
+                    return Json(new
+                    {
+                        redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
+                    });
+                }
             }
 
             if (product.CustomerEntersPrice)
@@ -628,7 +631,8 @@ namespace Nop.Web.Controllers
                 shoppingCartType: cartType,
                 storeId: (await _storeContext.GetCurrentStoreAsync()).Id,
                 attributesXml: attXml,
-                quantity: quantity);
+                quantity: quantity,
+                isMinusQty:isMinusQty);
             if (addToCartWarnings.Any())
             {
                 //cannot be added to the cart

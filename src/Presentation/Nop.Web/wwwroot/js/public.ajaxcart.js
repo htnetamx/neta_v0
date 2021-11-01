@@ -80,6 +80,7 @@ var AjaxCart = {
 
     success_process: function (response) {
         GetSavingTotal();
+
         if (response.updatetopcartsectionhtml) {
             $("#CartProductQuantity").load(" #CartProductQuantity");
             $("#CartTotalValue").load(" #CartTotalValue");
