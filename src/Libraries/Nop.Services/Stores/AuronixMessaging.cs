@@ -40,16 +40,18 @@ namespace Nop.Services.Stores
 
             var stores = await _storeService.GetAllStoresAsync();
             var fase1 = stores.Where(s => s.DisplayOrder == 1);
+
+            var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == fase1.First().Id);
+            var products = (await _productService.GetAllProductsAsync()).Where(v =>
+            prodMap.Any(x => x.EntityId == v.Id) && v.Sku.EndsWith("LH") && 
+                DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc &&
+                DateTime.UtcNow <= v.MarkAsNewEndDateTimeUtc).OrderByDescending(v => v.OldPrice - v.Price).ToList();
+
+            var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
             foreach (var info in fase1)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
-                    var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == info.Id);
-                    var products = (await _productService.GetAllProductsAsync()).Where(v =>
-                    prodMap.Any(x => x.EntityId == v.Id) && v.Sku.EndsWith("LH")).OrderByDescending(v => v.OldPrice - v.Price).Take(4);
-
-                    var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
-
                     var rta = await Send(info.CompanyPhoneNumber,
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:shop_promos_f1_v2",
                         products.First().Name,
@@ -62,16 +64,19 @@ namespace Nop.Services.Stores
             }
 
             var fase2 = stores.Where(s => s.DisplayOrder == 2);
+
+            prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == fase2.First().Id);
+            products = (await _productService.GetAllProductsAsync()).Where(v =>
+            prodMap.Any(x => x.EntityId == v.Id &&
+                DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc &&
+                DateTime.UtcNow <= v.MarkAsNewEndDateTimeUtc
+            && !(v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1")))).OrderByDescending(v => v.OldPrice - v.Price).Take(4).ToList();
+
+            prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
             foreach (var info in fase2)
             {
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
-                    var prodMap = (await _storeMapping.GetFullStoreMappingsAsync()).Where(v => v.StoreId == info.Id);
-                    var products = (await _productService.GetAllProductsAsync()).Where(v =>
-                    prodMap.Any(x => x.EntityId == v.Id && !(v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1")))).OrderByDescending(v => v.OldPrice - v.Price).Take(4);
-
-                    var prodList = string.Join(" /", products.Select(v => $"{v.Name} a ${v.Price.ToString("N2")} En otros lugares a ${v.OldPrice.ToString("N2")}").ToArray());
-
                     var rta = await Send(info.CompanyPhoneNumber,
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2",
                         info.Url,

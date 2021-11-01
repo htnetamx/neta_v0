@@ -9,7 +9,7 @@ using Nop.Services.Tasks;
 
 namespace Nop.Services.Stores
 {
-    public partial class StoreDailyUpdatePhaseTask : IScheduleTask
+    public partial class ControlSubaccounts : IScheduleTask
     {
         #region Fields
 

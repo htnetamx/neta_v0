@@ -28,6 +28,8 @@
 
     var children = service.GetRelatedAddressByIdAsync(phone).Result;
     var cnt = children.Count;
+    var maxSubaccounts = 2;
+
 
     if (string.IsNullOrWhiteSpace(name))
     {
@@ -90,20 +92,46 @@
                             Billing.newAddress(!$('#billing-address-select').val());
                         }
                     </script>
-                    @if (children.Count <= 5)
+                    @if (children.Count <= maxSubaccounts)
                     {
-                        <div class="new-btn">
-                            <a id="new-address-button" class="btn-link" onclick="Billing.resetBillingForm(); Billing.newAddress(true); return false;">agregar una cuenta</a>
-                        </div>
+                <div class="new-btn">
+                    <a id="new-address-button" class="btn-link" onclick="Billing.resetBillingForm(); Billing.newAddress(true); return false;">agregar una cuenta</a>
+                </div>
                     }
-                    <div class="buttons checkout-button-fix" id="billing-buttons-container">
-                        @*<button id="edit-address-button" type="button" class="button-1" onclick="Billing.editAddress('@(storeLocation)checkout/GetAddressById/'); return false;">@T("Common.Edit")</button>*@
+                <div class="buttons checkout-button-fix" id="billing-buttons-container">
+                    @*<button id="edit-address-button" type="button" class="button-1" onclick="Billing.editAddress('@(storeLocation)checkout/GetAddressById/'); return false;">@T("Common.Edit")</button>*@
 
-                        @*<button id="delete-address-button" type="button" class="button-1" onclick="Billing.deleteAddress('@(storeLocation)checkout/DeleteEditAddress/'); return false;">@T("Common.Delete")</button>*@
+                    @*<button id="delete-address-button" type="button" class="button-1" onclick="Billing.deleteAddress('@(storeLocation)checkout/DeleteEditAddress/'); return false;">@T("Common.Delete")</button>*@
 
-                        @*<button id="save-address-button" style="display: none" type="button" class="button-1" onclick="Billing.saveEditAddress('@(storeLocation)checkout/SaveEditAddress/'); return false;">@T("Common.Save")</button>*@
+                    @*<button id="save-address-button" style="display: none" type="button" class="button-1" onclick="Billing.saveEditAddress('@(storeLocation)checkout/SaveEditAddress/'); return false;">@T("Common.Save")</button>*@
+                    
+                    <button type="button" style="@cnt == 1 ? 'display: block' : 'display: none'" name="save" class="button-1 new-address-next-step-button btn-black" onclick="billingSaveWithValidation(@children.Count,@children[0].Id,@children[children.Count - 1].Id,'@(storeLocation)',@maxSubaccounts)"> @T("Common.Continue") </button>
+                    <script>
+                            function billingSaveWithValidation(childrenCount, firstChildId,lastChildId, storeLocation, maxSubaccounts) {
+                                var creatingScreen = document.getElementById('AddNewAddressback').style.display != 'none';
 
-                        <button type="button" style="@cnt == 1 ? 'display: block' : 'display: none'" name="save" class="button-1 new-address-next-step-button btn-black" onclick="Billing.save()">@T("Common.Continue")</button>
+                                if (creatingScreen) {
+                                    if (childrenCount >= maxSubaccounts + 1) {
+                                        //Case 1: Last Account is deleted and new one is created
+                                        //url=storeLocation+'checkout/DeleteEditAddress/'
+                                        //Billing.deleteAddress(url, lastChildId);
+                                        //Billing.save();
+
+                                        //Case 2: Don't Create new address
+                                        alert("Address not created");
+                                        //Throw error if necessary
+                                    }
+                                    else {
+                                        Billing.save();
+                                    }
+                                }
+                                else {
+                                    Billing.save(firstChildId);
+                                }
+                                
+                            }
+                    </script>
+
                         <span class="please-wait" id="billing-please-wait" style="display: none;">@T("Common.LoadingNextStep")</span>
                     </div>
                 </div>
@@ -242,14 +270,14 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpcContentAfter })
     </div>
     <script asp-location="Footer">
-       
+
         Accordion.init('checkout-steps', '.step-title', true);
         Accordion.openSection('#opc-billing');
         Checkout.init('@(storeLocation)cart/');
         if (Billing.disableBillingAddressCheckoutStep)
         {
             Accordion.hideSection('#opc-billing');
-            Billing.save();
+            billingSaveWithValidation(@children.Count,@children[children.Count - 1].Id,'@(storeLocation)',@maxSubaccounts)
         }
 
         function BacktoAddress() {
@@ -257,11 +285,12 @@
             $('#delete-address-button').show();
             $(".select-billing-address").show();
             $(".new-billing-address").hide();
-            @if (children.Count <= 5)
+            @*@if (children.Count <= 5)
             {
                 <text>$("#new-address-button").show();</text>
-            }
+            }*@
             Checkout.back();
+            window.location.reload();
         }
     </script>
 </div>

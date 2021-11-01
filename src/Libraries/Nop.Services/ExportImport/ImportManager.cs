@@ -1314,7 +1314,7 @@ namespace Nop.Services.ExportImport
                             product.Name = property.StringValue;
                             break;
                         case "PerTaras":
-                            product.PerTaras = property.IntValue;
+                            product.PerTaras = property.DecimalValue;
                             break;
                         case "ShortDescription":
                             product.ShortDescription = property.StringValue;
