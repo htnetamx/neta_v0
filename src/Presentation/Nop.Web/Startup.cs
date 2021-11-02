@@ -36,6 +36,7 @@ namespace Nop.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureApplicationServices(_configuration, _webHostEnvironment);
+            services.AddAuthentication(Microsoft.AspNetCore.Authentication.Certificate.CertificateAuthenticationDefaults.AuthenticationScheme).AddCertificate();
         }
 
         /// <summary>
@@ -44,6 +45,7 @@ namespace Nop.Web
         /// <param name="application">Builder for configuring an application's request pipeline</param>
         public void Configure(IApplicationBuilder application)
         {
+            application.UseAuthentication();
             application.UseMiddleware<NetaMiddleware>().ConfigureRequestPipeline();
             application.StartEngine();
         }
