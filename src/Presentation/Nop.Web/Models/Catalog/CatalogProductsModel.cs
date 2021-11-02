@@ -91,7 +91,7 @@ namespace Nop.Web.Models.Catalog
         public IList<ProductOverviewModel> Products { get; set; }
 
         public IList<ProductOverviewModel> Promos { get; set; }
-
+        public IList<ProductOverviewModel> PromoRayo { get; set; }
         public int MaxProducts { get; set; }
         public string MinimumProducts { get; set; }
         public string Increment { get; set; }

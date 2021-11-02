@@ -1,97 +1,19 @@
 ﻿@model Nop.Web.Models.Catalog.SearchModel
 @inject Nop.Core.IStoreContext storeContext
-@*<div style="border-bottom-width: 1px; border-bottom-color: black; border-bottom-style: solid; justify-content: space-around; display: flex; padding: 2vh 0 2vh 0; margin-bottom: 5vh">
-        <a style="background-color: #4ab2f1; color: white;border-radius: 15px;padding: 2vh 3vw; margin: 0 2vw" href="/newproducts">Haz click aqui para nuevos productos</a>
-        <a style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw " href="/curiosities">Haz click y descubre curiosidades neta</a>
-    </div>
 
-    @if (Model.CatalogProductsModel.Products.Count > 0)
-    {
-        var store = storeContext.GetCurrentStore();
-        ViewBag.RoyaltyMessage = null;
-        if (ViewBag.RoyaltyMessage != null)
-        {
-            if (store.Id == 49)
-            {
-                ViewBag.RoyaltyMessage = "2.5%";
-            }
-            else
-            {
-                ViewBag.RoyaltyMessage = "5%";
-            }
-            <div class="product-grid home-page-product-grid">
-                <div class="title">
-                    <strong>@ViewBag.RoyaltyMessage de descuento parejo para nuestros clientes los más neta!</strong>
-                </div>
-                <div class="item-grid">
-                    <h1>Sabías que … todos nuestros clientes que acumulan $300 pesos o mas de compras a la semana se ganan un @ViewBag.RoyaltyMessage de descuento adicional en su compra diaria? Se nuestro cliente más neta y gánate este descuento especial!</h1>
-                </div>
-            </div>
-        }
-        else
-        {
-            if (Model.CatalogProductsModel.Products.Where(v => v.MarkAsLoyalty).Any())
-            {
-                <div class="product-grid home-page-product-grid">
-                    <div class="title">
-                        <strong>Super promoción del día para nuestros clientes los más neta!</strong>
-                    </div>
-                    <h2>Acumula $300 pesos o mas de compras en la semana y entra a la super promo diaria! No te quedes sin este beneficio</h2>
-                    <h2>El electrolit coco suero está a $8 con tu código!</h2>
-                    <div class="item-grid">
-                        @foreach (var item in Model.CatalogProductsModel.Products.Where(v => v.MarkAsLoyalty))
-                        {
-                            <div class="item-box">
-                                @await Html.PartialAsync("_ProductBox", item)
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-        }
-    }*@
-
-<div>
-    @await Component.InvokeAsync("SearchBoxV2")
-</div>
-@*<div class="product-grid home-page-product-grid">
-        <div class="title">
-            <strong>Solo se puede pedir 5 unidad por cliente al día</strong>
-        </div>
-    </div>*@
-@if (Model.CatalogProductsModel.Promos.Count > 0)
+@if (Model.CatalogProductsModel.PromoRayo.Count > 0)
 {
     <div class="product-grid home-page-product-grid" style="margin: 0px">
         <div style="text-align: left; margin-bottom: 15px">
-            <p style="margin: 0px; font: bold 18px Roboto; line-height: 25.2px;color: #212121"> @T("Homepage.Products")</p>
+            <p style="margin: 0px; font: bold 18px Roboto; line-height: 25.2px;color: #212121"><br>Promos Rayo</p>
         </div>
         <div id="Descuentos-Dia" class="item-grid">
-            @foreach (var item in Model.CatalogProductsModel.Promos.OrderBy(v => v.DisplayOrder))
+            @foreach (var item in Model.CatalogProductsModel.PromoRayo.OrderBy(v => v.DisplayOrder))
             {
                 <div class="item-box" style="margin-left: 0px; margin-right: 0px;">
-                    @await Html.PartialAsync("_ProductBoxHomePage", item)
+                    @await Html.PartialAsync("_ProductBoxPromoRayo", item)
                 </div>
             }
-        </div>
-    </div>
-}
-
-@if (Model.CatalogProductsModel.Products.Count > 0)
-{
-    <div class="product-grid home-page-product-grid" style="margin: 0px">
-        <div style="text-align: left;margin-bottom:15px">
-            <p style="margin: 0px;font: bold 18px Roboto; line-height: 25.2px;color: #212121">  Nuestra oferta de precios bajos! </p>
-        </div>
-        @*Hide Order By and page size
-            @await Html.PartialAsync("_CatalogSelectors", Model.CatalogProductsModel)
-            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })*@
-        <div id="Oferta-Precios-Bajos" class="search-results" style="margin: 0px">
-            @{
-                var catalogProductsViewData = new ViewDataDictionary(ViewData);
-                catalogProductsViewData["fetchUrl"] = Html.Raw(Url.Action("SearchProducts", "Catalog"));
-                var a = catalogProductsViewData;
-            }
-            @await Html.PartialAsync("_CatalogProductsHome", Model.CatalogProductsModel, catalogProductsViewData)
         </div>
     </div>
 }

@@ -76,6 +76,9 @@ namespace Nop.Web.Models.Catalog
         public DateTime? AvailableStartDate { get; set; }
         public DateTime? AvailableEndDate { get; set; }
 
+        public DateTime? PromoRayoStartDate { get; set; }
+        public DateTime? PromoRayoEndDate { get; set; }
+
         public ManageInventoryMethod ManageInventoryMethod { get; set; }
 
         public string StockAvailability { get; set; }

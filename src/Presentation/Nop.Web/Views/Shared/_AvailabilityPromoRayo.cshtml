@@ -1,0 +1,57 @@
+﻿@model ProductDetailsModel
+
+@try
+{
+    <div class="availability">
+        <div id="counterCtrl-@Model.Id">
+            <div class="stock">
+                <span class="value" id="stock-availabilityenddate-value-@Model.Id"></span>
+            </div>
+        </div>
+        
+        <script asp-location="Footer">
+                    function counter(id, future_date) {
+                        var current_date = new Date().getTime();
+                        var seconds_left = (future_date - current_date) / 1000;
+
+                        days = parseInt(seconds_left / 86400);
+                        seconds_left = seconds_left % 86400;
+
+                        hours = parseInt(seconds_left / 3600);
+                        seconds_left = seconds_left % 3600;
+
+                        minutes = parseInt(seconds_left / 60);
+                        seconds = parseInt(seconds_left % 60);
+
+                        var totalTime = days + hours + minutes + seconds;
+                        if (totalTime <= 0) {
+                            $("#counterCtrl-" + id).hide();
+                            $("#legendCtrl-" + id).show();
+                        } else {
+                            $("#counterCtrl-" + id).show();
+                            $("#legendCtrl-" + id).hide();
+                        }
+
+        var countdown = days + "d, " + hours + "h, " + minutes + "m, " + seconds + "s";
+        $("#stock-availabilityenddate-value-" + id).text(countdown + " para que la promoción cierre");
+    }
+    $(document).ready(function () {
+        $("#counterCtrl-@Model.Id").hide();
+        $("#legendCtrl-@Model.Id").hide();
+
+        var future_date = new Date(@Model.PromoRayoEndDate.Value.Year,
+                                    @Model.PromoRayoEndDate.Value.Month-1,
+                                    @Model.PromoRayoEndDate.Value.Day-1,21,0,0,0).getTime();
+
+        counter(@Model.Id, future_date);
+        window.setInterval(function () {
+            counter(@Model.Id, future_date);
+        }, 1000);
+    });
+        </script>
+    </div>
+}
+catch (Exception ex)
+{
+    <div>@ex.Message</div>
+}
