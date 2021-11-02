@@ -125,6 +125,11 @@ namespace Nop.Web.Infrastructure
                 pattern: $"{lang}/curiosities/",
                 defaults: new { controller = "Product", action = "CuriosityProducts" });
 
+            //promo-rayo
+            endpointRouteBuilder.MapControllerRoute(name: "NewProducts",
+                pattern: $"{lang}/promo-rayo/",
+                defaults: new { controller = "PromoRayo", action = "Index" });
+
             //blog
             endpointRouteBuilder.MapControllerRoute(name: "Blog",
                 pattern: $"{lang}/blog",
