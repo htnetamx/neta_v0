@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
@@ -35,6 +36,9 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         [NopResourceDisplayName("Admin.Configuration.Settings.GeneralCommon.AllowCustomerToSelectTheme")]
         public bool AllowCustomerToSelectTheme { get; set; }
         public bool AllowCustomerToSelectTheme_OverrideForStore { get; set; }
+
+        [DisplayName("Habilitar Promo Rayo")]
+        public bool PromoRayo { get; set; }
 
         [UIHint("Picture")]
         [NopResourceDisplayName("Admin.Configuration.Settings.GeneralCommon.Logo")]

@@ -1,10 +1,12 @@
 ﻿@model GeneralCommonSettingsModel
 @inject Nop.Services.Stores.IStoreService storeService
+@inject ISettingService settingService
 @using Nop.Web.Framework.Models.AdminAreaTour
-
+@using Nop.Services.Configuration
 @{
     //tour step
     ViewBag.TourStep = TourStep.GeneralSettings;
+    Model.StoreInformationSettings.PromoRayo = bool.Parse((await settingService.GetSettingAsync("producteditorsettings.promorayo")).Value);
 }
 
 @await Html.PartialAsync("_AdminTour")
@@ -51,6 +53,16 @@
         <div class="col-md-9">
             <nop-editor asp-for="StoreInformationSettings.AllowCustomerToSelectTheme" />
             <span asp-validation-for="StoreInformationSettings.AllowCustomerToSelectTheme"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <nop-override-store-checkbox asp-for="StoreInformationSettings.PromoRayo" asp-input="StoreInformationSettings.PromoRayo" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+            <nop-label asp-for="StoreInformationSettings.PromoRayo" />
+        </div>
+        <div class="col-md-9">
+            <nop-editor asp-for="StoreInformationSettings.PromoRayo" />
+            <span asp-validation-for="StoreInformationSettings.PromoRayo"></span>
         </div>
     </div>
     <div class="form-group row" id="logo-area">

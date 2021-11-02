@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
+using System.ComponentModel;
 
 namespace Nop.Web.Areas.Admin.Models.Settings
 {
@@ -191,7 +192,7 @@ namespace Nop.Web.Areas.Admin.Models.Settings
 
         [NopResourceDisplayName("Admin.Configuration.Settings.ProductEditor.StockQuantityHistory")]
         public bool StockQuantityHistory { get; set; }
-
+        
         #endregion
     }
 }

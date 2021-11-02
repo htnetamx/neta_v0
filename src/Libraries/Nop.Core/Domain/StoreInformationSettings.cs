@@ -34,6 +34,11 @@ namespace Nop.Core.Domain
         public bool AllowCustomerToSelectTheme { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether customers are allowed to select a theme
+        /// </summary>
+        public bool PromoRayo { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether we should display warnings about the new EU cookie law
         /// </summary>
         public bool DisplayEuCookieLawWarning { get; set; }

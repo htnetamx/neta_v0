@@ -378,6 +378,14 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         [UIHint("DateTimeNullable")]
         public DateTime? AvailableEndDateTimeUtc { get; set; }
 
+        [DisplayName("Fecha Inicio Promo Rayo")]
+        [UIHint("DateTimeNullable")]
+        public DateTime? PromoRayoStartDateTimeUtc { get; set; }
+
+        [DisplayName("Fecha Fin Promo Rayo")]
+        [UIHint("DateTimeNullable")]
+        public DateTime? PromoRayoEndDateTimeUtc { get; set; }
+
         [NopResourceDisplayName("Admin.Catalog.Products.Fields.DisplayOrder")]
         public int DisplayOrder { get; set; }
 

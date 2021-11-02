@@ -515,6 +515,16 @@ namespace Nop.Core.Domain.Catalog
         public DateTime? AvailableEndDateTimeUtc { get; set; }
 
         /// <summary>
+        /// Gets or sets the Promo Rayo end date and time
+        /// </summary>
+        public DateTime? PromoRayoEndDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Promo Rayo start date and time
+        /// </summary>
+        public DateTime? PromoRayoStartDateTimeUtc { get; set; }
+
+        /// <summary>
         /// Gets or sets a display order.
         /// This value is used when sorting associated products (used with "grouped" products)
         /// This value is used when sorting home page products
