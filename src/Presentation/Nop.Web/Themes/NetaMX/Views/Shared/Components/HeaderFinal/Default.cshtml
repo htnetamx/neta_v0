@@ -53,14 +53,14 @@
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container-fluid" style="padding: 0px">
                     <a class="navbar-brand" href="/" style="display: flex ">
-                        <img src="images/header2/Logo_Neta.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                        <img src="~/Themes/NetaMX/Content/images/logo.png" alt="" width="80" height="24" class="d-inline-block align-text-top logo">
                     </a>
                 </div>
             </nav>
         </div>
         <div class="new-header">
             <div class="_flex">
-                <div class="store-name" id="storeName" style="">@Model.Store.Name</div>
+                <div class="store-name"><a href="/">@Model.Store.Name</a><span  id="storeName" class="store-popup-open"></span></div>
                 <div class="store-popup">
                     <a class="loc">@Model.Store.CompanyAddress</a>
                 </div>
@@ -82,7 +82,7 @@
                     <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
                 </div>
                 <a class="cart-right" href="@Url.RouteUrl("ShoppingCart")">
-                    Finaliza tu pedido
+                    @T("Home.GotoCart")
                 </a>
             </div>
         </div>

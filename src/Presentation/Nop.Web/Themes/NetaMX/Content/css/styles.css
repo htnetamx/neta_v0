@@ -602,7 +602,7 @@ label, label + * {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 1010101;
   width: 100%;
   line-height: 16px;
   color: #fff;
@@ -1741,7 +1741,10 @@ label, label + * {
  color: #E0329B;
  font-weight:700;
  font-size:12px;line-height:14px;
+ display:flex;
+ align-items:center;
 }
+.details .prd-top .left img{margin-right:3px;}
 .details .prd-top .right
 {
  color: #6A696E;
@@ -1914,10 +1917,21 @@ label, label + * {
  min-width: 90px;
  height: 24px;
 }
-
 .item-box .product-box-add-to-cart-button:hover,
 .item-box .product-box-add-to-cart-button:focus {
   background-color: #3870FF;
+}
+
+.item-box .disableButton {
+  text-align: center;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 180px;
+  padding: 0;
+  min-width: 115px;
+  height: 24px;
+  background-color: #c1c1c1;
 }
 
 .item-box .add-to-compare-list-button,
@@ -2125,6 +2139,8 @@ label, label + * {
   position:relative;
  }
 
+ .logo{height:auto;}
+
 .new-header ._flex .new_flex{display:flex;align-items:center;}
 .new-header ._flex .new_flex .search-icon{background:url('../images/Search.svg')no-repeat center center;width:24px;height:24px;display:none;cursor:pointer;margin-right:20px;}
 .scroll-start .new-header ._flex .new_flex .search-icon{display:inline-block;}
@@ -2153,9 +2169,13 @@ label, label + * {
  font-weight: 700;
  cursor: pointer;
 }
- .store-name:after
+.store-name a{text-decoration:none;}
+ .store-name a:hover
  {
-  content: '';
+  color: #212121;
+ }
+ .store-name span
+ {
   background: url('../images/caret-down.png')no-repeat center center;
   width: 8px;
   height: 4px;

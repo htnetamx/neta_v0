@@ -3,9 +3,13 @@
 @using Nop.Core.Domain.Catalog
 @using Nop.Core.Domain.Orders
 @using Nop.Core.Domain.Tax
+@using Nop.Services.Catalog
 @inject CatalogSettings catalogSettings
 @inject IWorkContext workContext
+@inject IProductService  productService
 @{
+    var product = await productService.GetProductByIdAsync(Model.Id);
+
     //prepare "Add to cart" AJAX link
     var addtocartlink = "";
     var removetocartlink = "";
@@ -15,7 +19,7 @@
     if (Model.ProductPrice.ForceRedirectionAfterAddingToCart)
     {
         addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity, forceredirection = Model.ProductPrice.ForceRedirectionAfterAddingToCart });
-        removetocartlink = Url.RouteUrl("AddProductToCart-CatalogMin", new { productId = Model.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantityMin, forceredirection = Model.ProductPrice.ForceRedirectionAfterAddingToCart , isMinusQty =true});
+        removetocartlink = Url.RouteUrl("AddProductToCart-CatalogMin", new { productId = Model.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantityMin, forceredirection = Model.ProductPrice.ForceRedirectionAfterAddingToCart, isMinusQty = true });
     }
     else
     {
@@ -34,10 +38,10 @@
     </div>
     <div class="details">
         <div class="prd-top">
-           
+
             <div class="left">
-                <img class="owlimg" src="\Themes\NetaMX\Content\images\Dis.icon.png"/>
-                <span style="float:right;">-@Model.ProductPrice.TotalSavingOnProduct</span> 
+                <img class="owlimg" src="\Themes\NetaMX\Content\images\Dis.icon.png" />
+                <span style="float:right;">-@Model.ProductPrice.TotalSavingOnProduct</span>
             </div>
             @*<div class="right">300 Unidades</div>*@
         </div>
@@ -104,7 +108,7 @@
             </div>
             <div class="prices">
                 <span class="price">En Carrito:</span>
-                <span class="price quantity">@Model.Details.CurrentProductQuantity</span>
+                <span class="price quantity" id="currentQty_@Model.Id">@Model.Details.CurrentProductQuantity</span>
             </div>
             <div class="new-product-title prd-title-new" style="">
                 <a href="@Url.RouteUrl("Product", new {SeName = Model.SeName})" style="text-decoration: none;">@Model.Name</a>
@@ -123,7 +127,7 @@
                     {
                         addToCartText = T("ShoppingCart.PreOrder").Text;
                     }
-                    <button type="button" class="button-2 product-box-add-to-cart-button" onclick="AddTocart_@(Model.Id)('@addtocartlink',this.parentElement.parentElement.getElementsByClassName('quantity')[0]);return false;">@(addToCartText)</button>
+                    <button type="button" class="button-2 product-box-add-to-cart-button" onclick="AddTocart_@(Model.Id)('@addtocartlink',$('#currentQty_@Model.Id'));return false;">@(addToCartText)</button>
                     <script>
                         function AddTocart_@(Model.Id)(url,element)
                         {
@@ -131,6 +135,10 @@
                             $("#prdparent-@(Model.Id)").addClass("active");
                         }
                     </script>
+                }
+                else
+                {
+                    <button type="button" class="button-2 disableButton">@T("ShoppingCart.AddToCart.NoQty")</button>
                 }
                 @if (!Model.ProductPrice.DisableAddToCompareListButton)
                 {
@@ -140,9 +148,16 @@
                 {
                     @*<button type="button" class="button-2 add-to-wishlist-button" title="@T("ShoppingCart.AddToWishlist")" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">@T("ShoppingCart.AddToWishlist")</button>*@
                 }
+                @{ 
+                    var currentQty = Model.Details.CurrentProductQuantity;
+                    if (product.OrderMaximumQuantity != Model.Details.CurrentProductQuantity)
+                    {
+                        currentQty++;
+                    }
+                }
                 <div class="add-quantity" id="prdparent-@Model.Id">
                     <span data-quantity="minus" class="icon minus"></span>
-                    <input id="itemquantity@(Model.Id)" class="qty-input@(Model.Id)" type="text" value="1" />
+                    <input id="itemquantity@(Model.Id)" class="qty-input@(Model.Id)" type="text" value="@(currentQty)" />
                     <span data-quantity="plus" class="icon plus"></span>
                 </div>
                 <script asp-location="Footer">
@@ -158,8 +173,11 @@
                             // If is not undefined
                             if (!isNaN(currentVal)) {
                                 // Increment
-                                $('#itemquantity@(Model.Id)').val(currentVal + 1);
-                                AjaxCart.addproducttocart_catalog('@addtocartlink');
+                                if (@(product.OrderMaximumQuantity) > currentVal) {
+                                    var qty = currentVal + 1;
+                                    $('#itemquantity@(Model.Id)').val(qty);
+                                    AjaxCart.addproducttocart_catalog('@addtocartlink', $('#currentQty_@Model.Id'));
+                                }
                             } else {
                                 // Otherwise put a 0 there
                                 $('#itemquantity@(Model.Id)').val(0);
@@ -176,8 +194,11 @@
                             // If it isn't undefined or its greater than 0
                             if (!isNaN(currentVal) && currentVal > 0) {
                                 // Decrement one
-                                $('#itemquantity@(Model.Id)').val(currentVal - 1);
-                                AjaxCart.addproducttocart_catalog('@removetocartlink');
+                                if (currentVal > 1) {
+                                    var qty = currentVal - 1;
+                                    $('#itemquantity@(Model.Id)').val(qty);
+                                    AjaxCart.addproducttocart_catalog('@removetocartlink', $('#currentQty_@Model.Id'));
+                                }
                             } else {
                                 // Otherwise put a 0 there
                                 $('#itemquantity@(Model.Id)').val(0);
