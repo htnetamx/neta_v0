@@ -7,32 +7,36 @@
 @using Nop.Web.Framework.Events
 @using Nop.Core
 @using Nop.Core.Events
-@using Nop.Services.Customers 
+@using Nop.Services.Customers
 @inject CommonSettings commonSettings
 @inject IEventPublisher eventPublisher
 @inject IPermissionService permissionService
 @inject IWorkContext workContext
 @inject SeoSettings seoSettings
 @inject AppSettings appSettings
-@inject ICustomerService  customerService 
+@inject ICustomerService  customerService
 @inject Nop.Services.Localization.ILanguageService languageService
+@inject IThemeContext themeContext
 @{
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.countryselect.js");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.ajaxcart.js");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.common.js");
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
+
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/Themes/{themeName}/Content/js/owl.carousel.min.js?v=01112021832");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.countryselect.js?v=01112021832");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.ajaxcart.js?v=01112021832");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.common.js?v=01112021832");
     //when jQuery migrate script logging is active you will see the log in the browser console
     if (commonSettings.JqueryMigrateScriptLoggingActive)
     {
-        Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.js");
+        Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.js?v=01112021832");
     }
     else
     {
-        Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.min.js");
+        Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.min.j?v=01112021832s");
     }
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-ui-dist/jquery-ui.min.js");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation/jquery.validate.min.js");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery/jquery.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-ui-dist/jquery-ui.min.js?v=01112021832");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js?v=01112021832");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation/jquery.validate.min.js?v=01112021832");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery/jquery.min.js?v=01112021832");
 
     //custom tag(s);
     if (!string.IsNullOrEmpty(seoSettings.CustomHeadTags))

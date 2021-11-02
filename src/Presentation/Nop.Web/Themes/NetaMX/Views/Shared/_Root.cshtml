@@ -1,0 +1,120 @@
+﻿@{
+    Layout = "_Root.Head";
+}
+@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.BodyStartHtmlTagAfter })
+@await Html.PartialAsync("_Notifications")
+@await Html.PartialAsync("_JavaScriptDisabledWarning")
+@await Html.PartialAsync("_OldInternetExplorerWarning")
+<div class="master-wrapper-page">
+    @*<div id="upper-page" style="display: flex; flex-direction: column; position: fixed; z-index: 99; background-color: white; width: 100vw; top: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: black">
+            @await Component.InvokeAsync("AdminHeaderLinks")
+
+            @await Html.PartialAsync("_Header")
+        </div>*@
+    @await Component.InvokeAsync("AdminHeaderLinks")
+    @await Html.PartialAsync("_HeaderV2")
+    <div class="search-container">
+        <div class="search-box store-search-box">
+            @await Component.InvokeAsync("SearchBoxV2")
+        </div>
+    </div>
+
+    <script asp-location="Footer">
+        var localized_data = {
+            AjaxCartFailure: "@T("AjaxCart.Failure")"
+        };
+        AjaxCart.init(false, '#headerV21', '.header-links .wishlist-qty', '#flyout-cart', localized_data);
+    </script>
+    @*<div class="header-menu">
+            @await Component.InvokeAsync("TopMenu")
+        </div>*@
+    <div id="master-wrapper-cont" class="master-wrapper-content">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentBefore })
+
+        @if (IsSectionDefined("Breadcrumb"))
+        {
+            @RenderSection("Breadcrumb")
+        }
+        <div class="master-column-wrapper">
+            @RenderBody()
+        </div>
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentAfter })
+    </div>
+    @*@await Component.InvokeAsync("Footer")*@
+    <script>
+        resizer();
+        window.addEventListener('resize', resizer);
+
+        function resizer() {
+            try {
+                basicResize();
+                homePageActions(cantxfilas);
+            }
+            catch {
+                console.log("Error Resizer");
+            }
+        }
+        function basicResize() {
+            try {
+                var mwc = document.getElementById("master-wrapper-cont");
+                var admin = document.getElementById("admin_hl");
+                var mwp = document.getElementById("headerV21");
+
+                var cartInfo = document.getElementById("cartInfo");
+                //if (mwp != null) {
+                //    var padding = (mwp.clientWidth - mwc.clientWidth) / 2;
+                //    mwp.style.paddingLeft = padding.toString() + "px";
+                //    mwp.style.paddingRight = padding.toString() + "px";
+                //    if (cartInfo != null) {
+                //        cartInfo.style.paddingLeft = padding.toString() + "px";
+                //        cartInfo.style.paddingRight = padding.toString() + "px";
+                //    }
+                //}
+                //if (mwc != null) {
+
+                //    var cartInfoHeigth = 0
+                //    if (cartInfo != null) {
+                //        cartInfoHeigth = cartInfo.clientHeight;
+                //    }
+
+                //    var mwpHeight = 0
+                //    if (mwp != null) {
+                //        mwpHeight = mwp.clientHeight;
+                //    }
+
+                //    var adminHeight = 0
+                //    if (admin != null) {
+                //        adminHeight = admin.clientHeight;
+                //    }
+                //    var upp = cartInfoHeigth + mwpHeight + adminHeight + 15;
+                //    mwc.style.top = upp.toString() + "px";
+                //}
+                var list = document.getElementById("auth_list");
+                if (list.innerText == "") {
+                    list.style.display = "none";
+                }
+                //var searchbar = document.getElementById("small-searchterms");
+                //if (searchbar != null) {
+                //    var lupa = document.getElementById("lupa_icon");
+                //    var left_diff = parseInt(lupa.style.left.toString().replace("px", ""), 10);
+                //    var diff = Math.ceil(lupa.clientWidth + left_diff * 2);
+                //    searchbar.style.paddingLeft = diff.toString() + "px";
+                //}
+
+            }
+            catch {
+                console.log("Error Basic Resize");
+            }
+        }
+
+
+    </script>
+</div>
+@await Component.InvokeAsync("EuCookieLaw")
+@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.BodyEndHtmlTagBefore })
+
+<script asp-location="Footer">
+    $(window).scroll(function () {
+        $(this).scrollTop() > 400 ? $("body").addClass('scroll-start') : $("body").removeClass('scroll-start')
+    });    
+</script>
