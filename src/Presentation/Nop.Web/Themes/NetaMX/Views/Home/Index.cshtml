@@ -26,12 +26,12 @@
         @await Component.InvokeAsync("TopicBlock", new { systemName = "HomepageText" })
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforeCategories })
         @await Component.InvokeAsync("HomepageCategories")
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforeProducts })
-        @await Component.InvokeAsync("HomepageMarkAsNewProducts")
         <div>
             <br />
             @await Component.InvokeAsync("SearchBoxV2")
         </div>
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforeProducts })
+        @await Component.InvokeAsync("HomepageMarkAsNewProducts")
         @await Component.InvokeAsync("CustomeHomepageProducts")
         @*@await Component.InvokeAsync("HomepageProducts")*@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforeBestSellers })
