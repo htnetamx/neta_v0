@@ -81,6 +81,8 @@ namespace Nop.Web.Controllers
         private readonly ShoppingCartSettings _shoppingCartSettings;
         private readonly ShippingSettings _shippingSettings;
 
+        private readonly IAddressService _addressService;
+
         #endregion
 
         #region Ctor
@@ -118,7 +120,8 @@ namespace Nop.Web.Controllers
             MediaSettings mediaSettings,
             OrderSettings orderSettings,
             ShoppingCartSettings shoppingCartSettings,
-            ShippingSettings shippingSettings)
+            ShippingSettings shippingSettings,
+            IAddressService addressService)
         {
             _captchaSettings = captchaSettings;
             _customerSettings = customerSettings;
@@ -154,6 +157,7 @@ namespace Nop.Web.Controllers
             _orderSettings = orderSettings;
             _shoppingCartSettings = shoppingCartSettings;
             _shippingSettings = shippingSettings;
+            _addressService = addressService;
         }
 
         #endregion
@@ -1159,6 +1163,7 @@ namespace Nop.Web.Controllers
             var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
             var model = new ShoppingCartModel();
             model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
+
             return View(model);
         }
 
