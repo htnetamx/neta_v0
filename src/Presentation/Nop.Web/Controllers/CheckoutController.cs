@@ -2183,12 +2183,11 @@ namespace Nop.Web.Controllers
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 12,
-                        "*" + name + "*",
+                        name,
                         "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
-                        "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
+                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
                         buscar,
-                        "*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*",
-                        //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
+                        (await _storeContext.GetCurrentStoreAsync()).Name,
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
 
