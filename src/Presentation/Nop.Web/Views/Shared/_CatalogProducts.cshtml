@@ -1,7 +1,7 @@
 ﻿@model CatalogProductsModel
 
 @{
-    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.catalogproducts.js?v1.0");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.catalogproducts.js?v" + Guid.NewGuid());
 }
 
 <div class="products-container">
