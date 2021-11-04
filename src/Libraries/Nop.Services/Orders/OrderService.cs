@@ -8,6 +8,7 @@ using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
+using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Html;
@@ -39,6 +40,9 @@ namespace Nop.Services.Orders
         private readonly IShipmentService _shipmentService;
         private readonly IAddressService _addressService;
 
+        private readonly IRepository<DiscountUsageHistory> _discountUsageHistoryRepository;
+        private readonly IRepository<Discount> _discountRepository;
+
         #endregion
 
         #region Ctor
@@ -53,6 +57,8 @@ namespace Nop.Services.Orders
             IRepository<ProductWarehouseInventory> productWarehouseInventoryRepository,
             IRepository<RecurringPayment> recurringPaymentRepository,
             IRepository<RecurringPaymentHistory> recurringPaymentHistoryRepository,
+            IRepository<DiscountUsageHistory> discountUsageHistoryRepository,
+            IRepository<Discount> discountRepository,
             IShipmentService shipmentService,
             IAddressService addressService)
         {
@@ -68,6 +74,9 @@ namespace Nop.Services.Orders
             _recurringPaymentHistoryRepository = recurringPaymentHistoryRepository;
             _shipmentService = shipmentService;
             _addressService = addressService;
+
+            _discountUsageHistoryRepository = discountUsageHistoryRepository;
+            _discountRepository = discountRepository;
         }
 
         #endregion
@@ -1105,6 +1114,15 @@ namespace Nop.Services.Orders
             return await (from o in _orderRepository.Table
                          where o.StoreId == storeId
                          select o).ToListAsync();
+        }
+
+        public async Task<bool> GetByDiscountCode(string discountcouponcode, string phoneNumber)
+        {
+            return await _orderRepository.Table
+                .Where(v => _discountUsageHistoryRepository.Table.Any(d => 
+                    d.OrderId.Equals(v.Id) && 
+                    _discountRepository.Table.Any(d1 => d1.Id.Equals(d.DiscountId) && d1.CouponCode.Equals(discountcouponcode)))
+                ).AnyAsync(o => _addressRepository.Table.Any(a => o.BillingAddressId.Equals(a.Id) && a.PhoneNumber.Equals(phoneNumber)));
         }
 
         #endregion

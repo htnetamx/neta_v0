@@ -6592,6 +6592,14 @@ pre {
 }
 .cart-total .customer-saving{border-radius:10px;}
 
+.customer-banner {
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  background: yellow !important;
+  padding: 10px 0;
+}
+
 @media all and (max-width: 769px)
 {
  .review-rating .name-description {
