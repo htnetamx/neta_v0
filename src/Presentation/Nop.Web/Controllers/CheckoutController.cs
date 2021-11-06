@@ -1592,90 +1592,90 @@ namespace Nop.Web.Controllers
                     });
                 }
 
-                string discountcouponcode = "FIX_SSL_ISSUE";
-                await _customerService.RemoveDiscountCouponCodeAsync(
-                    await _workContext.GetCurrentCustomerAsync(),
-                    discountcouponcode);
+                //string discountcouponcode = "FIX_SSL_ISSUE";
+                //await _customerService.RemoveDiscountCouponCodeAsync(
+                //    await _workContext.GetCurrentCustomerAsync(),
+                //    discountcouponcode);
 
-                var customer = (await _workContext.GetCurrentCustomerAsync());
-                var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
-                if (addr != null)
-                {
-                    if (addr.Email == addr.PhoneNumber || addr.Email.Contains("@"))
-                    {
-                        var usado = await _orderService.GetByDiscountCode(discountcouponcode, addr.PhoneNumber);
-                        if (!usado)
-                        {
-                            var esViejo = (await _orderService.GetOrdersByPhoneNumberAsync(addr.PhoneNumber)).Any();
-                            if (esViejo)
-                            {
-                                var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
-                                if (total > 50)
-                                {
-                                    var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
-                                        .Where(d => d.RequiresCouponCode)
-                                        .ToList();
-                                    if (discounts.Any())
-                                    {
-                                        var userErrors = new List<string>();
-                                        var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
-                                        {
-                                            var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
-                                            userErrors.AddRange(validationResult.Errors);
+                //var customer = (await _workContext.GetCurrentCustomerAsync());
+                //var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
+                //if (addr != null)
+                //{
+                //    if (addr.Email == addr.PhoneNumber || addr.Email.Contains("@"))
+                //    {
+                //        var usado = await _orderService.GetByDiscountCode(discountcouponcode, addr.PhoneNumber);
+                //        if (!usado)
+                //        {
+                //            var esViejo = (await _orderService.GetOrdersByPhoneNumberAsync(addr.PhoneNumber)).Any();
+                //            if (esViejo)
+                //            {
+                //                var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
+                //                if (total > 50)
+                //                {
+                //                    var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
+                //                        .Where(d => d.RequiresCouponCode)
+                //                        .ToList();
+                //                    if (discounts.Any())
+                //                    {
+                //                        var userErrors = new List<string>();
+                //                        var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
+                //                        {
+                //                            var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
+                //                            userErrors.AddRange(validationResult.Errors);
 
-                                            return validationResult.IsValid;
-                                        });
+                //                            return validationResult.IsValid;
+                //                        });
 
-                                        if (anyValidDiscount)
-                                        {
-                                            await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
-                                        }
-                                        else
-                                        {
-                                            //if (userErrors.Any())
-                                            //    model.DiscountBox.Messages = userErrors;
-                                            //else
-                                            //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.WrongDiscount"));
-                                        }
-                                    }
-                                    //else
-                                    //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.CannotBeFound"));
-                                }
-                            }
-                            else
-                            {
-                                var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
-                                    .Where(d => d.RequiresCouponCode)
-                                    .ToList();
-                                if (discounts.Any())
-                                {
-                                    var userErrors = new List<string>();
-                                    var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
-                                    {
-                                        var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
-                                        userErrors.AddRange(validationResult.Errors);
+                //                        if (anyValidDiscount)
+                //                        {
+                //                            await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
+                //                        }
+                //                        else
+                //                        {
+                //                            //if (userErrors.Any())
+                //                            //    model.DiscountBox.Messages = userErrors;
+                //                            //else
+                //                            //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.WrongDiscount"));
+                //                        }
+                //                    }
+                //                    //else
+                //                    //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.CannotBeFound"));
+                //                }
+                //            }
+                //            else
+                //            {
+                //                var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
+                //                    .Where(d => d.RequiresCouponCode)
+                //                    .ToList();
+                //                if (discounts.Any())
+                //                {
+                //                    var userErrors = new List<string>();
+                //                    var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
+                //                    {
+                //                        var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
+                //                        userErrors.AddRange(validationResult.Errors);
 
-                                        return validationResult.IsValid;
-                                    });
+                //                        return validationResult.IsValid;
+                //                    });
 
-                                    if (anyValidDiscount)
-                                    {
-                                        await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
-                                    }
-                                    else
-                                    {
-                                        //if (userErrors.Any())
-                                        //    model.DiscountBox.Messages = userErrors;
-                                        //else
-                                        //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.WrongDiscount"));
-                                    }
-                                }
-                                //else
-                                //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.CannotBeFound"));
-                            }
-                        }
-                    }
-                }
+                //                    if (anyValidDiscount)
+                //                    {
+                //                        await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
+                //                    }
+                //                    else
+                //                    {
+                //                        //if (userErrors.Any())
+                //                        //    model.DiscountBox.Messages = userErrors;
+                //                        //else
+                //                        //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.WrongDiscount"));
+                //                    }
+                //                }
+                //                //else
+                //                //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.CannotBeFound"));
+                //            }
+                //        }
+                //    }
+                //}
 
 
                 //shipping is not required
