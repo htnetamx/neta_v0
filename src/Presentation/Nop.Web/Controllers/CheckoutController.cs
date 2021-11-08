@@ -4,11 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Configuration;
-using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
@@ -20,7 +18,6 @@ using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
-using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Orders;
@@ -64,8 +61,6 @@ namespace Nop.Web.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
 
-        private readonly IDiscountService _discountService;
-
         #endregion
 
         #region Ctor
@@ -93,8 +88,7 @@ namespace Nop.Web.Controllers
             OrderSettings orderSettings,
             PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings,
-            ShippingSettings shippingSettings,
-            IDiscountService discountService)
+            ShippingSettings shippingSettings)
         {
             _addressSettings = addressSettings;
             _customerSettings = customerSettings;
@@ -120,7 +114,6 @@ namespace Nop.Web.Controllers
             _paymentSettings = paymentSettings;
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
-            _discountService = discountService;
         }
 
         #endregion
@@ -1168,7 +1161,7 @@ namespace Nop.Web.Controllers
                     }
 
                     var list = new List<string>();
-                    foreach(var item in cart)
+                    foreach (var item in cart)
                     {
                         var prod = await _productService.GetProductByIdAsync(item.ProductId);
                         list.Add($"{prod.Name} cantidad {item.Quantity.ToString()}");
@@ -1199,12 +1192,12 @@ namespace Nop.Web.Controllers
                     }
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 12,
-                        "*" + name + "*",
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
+                        name,
                         "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
-                        "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
+                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
                         buscar,
-                        "*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*",
+                        (await _storeContext.GetCurrentStoreAsync()).Name,
                         //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
@@ -1432,7 +1425,7 @@ namespace Nop.Web.Controllers
                 {
                     //new address
                     var newAddress = model.BillingNewAddress;
-                    if(billingAddressId > 0)
+                    if (billingAddressId > 0)
                     {
                         if (!string.IsNullOrWhiteSpace(model.BillingNewAddress.FirstName))
                         {
@@ -1440,7 +1433,7 @@ namespace Nop.Web.Controllers
                                 ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
 
                             var children = await _addressService.GetRelatedAddressByIdAsync(address1.PhoneNumber);
-                            newAddress.Email = children.Where(v=>v.Email == null || v.Email.Contains("@")).First().PhoneNumber;
+                            newAddress.Email = children.Where(v => v.Email == null || v.Email.Contains("@")).First().PhoneNumber;
                         }
                     }
 
@@ -1591,92 +1584,6 @@ namespace Nop.Web.Controllers
                         goto_section = "shipping"
                     });
                 }
-
-                //string discountcouponcode = "FIX_SSL_ISSUE";
-                //await _customerService.RemoveDiscountCouponCodeAsync(
-                //    await _workContext.GetCurrentCustomerAsync(),
-                //    discountcouponcode);
-
-                //var customer = (await _workContext.GetCurrentCustomerAsync());
-                //var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
-                //if (addr != null)
-                //{
-                //    if (addr.Email == addr.PhoneNumber || addr.Email.Contains("@"))
-                //    {
-                //        var usado = await _orderService.GetByDiscountCode(discountcouponcode, addr.PhoneNumber);
-                //        if (!usado)
-                //        {
-                //            var esViejo = (await _orderService.GetOrdersByPhoneNumberAsync(addr.PhoneNumber)).Any();
-                //            if (esViejo)
-                //            {
-                //                var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
-                //                if (total > 50)
-                //                {
-                //                    var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
-                //                        .Where(d => d.RequiresCouponCode)
-                //                        .ToList();
-                //                    if (discounts.Any())
-                //                    {
-                //                        var userErrors = new List<string>();
-                //                        var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
-                //                        {
-                //                            var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
-                //                            userErrors.AddRange(validationResult.Errors);
-
-                //                            return validationResult.IsValid;
-                //                        });
-
-                //                        if (anyValidDiscount)
-                //                        {
-                //                            await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
-                //                        }
-                //                        else
-                //                        {
-                //                            //if (userErrors.Any())
-                //                            //    model.DiscountBox.Messages = userErrors;
-                //                            //else
-                //                            //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.WrongDiscount"));
-                //                        }
-                //                    }
-                //                    //else
-                //                    //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.CannotBeFound"));
-                //                }
-                //            }
-                //            else
-                //            {
-                //                var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
-                //                    .Where(d => d.RequiresCouponCode)
-                //                    .ToList();
-                //                if (discounts.Any())
-                //                {
-                //                    var userErrors = new List<string>();
-                //                    var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
-                //                    {
-                //                        var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
-                //                        userErrors.AddRange(validationResult.Errors);
-
-                //                        return validationResult.IsValid;
-                //                    });
-
-                //                    if (anyValidDiscount)
-                //                    {
-                //                        await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
-                //                    }
-                //                    else
-                //                    {
-                //                        //if (userErrors.Any())
-                //                        //    model.DiscountBox.Messages = userErrors;
-                //                        //else
-                //                        //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.WrongDiscount"));
-                //                    }
-                //                }
-                //                //else
-                //                //    model.DiscountBox.Messages.Add(await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.CannotBeFound"));
-                //            }
-                //        }
-                //    }
-                //}
-
 
                 //shipping is not required
                 await _genericAttributeService.SaveAttributeAsync<ShippingOption>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.SelectedShippingOptionAttribute, null, (await _storeContext.GetCurrentStoreAsync()).Id);
@@ -2083,14 +1990,16 @@ namespace Nop.Web.Controllers
                 {
                     var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
 
+
                     var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
                     foreach (var item in cart)
                     {
-                        if(store.DisplayOrder==2) qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
+                        if (store.DisplayOrder == 2)
+                            qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
                         var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
-                        if(cnt != null)
+                        if (cnt != null)
                         {
-                            var qtyValidation=(qtyValidationMain) + qtyValidationSubAccounts * (children.Count() - 1);
+                            var qtyValidation = (qtyValidationMain) + qtyValidationSubAccounts * (children.Count() - 1);
                             if (cnt[0] + item.Quantity > qtyValidation)
                             {
                                 throw new Exception($"Haz comprado más de lo permitido, por favor ajusta las cantidades para poder finalizar tu pedido. " +
@@ -2113,7 +2022,7 @@ namespace Nop.Web.Controllers
                                     else
                                     {
                                         throw new Exception($"El límite de unidades por subcuenta es de {qtyValidation} unidades. " +
-                                            $"Si {addr.FirstName} quiere comprar más, dile que se registre!"); 
+                                            $"Si {addr.FirstName} quiere comprar más, dile que se registre!");
                                     }
                                 }
                             }
@@ -2148,7 +2057,7 @@ namespace Nop.Web.Controllers
                         Order = placeOrderResult.PlacedOrder
                     };
 
-                    
+
                     //postProcessPaymentRequest.Order.
                     var list = new List<string>();
                     foreach (var item in cart)
@@ -2182,12 +2091,13 @@ namespace Nop.Web.Controllers
                     }
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 12,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
                         name,
                         "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
                         placeOrderResult.PlacedOrder.OrderTotal.ToString(),
                         buscar,
                         (await _storeContext.GetCurrentStoreAsync()).Name,
+                        //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
 
