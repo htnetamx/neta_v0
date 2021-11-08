@@ -349,7 +349,6 @@ namespace Nop.Web.Controllers
                 "codigo_verificacion_usuario",
                 new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
 
-
             return Content("{'rta': true }", "application/json");
         }
 
@@ -1186,11 +1185,14 @@ namespace Nop.Web.Controllers
                     //orders = orders.Where(v => v.BillingAddressId == (billingAddressId ?? 0)).ToList();
 
                     var name = "Netero";
+                    var telusuario = "0";
                     if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
                     {
                         var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
                         name = customer.FirstName;
+                        telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
                     }
+
 
                     var buscar = "mañana,";
                     var refDate = DateTime.UtcNow.AddHours(-5);
@@ -1218,7 +1220,7 @@ namespace Nop.Web.Controllers
                     
                     
                     BotmakerMessaging.Send("525545439866",
-                        "521" + (await _workContext.GetCurrentCustomerAsync()).Username,
+                        "521" + telusuario,
                         "confirmacion_compra",
                         new Dictionary<string, object> { { "Nombre", name },
                                                          { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id},
