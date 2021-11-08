@@ -337,6 +337,12 @@ namespace Nop.Web.Controllers
 
             NetaAuronixMessaging.Send_SMS(form["Password"], $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar", "15");
 
+            BotmakerMessaging.Send("525545439866",
+                "521" + form["Password"],
+                "codigo_verificacion_usuario",
+                new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
+
+
             return Content("{'rta': true }", "application/json");
         }
 
@@ -1201,6 +1207,20 @@ namespace Nop.Web.Controllers
                         //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
+                    
+                    
+                    BotmakerMessaging.Send("525545439866",
+                        "521" + (await _workContext.GetCurrentCustomerAsync()).Username,
+                        "confirmacion_compra",
+                        new Dictionary<string, object> { { "Nombre", name },
+                                                         { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id},
+                                                         { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
+                                                         { "Dia", name },
+                                                         { "Tienda", (await _storeContext.GetCurrentStoreAsync()).Name  },
+                                                         { "6", 6 },
+                                                         { "Link", (await _storeContext.GetCurrentStoreAsync()).Url } } );
+
+
 
                     //NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,
                     //    $"Gracias {name} por comprar en NetaMx, tu orden es la siguiente, {"\r" + string.Join("\r", list.ToArray()) + "\r"} Tu total es de ${placeOrderResult.PlacedOrder.OrderTotal.ToString()};pasa mañana a {(await _storeContext.GetCurrentStoreAsync()).Name}, después de las {"5pm"}. Eres el cliente {(orders.Count + 1).ToString()} del pedido, recuerda que tenemos que llegar a 20 clientes para poder despachar. Comparte las promos y juntos lleguemos al mínimo de pedidos: {(await _storeContext.GetCurrentStoreAsync()).Url}");
