@@ -1188,7 +1188,7 @@ namespace Nop.Web.Controllers
 
 
                     var buscar = "mañana,";
-                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    var refDate = DateTime.UtcNow.AddHours(-6);
                     if (refDate.DayOfWeek == DayOfWeek.Saturday)
                     {
                         buscar = "el lunes,";
@@ -1981,72 +1981,34 @@ namespace Nop.Web.Controllers
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
                 var store = await _storeContext.GetCurrentStoreAsync();
-
-                //var appSettings = EngineContext.Current.Resolve<AppSettings>();
-                var qtyValidationMain = 0;
-                var qtyValidationSubAccounts = 0;
-                var validQty = true;
-                switch (store.DisplayOrder)
+                var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                foreach (var item in cart)
                 {
-                    case 1:
-                        qtyValidationMain = 2;
-                        qtyValidationSubAccounts = 2;
-                        validQty = false;
-                        break;
-
-                    case 2:
-                        qtyValidationMain = 10;
-                        qtyValidationSubAccounts = 1;
-                        validQty = false;
-                        break;
-
-                    default:
-                        qtyValidationMain = 0;
-                        qtyValidationSubAccounts = 0;
-                        validQty = false;
-                        break;
-                }
-                //appSettings.CommonConfig.QtyPerEndClients;
-                //appSettings.CommonConfig.ValidateQtyPerEndClients;
-                if (validQty)
-                {
-                    var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-
-
-                    var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
-                    foreach (var item in cart)
+                    var product = await _productService.GetProductByIdAsync(item.ProductId);
+                    var qtyValidationMain = product.OrderMaximumQuantity;
+                    if (product.Sku.EndsWith("LH"))
                     {
-                        if (store.DisplayOrder == 2)
-                            qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
-                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
-                        if (cnt != null)
+                        qtyValidationMain = 2;
+                    }
+                    var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0,
+                        item.ProductId,
+                        addr.PhoneNumber,
+                        (await _workContext.GetCurrentCustomerAsync()).Id);
+                    if (cnt != null)
+                    {
+                        if (cnt[1] + item.Quantity > qtyValidationMain)
                         {
-                            var qtyValidation = (qtyValidationMain) + qtyValidationSubAccounts * (children.Count() - 1);
-                            if (cnt[0] + item.Quantity > qtyValidation)
+                            if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
                             {
-                                throw new Exception($"Haz comprado más de lo permitido, por favor ajusta las cantidades para poder finalizar tu pedido. " +
-                                    $"La cuenta principal con sus asociados superan las {qtyValidation} unidades. " +
-                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades " +
-                                    $"y cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
+                                throw new Exception($"Haz llegado al límite de compra de este producto. " +
+                                    $"Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades " +
+                                    $"y quiere comprar {item.Quantity}. " +
+                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
                             }
                             else
                             {
-                                qtyValidation = (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@") ? qtyValidationMain : qtyValidationSubAccounts);
-                                if (cnt[1] + item.Quantity > qtyValidation)
-                                {
-                                    if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
-                                    {
-                                        throw new Exception($"Haz llegado al límite de compra de este producto. " +
-                                            $"Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades " +
-                                            $"y quiere comprar {item.Quantity}. " +
-                                            $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
-                                    }
-                                    else
-                                    {
-                                        throw new Exception($"El límite de unidades por subcuenta es de {qtyValidation} unidades. " +
-                                            $"Si {addr.FirstName} quiere comprar más, dile que se registre!");
-                                    }
-                                }
+                                throw new Exception($"El límite de unidades por subcuenta es de {qtyValidationMain} unidades. " +
+                                    $"Si {addr.FirstName} quiere comprar más, dile que se registre!");
                             }
                         }
                     }
@@ -2101,7 +2063,7 @@ namespace Nop.Web.Controllers
                     }
 
                     var buscar = "mañana,";
-                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    var refDate = DateTime.UtcNow.AddHours(-6);
                     if (refDate.DayOfWeek == DayOfWeek.Saturday)
                     {
                         buscar = "el lunes,";
