@@ -82,5 +82,11 @@ namespace Nop.Core.Domain.Stores
         /// Gets or sets the zipcode
         /// </summary>
         public string ZipCode { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the zipcode
+        /// </summary>
+        public bool FirstGmvBonusApplied { get; set; }
     }
 }
