@@ -4,11 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Configuration;
-using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
@@ -20,7 +18,6 @@ using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
-using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Orders;
@@ -64,8 +61,6 @@ namespace Nop.Web.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
 
-        private readonly IDiscountService _discountService;
-
         #endregion
 
         #region Ctor
@@ -93,8 +88,7 @@ namespace Nop.Web.Controllers
             OrderSettings orderSettings,
             PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings,
-            ShippingSettings shippingSettings,
-            IDiscountService discountService)
+            ShippingSettings shippingSettings)
         {
             _addressSettings = addressSettings;
             _customerSettings = customerSettings;
@@ -120,7 +114,6 @@ namespace Nop.Web.Controllers
             _paymentSettings = paymentSettings;
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
-            _discountService = discountService;
         }
 
         #endregion
@@ -344,11 +337,10 @@ namespace Nop.Web.Controllers
 
             NetaAuronixMessaging.Send_SMS(form["Password"], $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar", "15");
 
-            BotmakerMessaging.Send("525545439866",
-                "521" + form["Password"],
-                "codigo_verificacion_usuario",
-                new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
-
+            //BotmakerMessaging.Send("525545439866",
+            //    "521" + form["Password"],
+            //    "codigo_verificacion_usuario",
+            //    new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
 
             return Content("{'rta': true }", "application/json");
         }
@@ -1186,14 +1178,17 @@ namespace Nop.Web.Controllers
                     //orders = orders.Where(v => v.BillingAddressId == (billingAddressId ?? 0)).ToList();
 
                     var name = "Netero";
+                    var telusuario = "0";
                     if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
                     {
                         var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
                         name = customer.FirstName;
+                        telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
                     }
 
+
                     var buscar = "mañana,";
-                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    var refDate = DateTime.UtcNow.AddHours(-6);
                     if (refDate.DayOfWeek == DayOfWeek.Saturday)
                     {
                         buscar = "el lunes,";
@@ -1205,28 +1200,27 @@ namespace Nop.Web.Controllers
                     }
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 12,
-
-                        "*" + name + "*",
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
+                        name,
                         "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
-                        "*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*",
+                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
                         buscar,
-                        "*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*",
+                        (await _storeContext.GetCurrentStoreAsync()).Name,
                         //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
                     
                     
-                    BotmakerMessaging.Send("525545439866",
-                        "521" + (await _workContext.GetCurrentCustomerAsync()).Username,
-                        "confirmacion_compra",
-                        new Dictionary<string, object> { { "Nombre", name },
-                                                         { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id},
-                                                         { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
-                                                         { "Dia", name },
-                                                         { "Tienda", (await _storeContext.GetCurrentStoreAsync()).Name  },
-                                                         { "6", 6 },
-                                                         { "Link", (await _storeContext.GetCurrentStoreAsync()).Url } } );
+                    //BotmakerMessaging.Send("525545439866",
+                    //    "521" + telusuario,
+                    //    "confirmacion_compra",
+                    //    new Dictionary<string, object> { { "Nombre", name },
+                    //                                     { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id},
+                    //                                     { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
+                    //                                     { "Dia", name },
+                    //                                     { "Tienda", (await _storeContext.GetCurrentStoreAsync()).Name  },
+                    //                                     { "6", 6 },
+                    //                                     { "Link", (await _storeContext.GetCurrentStoreAsync()).Url } } );
 
 
 
@@ -2029,71 +2023,34 @@ namespace Nop.Web.Controllers
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
                 var store = await _storeContext.GetCurrentStoreAsync();
-
-                //var appSettings = EngineContext.Current.Resolve<AppSettings>();
-                var qtyValidationMain = 0;
-                var qtyValidationSubAccounts = 0;
-                var validQty = true;
-                switch (store.DisplayOrder)
+                var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                foreach (var item in cart)
                 {
-                    case 1:
-                        qtyValidationMain = 2;
-                        qtyValidationSubAccounts = 2;
-                        validQty = false;
-                        break;
-
-                    case 2:
-                        qtyValidationMain = 10;
-                        qtyValidationSubAccounts = 1;
-                        validQty = false;
-                        break;
-
-                    default:
-                        qtyValidationMain = 0;
-                        qtyValidationSubAccounts = 0;
-                        validQty = false;
-                        break;
-                }
-                //appSettings.CommonConfig.QtyPerEndClients;
-                //appSettings.CommonConfig.ValidateQtyPerEndClients;
-                if (validQty)
-                {
-                    var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-
-                    var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
-                    foreach (var item in cart)
+                    var product = await _productService.GetProductByIdAsync(item.ProductId);
+                    var qtyValidationMain = product.OrderMaximumQuantity;
+                    if (product.Sku.EndsWith("LH"))
                     {
-                        if (store.DisplayOrder == 2)
-                            qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
-                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
-                        if (cnt != null)
+                        qtyValidationMain = 2;
+                    }
+                    var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0,
+                        item.ProductId,
+                        addr.PhoneNumber,
+                        (await _workContext.GetCurrentCustomerAsync()).Id);
+                    if (cnt != null)
+                    {
+                        if (cnt[1] + item.Quantity > qtyValidationMain)
                         {
-                            var qtyValidation = (qtyValidationMain) + qtyValidationSubAccounts * (children.Count() - 1);
-                            if (cnt[0] + item.Quantity > qtyValidation)
+                            if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
                             {
-                                throw new Exception($"Haz comprado más de lo permitido, por favor ajusta las cantidades para poder finalizar tu pedido. " +
-                                    $"La cuenta principal con sus asociados superan las {qtyValidation} unidades. " +
-                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades " +
-                                    $"y cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
+                                throw new Exception($"Haz llegado al límite de compra de este producto. " +
+                                    $"Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades " +
+                                    $"y quiere comprar {item.Quantity}. " +
+                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
                             }
                             else
                             {
-                                qtyValidation = (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@") ? qtyValidationMain : qtyValidationSubAccounts);
-                                if (cnt[1] + item.Quantity > qtyValidation)
-                                {
-                                    if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
-                                    {
-                                        throw new Exception($"Haz llegado al límite de compra de este producto. " +
-                                            $"Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades " +
-                                            $"y quiere comprar {item.Quantity}. " +
-                                            $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
-                                    }
-                                    else
-                                    {
-                                        throw new Exception($"El límite de unidades por subcuenta es de {qtyValidation} unidades. " +
-                                            $"Si {addr.FirstName} quiere comprar más, dile que se registre!");
-                                    }
-                                }
+                                throw new Exception($"El límite de unidades por subcuenta es de {qtyValidationMain} unidades. " +
+                                    $"Si {addr.FirstName} quiere comprar más, dile que se registre!");
                             }
                         }
                     }
@@ -2148,7 +2105,7 @@ namespace Nop.Web.Controllers
                     }
 
                     var buscar = "mañana,";
-                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    var refDate = DateTime.UtcNow.AddHours(-6);
                     if (refDate.DayOfWeek == DayOfWeek.Saturday)
                     {
                         buscar = "el lunes,";
@@ -2160,12 +2117,13 @@ namespace Nop.Web.Controllers
                     }
 
                     NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion__de_compra", 12,
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
                         name,
                         "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
                         placeOrderResult.PlacedOrder.OrderTotal.ToString(),
                         buscar,
                         (await _storeContext.GetCurrentStoreAsync()).Name,
+                        //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
 
