@@ -22,17 +22,21 @@
     Html.AppendPageCssClassParts("html-home-page");
 }
 
-@if (bool.Parse((await settingService.GetSettingAsync("producteditorsettings.promorayo")).Value))
-{
-    <div class="form-popup" id="promoRayoForm" style="border: 5px solid black; padding: 20px; display: flex; align-content: center; align-items: center; position: fixed; justify-content: center; z-index: 100; margin-left: 15vw; background: orange; margin-top: 15vh;">
-        <div style="cursor: pointer; position: absolute; top: 0px; right: 0px; background: white; height: 15%; width: 4%; display: flex; justify-content: center; align-items: center; align-content: center; font-size: medium; color: red; font-weight: bold;">
-            <span id='close' onclick='document.getElementById("promoRayoForm").style.display="none"'>x</span>
+@{
+    var getPromoRayo = await settingService.GetSettingAsync("producteditorsettings.promorayo");
+    var promoRayo = (getPromoRayo != null) ? bool.Parse(getPromoRayo.Value) : false;
+    if (promoRayo)
+    {
+        <div class="form-popup" id="promoRayoForm" style="border: 5px solid black; padding: 20px; display: flex; align-content: center; align-items: center; position: fixed; justify-content: center; z-index: 100; margin-left: 15vw; background: orange; margin-top: 15vh;">
+            <div style="cursor: pointer; position: absolute; top: 0px; right: 0px; background: white; height: 15%; width: 4%; display: flex; justify-content: center; align-items: center; align-content: center; font-size: medium; color: red; font-weight: bold;">
+                <span id='close' onclick='document.getElementById("promoRayoForm").style.display="none"'>x</span>
+            </div>
+            <form action="/promo-rayo" style="display: flex;flex-direction: column;justify-content: center;align-items: center;align-content: center;">
+                <h1>Encuentra Aqui Tus Promos Rayo</h1>
+                <input type="submit" value="Promo Rayo" style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw; width: 40vw">
+            </form>
         </div>
-        <form action="/promo-rayo" style="display: flex;flex-direction: column;justify-content: center;align-items: center;align-content: center;">
-            <h1>Encuentra Aqui Tus Promos Rayo</h1>
-            <input type="submit" value="Promo Rayo" style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw; width: 40vw">
-        </form>
-    </div>
+    }
 }
 
 <div class="page home-page">
