@@ -18,6 +18,7 @@ using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
+using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Orders;
@@ -61,6 +62,8 @@ namespace Nop.Web.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
 
+        private readonly IDiscountService _discountService;
+
         #endregion
 
         #region Ctor
@@ -88,7 +91,8 @@ namespace Nop.Web.Controllers
             OrderSettings orderSettings,
             PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings,
-            ShippingSettings shippingSettings)
+            ShippingSettings shippingSettings,
+            IDiscountService discountService)
         {
             _addressSettings = addressSettings;
             _customerSettings = customerSettings;
@@ -114,6 +118,7 @@ namespace Nop.Web.Controllers
             _paymentSettings = paymentSettings;
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
+            _discountService = discountService;
         }
 
         #endregion
@@ -1606,6 +1611,48 @@ namespace Nop.Web.Controllers
                         goto_section = "shipping"
                     });
                 }
+
+                string discountcouponcode = "BUEN_FIN_NETA";
+                await _customerService.RemoveDiscountCouponCodeAsync(
+                    await _workContext.GetCurrentCustomerAsync(),
+                    discountcouponcode);
+
+                var customer = (await _workContext.GetCurrentCustomerAsync());
+                var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
+                if (addr != null)
+                {
+                    if (addr.Email == addr.PhoneNumber || addr.Email.Contains("@"))
+                    {
+                        var usado = await _orderService.GetByDiscountCode(discountcouponcode, addr.PhoneNumber);
+                        if (!usado)
+                        {
+                            var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
+                            if (total > 150)
+                            {
+                                var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
+                                    .Where(d => d.RequiresCouponCode)
+                                    .ToList();
+                                if (discounts.Any())
+                                {
+                                    var userErrors = new List<string>();
+                                    var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
+                                    {
+                                        var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
+                                        userErrors.AddRange(validationResult.Errors);
+
+                                        return validationResult.IsValid;
+                                    });
+
+                                    if (anyValidDiscount)
+                                    {
+                                        await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 //shipping is not required
                 await _genericAttributeService.SaveAttributeAsync<ShippingOption>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.SelectedShippingOptionAttribute, null, (await _storeContext.GetCurrentStoreAsync()).Id);

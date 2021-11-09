@@ -153,11 +153,11 @@ label, label + * {
 }
 
 .master-wrapper-content {
-  position: relative;
+  position: sticky;
   z-index: 0;
   width: 90%;
   margin: 0 auto;
-  top:160px !important;
+  top:5px !important;
 }
 
 .master-column-wrapper {
@@ -6528,7 +6528,7 @@ pre {
   color: #666;
 }
 
-#upper-page{right:0;}
+#upper-page{right:0; position:sticky}
 
 .checkout-data .tab-section{display:none;}
 .checkout-data .tab-section.active{display:block;}

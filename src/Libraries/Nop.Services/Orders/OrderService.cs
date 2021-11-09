@@ -1118,8 +1118,9 @@ namespace Nop.Services.Orders
 
         public async Task<bool> GetByDiscountCode(string discountcouponcode, string phoneNumber)
         {
+            var date = DateTime.UtcNow.AddHours(-6).Date;
             return await _orderRepository.Table
-                .Where(v => _discountUsageHistoryRepository.Table.Any(d => 
+                .Where(v => v.CreatedOnUtc.AddHours(-6).Equals(date) && _discountUsageHistoryRepository.Table.Any(d => 
                     d.OrderId.Equals(v.Id) && 
                     _discountRepository.Table.Any(d1 => d1.Id.Equals(d.DiscountId) && d1.CouponCode.Equals(discountcouponcode)))
                 ).AnyAsync(o => _addressRepository.Table.Any(a => o.BillingAddressId.Equals(a.Id) && a.PhoneNumber.Equals(phoneNumber)));
