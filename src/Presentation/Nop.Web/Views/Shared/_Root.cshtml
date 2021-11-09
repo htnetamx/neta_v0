@@ -11,7 +11,7 @@
 
             @await Html.PartialAsync("_Header")
         </div>*@
-    <div id="upper-page" style="position:fixed;top: 0;left:0;z-index: 100">
+    <div id="upper-page" style="position:sticky;top: 0;left:0;z-index: 100">
         @await Component.InvokeAsync("AdminHeaderLinks")
         @await Html.PartialAsync("_HeaderV2")
     </div>
