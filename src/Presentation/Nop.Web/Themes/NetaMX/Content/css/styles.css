@@ -157,7 +157,7 @@ label, label + * {
   z-index: 0;
   width: 90%;
   margin: 0 auto;
-  top:5px !important;
+  top:0px !important;
 }
 
 .master-column-wrapper {
