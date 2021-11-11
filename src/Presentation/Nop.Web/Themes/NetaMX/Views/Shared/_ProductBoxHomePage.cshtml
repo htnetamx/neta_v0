@@ -38,11 +38,13 @@
     </div>
     <div class="details">
         <div class="prd-top">
-
+            @if (!string.IsNullOrEmpty(Model.ProductPrice.TotalSavingOnProduct))
+            {
             <div class="left">
                 <img class="owlimg" src="\Themes\NetaMX\Content\images\Dis.icon.png" />
                 <span style="float:right;">-@Model.ProductPrice.TotalSavingOnProduct</span>
             </div>
+            }
             @*<div class="right">300 Unidades</div>*@
         </div>
         @if (catalogSettings.ShowSkuOnCatalogPages && !string.IsNullOrEmpty(Model.Sku))
@@ -150,7 +152,7 @@
                 }
                 @{ 
                     var currentQty = Model.Details.CurrentProductQuantity;
-                    if (product.OrderMaximumQuantity != Model.Details.CurrentProductQuantity)
+                    if (product.StockQuantity > Model.Details.CurrentProductQuantity)
                     {
                         currentQty++;
                     }
@@ -173,7 +175,7 @@
                             // If is not undefined
                             if (!isNaN(currentVal)) {
                                 // Increment
-                                if (@(product.OrderMaximumQuantity) > currentVal) {
+                                if (@(product.StockQuantity) > currentVal) {
                                     var qty = currentVal + 1;
                                     $('#itemquantity@(Model.Id)').val(qty);
                                     AjaxCart.addproducttocart_catalog('@addtocartlink', $('#currentQty_@Model.Id'));
