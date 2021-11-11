@@ -445,7 +445,7 @@ namespace Nop.Web.Controllers
                     ? await _customerService.GetCustomerByUsernameAsync(model.Username)
                     : await _customerService.GetCustomerByEmailAsync(model.Email);
 
-                return await _customerRegistrationService.SignInCustomerAsync(customer1, returnUrl, model.RememberMe);
+                return await _customerRegistrationService.SignInCustomerAsync(customer1, returnUrl, true);
             }
 
             if (form["code_generated"] != form["codeVerif"])
@@ -482,7 +482,7 @@ namespace Nop.Web.Controllers
                 return View(model);
             }
             var customer = await _customerService.GetCustomerByTelephoneAsync(model.Password);
-            return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
+            return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, true);
 
             //if (ModelState.IsValid)
             //{

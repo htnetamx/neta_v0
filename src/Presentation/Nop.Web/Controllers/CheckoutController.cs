@@ -18,6 +18,7 @@ using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
+using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Orders;
@@ -61,6 +62,8 @@ namespace Nop.Web.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
 
+        private readonly IDiscountService _discountService;
+
         #endregion
 
         #region Ctor
@@ -88,7 +91,8 @@ namespace Nop.Web.Controllers
             OrderSettings orderSettings,
             PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings,
-            ShippingSettings shippingSettings)
+            ShippingSettings shippingSettings,
+            IDiscountService discountService)
         {
             _addressSettings = addressSettings;
             _customerSettings = customerSettings;
@@ -114,6 +118,7 @@ namespace Nop.Web.Controllers
             _paymentSettings = paymentSettings;
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
+            _discountService = discountService;
         }
 
         #endregion
@@ -336,6 +341,11 @@ namespace Nop.Web.Controllers
             //    12, form["code_generated"]);
 
             NetaAuronixMessaging.Send_SMS(form["Password"], $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar", "15");
+
+            //BotmakerMessaging.Send("525545439866",
+            //    "521" + form["Password"],
+            //    "codigo_verificacion_usuario",
+            //    new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
 
             return Content("{'rta': true }", "application/json");
         }
@@ -1161,7 +1171,7 @@ namespace Nop.Web.Controllers
                     }
 
                     var list = new List<string>();
-                    foreach(var item in cart)
+                    foreach (var item in cart)
                     {
                         var prod = await _productService.GetProductByIdAsync(item.ProductId);
                         list.Add($"{prod.Name} cantidad {item.Quantity.ToString()}");
@@ -1173,14 +1183,17 @@ namespace Nop.Web.Controllers
                     //orders = orders.Where(v => v.BillingAddressId == (billingAddressId ?? 0)).ToList();
 
                     var name = "Netero";
+                    var telusuario = "0";
                     if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
                     {
                         var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
                         name = customer.FirstName;
+                        telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
                     }
 
+
                     var buscar = "mañana,";
-                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    var refDate = DateTime.UtcNow.AddHours(-6);
                     if (refDate.DayOfWeek == DayOfWeek.Saturday)
                     {
                         buscar = "el lunes,";
@@ -1201,6 +1214,20 @@ namespace Nop.Web.Controllers
                         //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
                         "5pm", (orders.Count + 1).ToString(), "10",
                         (await _storeContext.GetCurrentStoreAsync()).Url);
+                    
+                    
+                    //BotmakerMessaging.Send("525545439866",
+                    //    "521" + telusuario,
+                    //    "confirmacion_compra",
+                    //    new Dictionary<string, object> { { "Nombre", name },
+                    //                                     { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id},
+                    //                                     { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
+                    //                                     { "Dia", name },
+                    //                                     { "Tienda", (await _storeContext.GetCurrentStoreAsync()).Name  },
+                    //                                     { "6", 6 },
+                    //                                     { "Link", (await _storeContext.GetCurrentStoreAsync()).Url } } );
+
+
 
                     //NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,
                     //    $"Gracias {name} por comprar en NetaMx, tu orden es la siguiente, {"\r" + string.Join("\r", list.ToArray()) + "\r"} Tu total es de ${placeOrderResult.PlacedOrder.OrderTotal.ToString()};pasa mañana a {(await _storeContext.GetCurrentStoreAsync()).Name}, después de las {"5pm"}. Eres el cliente {(orders.Count + 1).ToString()} del pedido, recuerda que tenemos que llegar a 20 clientes para poder despachar. Comparte las promos y juntos lleguemos al mínimo de pedidos: {(await _storeContext.GetCurrentStoreAsync()).Url}");
@@ -1425,7 +1452,7 @@ namespace Nop.Web.Controllers
                 {
                     //new address
                     var newAddress = model.BillingNewAddress;
-                    if(billingAddressId > 0)
+                    if (billingAddressId > 0)
                     {
                         if (!string.IsNullOrWhiteSpace(model.BillingNewAddress.FirstName))
                         {
@@ -1433,7 +1460,7 @@ namespace Nop.Web.Controllers
                                 ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
 
                             var children = await _addressService.GetRelatedAddressByIdAsync(address1.PhoneNumber);
-                            newAddress.Email = children.Where(v=>v.Email == null || v.Email.Contains("@")).First().PhoneNumber;
+                            newAddress.Email = children.Where(v => v.Email == null || v.Email.Contains("@")).First().PhoneNumber;
                         }
                     }
 
@@ -1584,6 +1611,48 @@ namespace Nop.Web.Controllers
                         goto_section = "shipping"
                     });
                 }
+
+                string discountcouponcode = "BUEN_FIN_NETA";
+                await _customerService.RemoveDiscountCouponCodeAsync(
+                    await _workContext.GetCurrentCustomerAsync(),
+                    discountcouponcode);
+
+                var customer = (await _workContext.GetCurrentCustomerAsync());
+                var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
+                if (addr != null)
+                {
+                    if (addr.Email == addr.PhoneNumber || addr.Email.Contains("@"))
+                    {
+                        var usado = await _orderService.GetByDiscountCode(discountcouponcode, addr.PhoneNumber);
+                        if (!usado)
+                        {
+                            var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
+                            if (total > 150)
+                            {
+                                var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
+                                    .Where(d => d.RequiresCouponCode)
+                                    .ToList();
+                                if (discounts.Any())
+                                {
+                                    var userErrors = new List<string>();
+                                    var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
+                                    {
+                                        var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
+                                        userErrors.AddRange(validationResult.Errors);
+
+                                        return validationResult.IsValid;
+                                    });
+
+                                    if (anyValidDiscount)
+                                    {
+                                        await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 //shipping is not required
                 await _genericAttributeService.SaveAttributeAsync<ShippingOption>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.SelectedShippingOptionAttribute, null, (await _storeContext.GetCurrentStoreAsync()).Id);
@@ -1959,71 +2028,34 @@ namespace Nop.Web.Controllers
                 //    throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
                 var store = await _storeContext.GetCurrentStoreAsync();
-
-                //var appSettings = EngineContext.Current.Resolve<AppSettings>();
-                var qtyValidationMain = 0;
-                var qtyValidationSubAccounts = 0;
-                var validQty = true;
-                switch (store.DisplayOrder)
+                var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                foreach (var item in cart)
                 {
-                    case 1:
-                        qtyValidationMain = 2;
-                        qtyValidationSubAccounts = 2;
-                        validQty = false;
-                        break;
-
-                    case 2:
-                        qtyValidationMain = 10;
-                        qtyValidationSubAccounts = 1;
-                        validQty = false;
-                        break;
-
-                    default:
-                        qtyValidationMain = 0;
-                        qtyValidationSubAccounts = 0;
-                        validQty = false;
-                        break;
-                }
-                //appSettings.CommonConfig.QtyPerEndClients;
-                //appSettings.CommonConfig.ValidateQtyPerEndClients;
-                if (validQty)
-                {
-                    var addr = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-                    
-
-                    var children = await _addressService.GetRelatedAddressByIdAsync(addr.PhoneNumber);
-                    foreach (var item in cart)
+                    var product = await _productService.GetProductByIdAsync(item.ProductId);
+                    var qtyValidationMain = product.OrderMaximumQuantity;
+                    if (product.Sku.EndsWith("LH"))
                     {
-                        if(store.DisplayOrder==2) qtyValidationMain = (await _productService.GetProductByIdAsync(item.ProductId)).OrderMaximumQuantity;
-                        var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, item.ProductId, addr.PhoneNumber, (await _workContext.GetCurrentCustomerAsync()).Id);
-                        if(cnt != null)
+                        qtyValidationMain = 2;
+                    }
+                    var cnt = await _orderService.GetOrderSkuCountAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0,
+                        item.ProductId,
+                        addr.PhoneNumber,
+                        (await _workContext.GetCurrentCustomerAsync()).Id);
+                    if (cnt != null)
+                    {
+                        if (cnt[1] + item.Quantity > qtyValidationMain)
                         {
-                            var qtyValidation=(qtyValidationMain) + qtyValidationSubAccounts * (children.Count() - 1);
-                            if (cnt[0] + item.Quantity > qtyValidation)
+                            if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
                             {
-                                throw new Exception($"Haz comprado más de lo permitido, por favor ajusta las cantidades para poder finalizar tu pedido. " +
-                                    $"La cuenta principal con sus asociados superan las {qtyValidation} unidades. " +
-                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades " +
-                                    $"y cada asociado tiene un máximo de {qtyValidationSubAccounts} unidades.");
+                                throw new Exception($"Haz llegado al límite de compra de este producto. " +
+                                    $"Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades " +
+                                    $"y quiere comprar {item.Quantity}. " +
+                                    $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
                             }
                             else
                             {
-                                qtyValidation = (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@") ? qtyValidationMain : qtyValidationSubAccounts);
-                                if (cnt[1] + item.Quantity > qtyValidation)
-                                {
-                                    if (string.IsNullOrWhiteSpace(addr.Email) || addr.Email.Contains("@"))
-                                    {
-                                        throw new Exception($"Haz llegado al límite de compra de este producto. " +
-                                            $"Tu cuenta principal, {addr.FirstName} , ya compró {cnt[1]} unidades " +
-                                            $"y quiere comprar {item.Quantity}. " +
-                                            $"Recuerda que la cuenta principal tiene un máximo de {qtyValidationMain} unidades.");
-                                    }
-                                    else
-                                    {
-                                        throw new Exception($"El límite de unidades por subcuenta es de {qtyValidation} unidades. " +
-                                            $"Si {addr.FirstName} quiere comprar más, dile que se registre!"); 
-                                    }
-                                }
+                                throw new Exception($"El límite de unidades por subcuenta es de {qtyValidationMain} unidades. " +
+                                    $"Si {addr.FirstName} quiere comprar más, dile que se registre!");
                             }
                         }
                     }
@@ -2056,7 +2088,7 @@ namespace Nop.Web.Controllers
                         Order = placeOrderResult.PlacedOrder
                     };
 
-                    
+
                     //postProcessPaymentRequest.Order.
                     var list = new List<string>();
                     foreach (var item in cart)
@@ -2078,7 +2110,7 @@ namespace Nop.Web.Controllers
                     }
 
                     var buscar = "mañana,";
-                    var refDate = DateTime.UtcNow.AddHours(-5);
+                    var refDate = DateTime.UtcNow.AddHours(-6);
                     if (refDate.DayOfWeek == DayOfWeek.Saturday)
                     {
                         buscar = "el lunes,";

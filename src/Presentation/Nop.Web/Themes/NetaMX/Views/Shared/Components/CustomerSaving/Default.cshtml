@@ -1,7 +1,11 @@
-﻿@model decimal
+﻿@model decimal[]
 @{
-    var resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model + "</b>");
-    string absoluteurl = Context.Request.Path;
+    var resource = string.Empty;
+    if(Model[1] > 150){
+        resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model[0] + "</b>") + "<span id='customer-buenfin' style='display: block'>+ $20 pesos de regalo</span>";
+    } else {
+        resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model[0] + "</b>") + "<span id='customer-buenfin' style='display: none'>+ $20 pesos de regalo</span>";
+    }
 }
 <div class="customer-saving">
     <span>@Html.Raw(resource)</span>
@@ -18,8 +22,15 @@
             url: "@(Url.Action("GetTotalSaving", "CustomProduct"))",
             dataType: 'json',
             success: function (response) {
-                $("#customer-saving").text("$" + response.totalSaving);
-
+                console.log(response)
+                if (response.totalCart > 150) {
+                    $("#customer-saving").text("$" + response.totalSaving);
+                    $("#customer-buenfin").show();
+                }
+                else {
+                    $("#customer-saving").text("$" + response.totalSaving);
+                    $("#customer-buenfin").hide();
+                }
             },
             failure: function (response) {
 

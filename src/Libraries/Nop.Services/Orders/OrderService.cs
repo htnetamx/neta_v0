@@ -8,6 +8,7 @@ using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
+using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Html;
@@ -39,6 +40,9 @@ namespace Nop.Services.Orders
         private readonly IShipmentService _shipmentService;
         private readonly IAddressService _addressService;
 
+        private readonly IRepository<DiscountUsageHistory> _discountUsageHistoryRepository;
+        private readonly IRepository<Discount> _discountRepository;
+
         #endregion
 
         #region Ctor
@@ -53,6 +57,8 @@ namespace Nop.Services.Orders
             IRepository<ProductWarehouseInventory> productWarehouseInventoryRepository,
             IRepository<RecurringPayment> recurringPaymentRepository,
             IRepository<RecurringPaymentHistory> recurringPaymentHistoryRepository,
+            IRepository<DiscountUsageHistory> discountUsageHistoryRepository,
+            IRepository<Discount> discountRepository,
             IShipmentService shipmentService,
             IAddressService addressService)
         {
@@ -68,6 +74,9 @@ namespace Nop.Services.Orders
             _recurringPaymentHistoryRepository = recurringPaymentHistoryRepository;
             _shipmentService = shipmentService;
             _addressService = addressService;
+
+            _discountUsageHistoryRepository = discountUsageHistoryRepository;
+            _discountRepository = discountRepository;
         }
 
         #endregion
@@ -248,7 +257,7 @@ namespace Nop.Services.Orders
             var currentAddress = await _addressService.GetAddressByIdAsync(addressId);
             var children = await _addressService.GetRelatedAddressByIdAsync(currentAddress.PhoneNumber);
 
-            DateTime date = DateTime.UtcNow.AddHours(-5).Date;
+            DateTime date = DateTime.UtcNow.AddHours(-6).Date;
             //DateTime date = DateTime.UtcNow.Date;
 
             var total = 0;
@@ -258,7 +267,7 @@ namespace Nop.Services.Orders
                 var cnt = await (from o in _orderRepository.Table
                               join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                               join a in _addressRepository.Table on o.BillingAddressId equals a.Id
-                              where o.Deleted == false && oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.AddHours(-5).Date == date
+                              where o.Deleted == false && oi.ProductId == productId && o.BillingAddressId == child.Id && o.CreatedOnUtc.AddHours(-6).Date == date
                               select oi).SumAsync(v => v.Quantity);
                 if (child.PhoneNumber == phoneNumber)
                 {
@@ -1105,6 +1114,16 @@ namespace Nop.Services.Orders
             return await (from o in _orderRepository.Table
                          where o.StoreId == storeId
                          select o).ToListAsync();
+        }
+
+        public async Task<bool> GetByDiscountCode(string discountcouponcode, string phoneNumber)
+        {
+            var date = DateTime.UtcNow.AddHours(-6).Date;
+            return await _orderRepository.Table
+                .Where(v => v.CreatedOnUtc.AddHours(-6).Equals(date) && _discountUsageHistoryRepository.Table.Any(d => 
+                    d.OrderId.Equals(v.Id) && 
+                    _discountRepository.Table.Any(d1 => d1.Id.Equals(d.DiscountId) && d1.CouponCode.Equals(discountcouponcode)))
+                ).AnyAsync(o => _addressRepository.Table.Any(a => o.BillingAddressId.Equals(a.Id) && a.PhoneNumber.Equals(phoneNumber)));
         }
 
         #endregion

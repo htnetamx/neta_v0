@@ -73,11 +73,11 @@ namespace Nop.Services.Stores
                     var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
 
                     ////Bonus CASE 500 GMV, 8 distinct customers
-                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 8 && orderValueGMV > 500)
+                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 8 && orderValueGMV > 500 && !store.FirstGmvBonusApplied)
                     {
-                        store.NetaCoin = 100;
+                        store.NetaCoin = 200;
+                        store.FirstGmvBonusApplied = true;
                         storesUnlokcingBonus.Add(store.Name.ToString());
-
                     }
 
                     //Transition Case

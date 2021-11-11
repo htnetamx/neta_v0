@@ -1027,7 +1027,7 @@ namespace Nop.Services.Common
             doc.Add(productsTable);
         }
 
-        protected virtual async Task PrintProductsAsync1(int vendorId, Language lang, Font titleFont, Document doc, Dictionary<string, OrderStoreTotal> products, Font font, Font attributesFont)
+        protected virtual async Task PrintProductsAsync1(int vendorId, Language lang, Font titleFont, Document doc, Dictionary<string, Dictionary<decimal, OrderStoreTotal>> products, Font font, Font attributesFont)
         {
             var productsHeader = new PdfPTable(1)
             {
@@ -1086,45 +1086,47 @@ namespace Nop.Services.Common
 
             foreach (var orderItem in orderItems)
             {
-                var product = orderItem;
+                foreach(var oItem in orderItems[orderItem.Key])
+                {
+                    var product = oItem;
 
-                var pAttribTable = new PdfPTable(1) { RunDirection = GetDirection(lang) };
-                pAttribTable.DefaultCell.Border = Rectangle.NO_BORDER;
+                    var pAttribTable = new PdfPTable(1) { RunDirection = GetDirection(lang) };
+                    pAttribTable.DefaultCell.Border = Rectangle.NO_BORDER;
 
-                //product name
-                var name = product.Key;
-                pAttribTable.AddCell(new Paragraph(name, font));
-                cellProductItem.AddElement(new Paragraph(name, font));
-                productsTable.AddCell(pAttribTable);
+                    //product name
+                    var name = orderItem.Key;
+                    pAttribTable.AddCell(new Paragraph(name, font));
+                    cellProductItem.AddElement(new Paragraph(name, font));
+                    productsTable.AddCell(pAttribTable);
 
-                //price
-                string unitPrice;
-                var unitPriceInclTaxInCustomerCurrency =
-                    _currencyService.ConvertCurrency(orderItem.Value.Price, 1);
-                unitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true,
-                    "PES", lang.Id, true);
+                    //price
+                    string unitPrice;
+                    var unitPriceInclTaxInCustomerCurrency =
+                        _currencyService.ConvertCurrency(oItem.Value.Price, 1);
+                    unitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true,
+                        "PES", lang.Id, true);
 
-                cellProductItem = GetPdfCell(unitPrice, font);
-                cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
-                productsTable.AddCell(cellProductItem);
+                    cellProductItem = GetPdfCell(unitPrice, font);
+                    cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
+                    productsTable.AddCell(cellProductItem);
 
-                //qty
-                cellProductItem = GetPdfCell(orderItem.Value.Quantity, font);
-                cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
-                productsTable.AddCell(cellProductItem);
+                    //qty
+                    cellProductItem = GetPdfCell(oItem.Value.Quantity, font);
+                    cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
+                    productsTable.AddCell(cellProductItem);
 
-                //total
-                string subTotal;
-                var priceInclTaxInCustomerCurrency =
-                    _currencyService.ConvertCurrency(orderItem.Value.Price * orderItem.Value.Quantity, 1);
-                subTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, "PES",
-                    lang.Id, true);
+                    //total
+                    string subTotal;
+                    var priceInclTaxInCustomerCurrency =
+                        _currencyService.ConvertCurrency(oItem.Value.Price * oItem.Value.Quantity, 1);
+                    subTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, "PES",
+                        lang.Id, true);
 
-                cellProductItem = GetPdfCell(subTotal, font);
-                cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
-                productsTable.AddCell(cellProductItem);
+                    cellProductItem = GetPdfCell(subTotal, font);
+                    cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
+                    productsTable.AddCell(cellProductItem);
+                }
             }
-
             doc.Add(productsTable);
         }
 
@@ -1649,7 +1651,9 @@ namespace Nop.Services.Common
             if (lang == null || !lang.Published)
                 lang = await _workContext.GetWorkingLanguageAsync();
 
-            var products = new Dictionary<string, OrderStoreTotal>();
+            var products = new Dictionary<string, Dictionary<decimal, OrderStoreTotal>>();
+            decimal sumDiscount = 0;
+            decimal sumTotal = 0;
             foreach (var order in orders)
             {
                 var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
@@ -1659,12 +1663,16 @@ namespace Nop.Services.Common
                     var name = await _localizationService.GetLocalizedAsync(product, x => x.Name, lang.Id);
                     if (!products.ContainsKey(name))
                     {
-                        products.Add(name, new OrderStoreTotal());
+                        products.Add(name, new Dictionary<decimal, OrderStoreTotal>());
+                    }
+                    if (!products[name].ContainsKey(orderItem.UnitPriceExclTax))
+                    {
+                        products[name].Add(orderItem.UnitPriceExclTax, new OrderStoreTotal());
                     }
 
-                    products[name].Price = orderItem.UnitPriceExclTax;
-                    products[name].Quantity += orderItem.Quantity;
-                    products[name].Discount += orderItem.DiscountAmountExclTax;
+                    products[name][orderItem.UnitPriceExclTax].Price = orderItem.UnitPriceExclTax;
+                    products[name][orderItem.UnitPriceExclTax].Quantity += orderItem.Quantity;
+                    products[name][orderItem.UnitPriceExclTax].Discount += orderItem.DiscountAmountExclTax;
                 }
 
                 if (order.OrderDiscount != 0)
@@ -1672,16 +1680,17 @@ namespace Nop.Services.Common
                     var name = "Descuento de Orden";
                     if (!products.ContainsKey(name))
                     {
-                        products.Add(name, new OrderStoreTotal());
+                        products.Add(name, new Dictionary<decimal, OrderStoreTotal>());
+                        products[name].Add(order.OrderDiscount, new OrderStoreTotal());
                     }
-                    products[name].Price = 0;
-                    products[name].Quantity += 1;
-                    products[name].Discount += order.OrderDiscount;
+                    products[name][order.OrderDiscount].Price = 0;
+                    products[name][order.OrderDiscount].Quantity += 1;
+                    products[name][order.OrderDiscount].Discount += order.OrderDiscount;
                 }
             }
 
-            var sumDiscount = products.Sum(p => p.Value.Discount);
-            var sumTotal = products.Sum(p => (p.Value.Quantity * p.Value.Price) - p.Value.Discount);
+            sumDiscount += products.Values.Sum(p => p.Values.Sum(p1 => p1.Discount));
+            sumTotal += products.Values.Sum(p => p.Values.Sum(p1 => (p1.Quantity * p1.Price) - p1.Discount));
 
             //by default _pdfSettings contains settings for the current active store
             //and we need PdfSettings for the store which was used to place an order

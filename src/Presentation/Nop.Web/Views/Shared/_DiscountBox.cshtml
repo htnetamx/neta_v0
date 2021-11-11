@@ -22,9 +22,9 @@
         @foreach (var discount in Model.AppliedDiscountsWithCodes)
         {
             <div class="current-code">
-                <span class="applied-discount-code">@string.Format(T("ShoppingCart.DiscountCouponCode.CurrentCode").Text, discount.CouponCode)</span>
+                @*<span class="applied-discount-code">@string.Format(T("ShoppingCart.DiscountCouponCode.CurrentCode").Text, discount.CouponCode)</span>*@
                 @*empty value (little hack for FormValueExistsAttribute)*@
-                <button type="submit" name="removediscount-@discount.Id" class="remove-discount-button"></button>
+                @*<button type="submit" name="removediscount-@discount.Id" class="remove-discount-button"></button>*@
             </div>
         }
     </div>

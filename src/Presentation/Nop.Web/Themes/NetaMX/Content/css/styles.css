@@ -166,10 +166,11 @@ label, label + * {
 }
 
 .master-wrapper-content {
-  position: relative;
+  position: sticky;
   z-index: 0;
   width: 90%;
   margin: 0 auto;
+  top:0px !important;
 }
 
 .master-column-wrapper {
@@ -6824,7 +6825,7 @@ pre {
   color: #666;
 }
 
-#upper-page{right:0;}
+#upper-page{right:0; position:sticky}
 
 .checkout-data .tab-section{display:none;}
 .checkout-data .tab-section.active{display:block;}
@@ -6883,6 +6884,14 @@ pre {
 .customer-saving {
 }
 .cart-total .customer-saving{}
+
+.customer-banner {
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  background: yellow !important;
+  padding: 10px 0;
+}
 
 .prd-title{margin:0 0 24px;}
 .prd-title h2{font-size:20px;color:#212121;font-weight:700;margin:0;padding:0;text-align:left;}

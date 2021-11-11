@@ -408,7 +408,6 @@ namespace Nop.Services.Orders
 
 
         Task<decimal> GetCurrentStockAsync(int storeId, int productId, DateTime? start, DateTime? end);
-
-
+        Task<bool> GetByDiscountCode(string discountcouponcode, string phoneNumber);
     }
 }
