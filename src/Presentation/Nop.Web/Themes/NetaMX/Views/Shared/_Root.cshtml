@@ -96,13 +96,13 @@
                 if (list.innerText == "") {
                     list.style.display = "none";
                 }
-                //var searchbar = document.getElementById("small-searchterms");
-                //if (searchbar != null) {
-                //    var lupa = document.getElementById("lupa_icon");
-                //    var left_diff = parseInt(lupa.style.left.toString().replace("px", ""), 10);
-                //    var diff = Math.ceil(lupa.clientWidth + left_diff * 2);
-                //    searchbar.style.paddingLeft = diff.toString() + "px";
-                //}
+                var searchbar = document.getElementById("small-searchterms");
+                if (searchbar != null) {
+                    var lupa = document.getElementById("lupa_icon");
+                    var left_diff = parseInt(lupa.style.left.toString().replace("px", ""), 10);
+                    var diff = Math.ceil(lupa.clientWidth + left_diff * 2);
+                    searchbar.style.paddingLeft = diff.toString() + "px";
+                }
 
             }
             catch {
