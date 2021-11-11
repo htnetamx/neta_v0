@@ -1,6 +1,7 @@
 ﻿@model decimal
 @{
     var resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model + "</b>");
+    string absoluteurl = Context.Request.Path;
 }
 <div class="customer-saving">
     <span>@Html.Raw(resource)</span>

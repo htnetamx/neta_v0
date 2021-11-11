@@ -2121,6 +2121,16 @@ label, label + * {
  padding-right: 15px;
 }
 .customer-saving:before{content:'';height:18px;width:2px;background:#C1E7CB;position:absolute;right:0;top:2px;}
+.cart-total .customer-saving {
+    margin-right: 0;
+    padding-right: 0;
+    background: #eaf7ee;
+    padding: 5px 7px;
+    border: 1px solid #eaf7ee;
+    border-radius: 11px;
+}
+.cart-total .customer-saving:before{background:unset;}
+.cart-total .customer-saving b{float:right;}
 
 .new-header
 {
@@ -3836,6 +3846,9 @@ label, label + * {
   font-size: 15px;
   color: #fff;
   text-transform: uppercase;
+}
+.btn-zipCode {
+    background-color: #CFCFCF !important;
 }
 
 .registration-page .button-1:hover,
