@@ -13,12 +13,15 @@
         </div>*@
     @await Component.InvokeAsync("AdminHeaderLinks")
     @await Html.PartialAsync("_HeaderV2")
-    <div class="search-container">
-        <div class="search-box store-search-box">
-            @await Component.InvokeAsync("SearchBoxV2")
+    @{string absoluteurl = Context.Request.Path;}
+    @if (!absoluteurl.Contains("checkout") && !absoluteurl.Contains("cart") && !absoluteurl.Contains("zipcodeupdate"))
+    {
+        <div class="search-container">
+            <div class="search-box store-search-box">
+                @await Component.InvokeAsync("SearchBoxV2")
+            </div>
         </div>
-    </div>
-
+    }
     <script asp-location="Footer">
         var localized_data = {
             AjaxCartFailure: "@T("AjaxCart.Failure")"

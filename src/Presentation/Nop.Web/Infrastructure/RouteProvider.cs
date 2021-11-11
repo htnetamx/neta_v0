@@ -700,6 +700,11 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapControllerRoute(name: "PageNotFound",
                 pattern: $"{lang}/page-not-found",
                 defaults: new { controller = "Common", action = "PageNotFound" });
+
+            //ZipCodeUpdate
+            endpointRouteBuilder.MapControllerRoute(name: "ZipCodeUpdate",
+                pattern: $"{lang}/zipcodeupdate",
+                defaults: new { controller = "Customer", action = "ZipCodeUpdate" });
         }
 
         #endregion
