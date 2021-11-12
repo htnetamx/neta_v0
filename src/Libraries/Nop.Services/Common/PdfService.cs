@@ -732,18 +732,8 @@ namespace Nop.Services.Common
                 totalsTable.AddCell(pDiscount);
             }
 
-            //discount total
-            var comission = subTotal * 10 / 100;
-            var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
-            var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
-
-            var pComission = GetPdfCell($"Tus ganancias con Neta: {orderComissionStr}", titleFont);
-            pComission.HorizontalAlignment = Element.ALIGN_RIGHT;
-            pComission.Border = Rectangle.NO_BORDER;
-            totalsTable.AddCell(pComission);
-
             var montoBono = current_store.NetaCoin;
-            var total_antes_bono = subTotal - comission - subDiscount;
+            var total_antes_bono = subTotal - subDiscount;
             decimal total_despues_bono = 0;
             decimal remainderBono = 0;
 
@@ -768,7 +758,17 @@ namespace Nop.Services.Common
             pBono.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pBono);
 
+            //discount total
+            var comission = total_despues_bono * 10 / 100;
+            var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
+            var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
 
+            var pComission = GetPdfCell($"Tus ganancias con Neta: {orderComissionStr}", titleFont);
+            pComission.HorizontalAlignment = Element.ALIGN_RIGHT;
+            pComission.Border = Rectangle.NO_BORDER;
+            totalsTable.AddCell(pComission);
+
+            total_despues_bono = total_despues_bono - comission;
 
             //Space between items and total
             var space = GetPdfCell($"---------------------------------------------", font);
