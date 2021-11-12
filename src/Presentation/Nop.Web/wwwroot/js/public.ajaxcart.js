@@ -91,7 +91,7 @@ var AjaxCart = {
         if (response.updateflyoutcartsectionhtml) {
             $(AjaxCart.flyoutcartselector).replaceWith(response.updateflyoutcartsectionhtml);
       }
-        if (response.newQuantity && this.indexValue.ItemQuantityBox) {
+      if (!isNaN(response.newQuantity) && this.indexValue.ItemQuantityBox) {
           this.indexValue.ItemQuantityBox.text(response.newQuantity);
         }
         if (response.message) {
