@@ -11,7 +11,6 @@
 }
 
 @await Html.PartialAsync("_AdminTour")
-
 <form asp-controller="Store" asp-action="Edit" method="post">
     <div class="content-header clearfix">
         <h1 class="float-left">
@@ -40,3 +39,36 @@
     @await Html.PartialAsync("_CreateOrUpdate", Model)
 </form>
 <nop-delete-confirmation asp-model-id="@Model.Id" asp-button-id="store-delete" />
+
+<script>
+    $.fn.bindFirst = function (name, fn) {
+        var elem, handlers, i, _len;
+        this.bind(name, fn);
+        for (i = 0, _len = this.length; i < _len; i++) {
+            elem = this[i];
+            handlers = jQuery._data(elem).events[name.split('.')[0]];
+            handlers.unshift(handlers.pop());
+        }
+    };
+
+    function filterbeforeBD() {
+        var elements = document.getElementsByClassName("k-link-date")
+        for (var i = 0; i < elements.length; ++i) {
+            var id = elements[i].parentNode.parentNode.parentNode.parentNode.id;
+            var input = document.getElementById(id + "DateTimeUtc");
+
+            var today = new Date();
+            var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear() + " 0:00:00";
+            var element = document.getElementById(id);
+            var day = id.replace("Start", "").replace("End", "");
+            if (date == input.value || !($("#"+day+"CheckBox").is(':checked'))) {
+                element = document.getElementById(day+"Info");
+                console.log(element)
+                element.remove();
+                i--;
+            }
+        }
+    }
+    $('button[name="save"]').bindFirst("click", function () { filterbeforeBD() });
+    $('button[name="save-continue"]').bindFirst("click", function () { filterbeforeBD() });
+</script>

@@ -83,10 +83,70 @@ namespace Nop.Core.Domain.Stores
         /// </summary>
         public string ZipCode { get; set; }
 
-
         /// <summary>
-        /// Gets or sets the zipcode
+        /// Gets or sets the bonus flag
         /// </summary>
         public bool FirstGmvBonusApplied { get; set; }
+        /// Gets or sets Monday Day Start
+        /// </summary>
+        public DateTime? MondayStartDateTimeUtc { get; set; }
+        /// <summary>
+        /// Gets or sets Monday Day End
+        /// </summary>
+        public DateTime? MondayEndDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets Tuesday Day Start
+        /// </summary>
+        public DateTime? TuesdayStartDateTimeUtc { get; set; }
+        /// <summary>
+        /// Gets or sets Tuesday Day End
+        /// </summary>
+        public DateTime? TuesdayEndDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets Wednesday Day Start
+        /// </summary>
+        public DateTime? WednesdayStartDateTimeUtc { get; set; }
+        /// <summary>
+        /// Gets or sets Wednesday Day End
+        /// </summary>
+        public DateTime? WednesdayEndDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets Thursday Day Start
+        /// </summary>
+        public DateTime? ThursdayStartDateTimeUtc { get; set; }
+        /// <summary>
+        /// Gets or sets Thursday Day End
+        /// </summary>
+        public DateTime? ThursdayEndDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets Friday Day Start
+        /// </summary>
+        public DateTime? FridayStartDateTimeUtc { get; set; }
+        /// <summary>
+        /// Gets or sets Friday Day End
+        /// </summary>
+        public DateTime? FridayEndDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets Saturday Day Start
+        /// </summary>
+        public DateTime? SaturdayStartDateTimeUtc { get; set; }
+        /// <summary>
+        /// Gets or sets Saturday Day End
+        /// </summary>
+        public DateTime? SaturdayEndDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets Sunday Day Start
+        /// </summary>
+        public DateTime? SundayStartDateTimeUtc { get; set; }
+        /// <summary>
+        /// Gets or sets Sunday Day End
+        /// </summary>
+        public DateTime? SundayEndDateTimeUtc { get; set; }
     }
 }
