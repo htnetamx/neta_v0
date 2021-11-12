@@ -29,6 +29,7 @@
 
     var addtowishlistlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
     var addtocomparelink = Url.RouteUrl("AddProductToCompare", new { productId = Model.Id });
+    var outofStock = product.StockQuantity <= 0;
 }
 <div class="product-item" data-productid="@Model.Id">
     <div class="picture" style="margin: 0px">
@@ -118,7 +119,7 @@
             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoMiddle, additionalData = Model })
             <div class="buttons">
                 @*<button type="button" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = Model.SeName })')">@T("Products.Details")</button>*@
-                @if (!Model.ProductPrice.DisableBuyButton)
+                @if (!Model.ProductPrice.DisableBuyButton && !outofStock)
                 {
                     var addToCartText = T("ShoppingCart.AddToCart").Text;
                     if (Model.ProductPrice.IsRental)
@@ -133,7 +134,9 @@
                     <script>
                         function AddTocart_@(Model.Id)(url,element)
                         {
-                            AjaxCart.addproducttocart_catalog(url, element);
+                            if (@(product.StockQuantity) > @Model.Details.CurrentProductQuantity && @(product.OrderMaximumQuantity) > @Model.Details.CurrentProductQuantity) {
+                                    AjaxCart.addproducttocart_catalog(url, element);
+                                }
                             $("#prdparent-@(Model.Id)").addClass("active");
                         }
                     </script>
@@ -175,11 +178,19 @@
                             // If is not undefined
                             if (!isNaN(currentVal)) {
                                 // Increment
-                                if (@(product.StockQuantity) > currentVal) {
+                                if (@(product.StockQuantity) > currentVal && @(product.OrderMaximumQuantity) > currentVal) {
                                     var qty = currentVal + 1;
                                     $('#itemquantity@(Model.Id)').val(qty);
                                     AjaxCart.addproducttocart_catalog('@addtocartlink', $('#currentQty_@Model.Id'));
                                 }
+                                var qtyLimit = currentVal + 1;
+                                if (@(product.StockQuantity) < qtyLimit) {
+                                    displayBarNotification("@T("StockQtyLimit.message")", 'error', 0);
+                                }
+                                else if (@(product.OrderMaximumQuantity) < qtyLimit) {
+                                    displayBarNotification("@T("OrderMixQtyLimit.message")", 'error', 0);
+                                }
+
                             } else {
                                 // Otherwise put a 0 there
                                 $('#itemquantity@(Model.Id)').val(0);
@@ -194,10 +205,13 @@
                             // Get its current value
                             var currentVal = parseInt($('#itemquantity@(Model.Id)').val());
                             // If it isn't undefined or its greater than 0
-                            if (!isNaN(currentVal) && currentVal > 0) {
+                            if (!isNaN(currentVal) && currentVal >= 0) {
                                 // Decrement one
-                                if (currentVal > 1) {
-                                    var qty = currentVal - 1;
+                                if (currentVal >= 0) {
+                                    qty = currentVal;
+                                    if (currentVal != 0) {
+                                        var qty = currentVal - 1;
+                                    }
                                     $('#itemquantity@(Model.Id)').val(qty);
                                     AjaxCart.addproducttocart_catalog('@removetocartlink', $('#currentQty_@Model.Id'));
                                 }

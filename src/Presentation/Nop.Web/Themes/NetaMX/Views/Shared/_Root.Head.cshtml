@@ -20,23 +20,23 @@
 @{
     var themeName = await themeContext.GetWorkingThemeNameAsync();
 
-    Html.AppendScriptParts(ResourceLocation.Footer, $"~/Themes/{themeName}/Content/js/owl.carousel.min.js?v=111120211021");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.countryselect.js?v=111120211021");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.ajaxcart.js?v=111120211021");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.common.js?v=111120211021");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/Themes/{themeName}/Content/js/owl.carousel.min.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/js/public.countryselect.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/js/public.ajaxcart.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/js/public.common.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
     //when jQuery migrate script logging is active you will see the log in the browser console
     if (commonSettings.JqueryMigrateScriptLoggingActive)
     {
-        Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.js?v=111120211021");
+        Html.AppendScriptParts(ResourceLocation.Footer, $"~/lib_npm/jquery-migrate/jquery-migrate.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
     }
     else
     {
-        Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.min.j?v=111120211021");
+        Html.AppendScriptParts(ResourceLocation.Footer, $"~/lib_npm/jquery-migrate/jquery-migrate.min.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
     }
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-ui-dist/jquery-ui.min.js?v=111120211021");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js?v=111120211021");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation/jquery.validate.min.js?v=111120211021");
-    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery/jquery.min.js?v=111120211021");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/lib_npm/jquery-ui-dist/jquery-ui.min.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/lib_npm/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/lib_npm/jquery-validation/jquery.validate.min.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/lib_npm/jquery/jquery.min.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
 
     //custom tag(s);
     if (!string.IsNullOrEmpty(seoSettings.CustomHeadTags))

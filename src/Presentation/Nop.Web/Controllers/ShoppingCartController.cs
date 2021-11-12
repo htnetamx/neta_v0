@@ -610,37 +610,44 @@ namespace Nop.Web.Controllers
             var shoppingCartItem = await _shoppingCartService.FindShoppingCartItemInTheCartAsync(cart, cartType, product);
             //if we already have the same product in the cart, then use the total quantity to validate
             var quantityToValidate = shoppingCartItem != null ? shoppingCartItem.Quantity + quantity : quantity;
-            var addToCartWarnings = await _shoppingCartService
-                .GetShoppingCartItemWarningsAsync(await _workContext.GetCurrentCustomerAsync(), cartType,
-                product, (await _storeContext.GetCurrentStoreAsync()).Id, string.Empty,
-                decimal.Zero, null, null, quantityToValidate, false, shoppingCartItem?.Id ?? 0, true, false, false, false);
-            if (addToCartWarnings.Any())
+            if (isMinusQty && quantityToValidate == 0)
             {
-                //cannot be added to the cart
-                //let's display standard warnings
-                return Json(new
-                {
-                    success = false,
-                    message = addToCartWarnings.ToArray()
-                });
+                await _shoppingCartService.DeleteShoppingCartItemAsync(shoppingCartItem);
             }
-
-            //now let's try adding product to the cart (now including product attribute validation, etc)
-            addToCartWarnings = await _shoppingCartService.AddToCartAsync(customer: await _workContext.GetCurrentCustomerAsync(),
-                product: product,
-                shoppingCartType: cartType,
-                storeId: (await _storeContext.GetCurrentStoreAsync()).Id,
-                attributesXml: attXml,
-                quantity: quantity,
-                isMinusQty:isMinusQty);
-            if (addToCartWarnings.Any())
+            else
             {
-                //cannot be added to the cart
-                //but we do not display attribute and gift card warnings here. let's do it on the product details page
-                return Json(new
+                var addToCartWarnings = await _shoppingCartService
+                    .GetShoppingCartItemWarningsAsync(await _workContext.GetCurrentCustomerAsync(), cartType,
+                    product, (await _storeContext.GetCurrentStoreAsync()).Id, string.Empty,
+                    decimal.Zero, null, null, quantityToValidate, false, shoppingCartItem?.Id ?? 0, true, false, false, false);
+                if (addToCartWarnings.Any())
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
-                });
+                    //cannot be added to the cart
+                    //let's display standard warnings
+                    return Json(new
+                    {
+                        success = false,
+                        message = addToCartWarnings.ToArray()
+                    });
+                }
+
+                //now let's try adding product to the cart (now including product attribute validation, etc)
+                addToCartWarnings = await _shoppingCartService.AddToCartAsync(customer: await _workContext.GetCurrentCustomerAsync(),
+                    product: product,
+                    shoppingCartType: cartType,
+                    storeId: (await _storeContext.GetCurrentStoreAsync()).Id,
+                    attributesXml: attXml,
+                    quantity: quantity,
+                    isMinusQty: isMinusQty);
+                if (addToCartWarnings.Any())
+                {
+                    //cannot be added to the cart
+                    //but we do not display attribute and gift card warnings here. let's do it on the product details page
+                    return Json(new
+                    {
+                        redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
+                    });
+                }
             }
 
             //added to the cart/wishlist
