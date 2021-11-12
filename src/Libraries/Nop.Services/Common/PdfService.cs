@@ -1690,7 +1690,7 @@ namespace Nop.Services.Common
             }
 
             sumDiscount += products.Values.Sum(p => p.Values.Sum(p1 => p1.Discount));
-            sumTotal += products.Values.Sum(p => p.Values.Sum(p1 => (p1.Quantity * p1.Price) - p1.Discount));
+            sumTotal += products.Values.Sum(p => p.Values.Sum(p1 => (p1.Quantity * p1.Price)));
 
             //by default _pdfSettings contains settings for the current active store
             //and we need PdfSettings for the store which was used to place an order
