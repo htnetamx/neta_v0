@@ -135,9 +135,10 @@
                         function AddTocart_@(Model.Id)(url,element)
                         {
                             if (@(product.StockQuantity) > @Model.Details.CurrentProductQuantity && @(product.OrderMaximumQuantity) > @Model.Details.CurrentProductQuantity) {
-                                    AjaxCart.addproducttocart_catalog(url, element);
-                                }
-                            $("#prdparent-@(Model.Id)").addClass("active");
+                                AjaxCart.addproducttocart_catalog(url, element);
+                                $("#prdparent-@(Model.Id)").addClass("active");
+                                $("#itemquantity@(Model.Id)").val("1");
+                            }
                         }
                     </script>
                 }
@@ -155,12 +156,9 @@
                 }
                 @{ 
                     var currentQty = Model.Details.CurrentProductQuantity;
-                    if (product.StockQuantity > Model.Details.CurrentProductQuantity)
-                    {
-                        currentQty++;
-                    }
+                    var activeClass = Model.Details.CurrentProductQuantity > 0 ? "active" : "";
                 }
-                <div class="add-quantity" id="prdparent-@Model.Id">
+                <div class="add-quantity @activeClass" id="prdparent-@Model.Id">
                     <span data-quantity="minus" class="icon minus"></span>
                     <input id="itemquantity@(Model.Id)" class="qty-input@(Model.Id)" type="text" value="@(currentQty)" />
                     <span data-quantity="plus" class="icon plus"></span>
@@ -214,6 +212,9 @@
                                     }
                                     $('#itemquantity@(Model.Id)').val(qty);
                                     AjaxCart.addproducttocart_catalog('@removetocartlink', $('#currentQty_@Model.Id'));
+                                    if (qty == 0) {
+                                        $("#prdparent-@(Model.Id)").removeClass("active");
+                                    }
                                 }
                             } else {
                                 // Otherwise put a 0 there

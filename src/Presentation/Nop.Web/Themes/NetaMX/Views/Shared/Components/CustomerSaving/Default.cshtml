@@ -2,9 +2,9 @@
 @{
     var resource = string.Empty;
     if(Model[1] > 150){
-        resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model[0] + "</b>") + "<span id='customer-buenfin' style='display: block'>+ $20 pesos de regalo</span>";
+        resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model[0] + "</b>") + "<span id='customer-buenfin' class='extraDdiscount'>+ $20 pesos de regalo</span>";
     } else {
-        resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model[0] + "</b>") + "<span id='customer-buenfin' style='display: none'>+ $20 pesos de regalo</span>";
+        resource = string.Format(T("Customer.SavePrice").Text, "<b id='customer-saving'>$" + Model[0] + "</b>") + "<span id='customer-buenfin' class='notextraDdiscount'>+ $20 pesos de regalo</span>";
     }
 }
 <div class="customer-saving">
