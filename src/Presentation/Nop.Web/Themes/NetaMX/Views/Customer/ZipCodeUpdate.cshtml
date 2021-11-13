@@ -23,7 +23,7 @@
     <h2>Iniciar Sesión</h2><a href="/">X</a>
 </div>
 
-<div class="page login-page">
+<div class="page login-page zipCode-page">
     <div class="page-title mb-h">
         <h1>@T("Account.Login.Welcome")</h1>
     </div>
@@ -40,14 +40,17 @@
                             <input id="zipCode" name="zipCode" type="text" class="text" placeholder="CP" required />
                         </div>
                     </div>
-                    <div class="form-fields">
-                        <div class="whatsapp-info h-lg">
-                            <span class="icon"></span>
-                            <label>@T("Account.Login.ZipCode.Info")</label>
+                    @if (userAgentHelper.IsMobileDevice())
+                    {
+                        <div class="form-fields">
+                            <div class="whatsapp-info h-lg">
+                                <span class="icon"></span>
+                                <label>@T("Account.Login.ZipCode.Info")</label>
+                            </div>
                         </div>
-                    </div>
+                    }
                     <div class="buttons button-fix">
-                        <button id="btnLogin" type="submit" class="button-1 login-button btn-zipCode">@T("Account.Login.ZipCode")</button>
+                        <button id="btnLogin" type="submit" class="button-1 login-button btn-black btn-zipCode">@T("Account.Login.ZipCode")</button>
                     </div>
                 </form>
             </div>

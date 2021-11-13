@@ -123,7 +123,7 @@ namespace Nop.Services.Authentication
                 var emailClaim = authenticateResult.Principal.FindFirst(claim => claim.Type == ClaimTypes.Email
                     && claim.Issuer.Equals(NopAuthenticationDefaults.ClaimsIssuer, StringComparison.InvariantCultureIgnoreCase));
                 if (emailClaim != null)
-                    customer = await _customerService.GetCustomerByEmailAsync(emailClaim.Value);
+                    customer = await _customerService.GetCustomerByEmailForLoginAsync(emailClaim.Value);
             }
 
             //whether the found customer is available
