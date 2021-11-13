@@ -166,7 +166,273 @@
                                     <span asp-validation-for="NetaCoin"></span>
                                 </div>
                             </div>
-                        </div>
+
+                            <div id="MondayFull" class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="MondayStartDateTimeUtc" />
+                                </div>
+                                <div id="Monday" class="col-md-9" style="display: flex;">
+                                    <input type="checkbox" id="MondayCheckBox" onchange="toggleCheckboxMonday(this)">
+                                    <div id="MondayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
+                                        <div id="MondayStart" class="col-md-10">
+                                            <nop-editor asp-for="MondayStartDateTimeUtc" />
+                                            <span asp-validation-for="MondayStartDateTimeUtc"></span>
+                                        </div>
+                                        <div id="MondayEnd" class="col-md-10">
+                                            <nop-editor asp-for="MondayEndDateTimeUtc" />
+                                            <span asp-validation-for="MondayEndDateTimeUtc"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                var monday_HTML = $("#MondayInfo");
+                                function toggleCheckboxMonday(element) {
+                                    if ($("#MondayCheckBox").is(':checked')) {
+                                        $("#MondayInfo").css("visibility", "visible");
+                                    } else {
+                                        $("#MondayInfo").css("visibility", "hidden");
+                                    }
+                                }
+                            </script>
+                            <div id="TuesdayFull" class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="TuesdayStartDateTimeUtc" />
+                                </div>
+                                <div  id="Tuesday" class="col-md-9" style="display: flex;">
+                                    <input type="checkbox" id="TuesdayCheckBox" onchange="toggleCheckboxTuesday(this)">
+                                    <div id="TuesdayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
+                                        <div id="TuesdayStart" class="col-md-10">
+                                            <nop-editor asp-for="TuesdayStartDateTimeUtc" />
+                                            <span asp-validation-for="TuesdayStartDateTimeUtc"></span>
+                                        </div>
+                                        <div id="TuesdayEnd" class="col-md-10">
+                                            <nop-editor asp-for="TuesdayEndDateTimeUtc" />
+                                            <span asp-validation-for="TuesdayEndDateTimeUtc"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                function toggleCheckboxTuesday(element) {
+                                    if ($("#TuesdayCheckBox").is(':checked')) {
+                                        $("#TuesdayInfo").css("visibility", "visible");
+                                    } else {
+                                        $("#TuesdayInfo").css("visibility", "hidden");
+                                    }
+                                }
+                            </script>
+                            <div id="WednesdayFull" class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="WednesdayStartDateTimeUtc" />
+                                </div>
+                                <div id="Wednesday" class="col-md-9" style="display: flex;">
+                                    <input type="checkbox" id="WednesdayCheckBox" onchange="toggleCheckboxWednesday(this)">
+                                    <div id="WednesdayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
+                                        <div id="WednesdayStart" class="col-md-10">
+                                            <nop-editor asp-for="WednesdayStartDateTimeUtc" />
+                                            <span asp-validation-for="WednesdayStartDateTimeUtc"></span>
+                                        </div>
+                                        <div id="WednesdayEnd" class="col-md-10">
+                                            <nop-editor asp-for="WednesdayEndDateTimeUtc" />
+                                            <span asp-validation-for="WednesdayEndDateTimeUtc"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                function toggleCheckboxWednesday(element) {
+                                    if ($("#WednesdayCheckBox").is(':checked')) {
+                                        $("#WednesdayInfo").css("visibility", "visible");
+                                    } else {
+                                        $("#WednesdayInfo").css("visibility", "hidden");
+                                    }
+                                }
+                            </script>
+                            <div id="ThursdayFull" class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="ThursdayStartDateTimeUtc" />
+                                </div>
+                                <div id="Thursday" class="col-md-9" style="display: flex;">
+                                    <input type="checkbox" id="ThursdayCheckBox" onchange="toggleCheckboxThursday(this)">
+                                    <div id="ThursdayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
+                                        <div id="ThursdayStart" class="col-md-10">
+                                            <nop-editor asp-for="ThursdayStartDateTimeUtc" />
+                                            <span asp-validation-for="ThursdayStartDateTimeUtc"></span>
+                                        </div>
+                                        <div id="ThursdayEnd" class="col-md-10">
+                                            <nop-editor asp-for="ThursdayEndDateTimeUtc" />
+                                            <span asp-validation-for="ThursdayEndDateTimeUtc"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                var Thursday_HTML = $("#ThursdayInfo");
+                                function toggleCheckboxThursday(element) {
+                                    if ($("#ThursdayCheckBox").is(':checked')) {
+                                        $("#ThursdayInfo").css("visibility", "visible");
+                                    } else {
+                                        $("#ThursdayInfo").css("visibility", "hidden");
+                                    }
+                                }
+                            </script>
+                            <div id="FridayFull" class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="FridayStartDateTimeUtc" />
+                                </div>
+                                <div id="Friday" class="col-md-9" style="display: flex;">
+                                    <input type="checkbox" id="FridayCheckBox" onchange="toggleCheckboxFriday(this)">
+                                    <div id="FridayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
+                                        <div id="FridayStart" class="col-md-10">
+                                            <nop-editor asp-for="FridayStartDateTimeUtc" />
+                                            <span asp-validation-for="FridayStartDateTimeUtc"></span>
+                                        </div>
+                                        <div id="FridayEnd" class="col-md-10">
+                                            <nop-editor asp-for="FridayEndDateTimeUtc" />
+                                            <span asp-validation-for="FridayEndDateTimeUtc"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                function toggleCheckboxFriday(element) {
+                                    if ($("#FridayCheckBox").is(':checked')) {
+                                        $("#FridayInfo").css("visibility", "visible");
+                                    } else {
+                                        $("#FridayInfo").css("visibility", "hidden");
+                                    }
+                                }
+                            </script>
+                            <div id="SaturdayFull" class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="SaturdayStartDateTimeUtc" />
+                                </div>
+                                <div id="Saturday" class="col-md-9" style="display: flex;">
+                                    <input type="checkbox" id="SaturdayCheckBox" onchange="toggleCheckboxSaturday(this)">
+                                    <div id="SaturdayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
+                                        <div id="SaturdayStart" class="col-md-10">
+                                            <nop-editor asp-for="SaturdayStartDateTimeUtc" />
+                                            <span asp-validation-for="SaturdayStartDateTimeUtc"></span>
+                                        </div>
+                                        <div id="SaturdayEnd" class="col-md-10">
+                                            <nop-editor asp-for="SaturdayEndDateTimeUtc" />
+                                            <span asp-validation-for="SaturdayEndDateTimeUtc"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                function toggleCheckboxSaturday(element) {
+                                    if ($("#SaturdayCheckBox").is(':checked')) {
+                                        $("#SaturdayInfo").css("visibility", "visible");
+                                    } else {
+                                        $("#SaturdayInfo").css("visibility", "hidden");
+                                    }
+                                }
+                            </script>
+                            <div id="SundayFull" class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="SundayStartDateTimeUtc" />
+                                </div>
+                                <div id="Sunday" class="col-md-9" style="display: flex;">
+                                    <input type="checkbox" id="SundayCheckBox" onchange="toggleCheckboxSunday(this)">
+                                    <div id="SundayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
+                                        <div id="SundayStart" class="col-md-10">
+                                            <nop-editor asp-for="SundayStartDateTimeUtc" />
+                                            <span asp-validation-for="SundayStartDateTimeUtc"></span>
+                                        </div>
+                                        <div id="SundayEnd" class="col-md-10">
+                                            <nop-editor asp-for="SundayEndDateTimeUtc" />
+                                            <span asp-validation-for="SundayEndDateTimeUtc"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                function toggleCheckboxSunday(element) {
+                                    if ($("#SundayCheckBox").is(':checked')) {
+                                        $("#SundayInfo").css("visibility", "visible");
+                                    } else {
+                                        $("#SundayInfo").css("visibility", "hidden");
+                                    }
+                                }
+                            </script>
+                            <script>
+
+                                function fillInfo(id) {
+                                    var input = document.getElementById(id + "DateTimeUtc");
+                                    var view = document.getElementById(id + "View");
+                                    
+                                    var today = new Date();
+                                    var date = today.getDate() + '/' + (today.getMonth() + 1)  + '/' +  today.getFullYear() + " 0:00:00";
+                                    var day = id.replace("Start", "").replace("End", "");
+                                    if (date == input.value) {
+                                        view.textContent = ""
+                                        console.log(id);
+                                        $("#" + day + "Info").css("visibility", "hidden");
+                                    } else {
+                                        const resultado = input.value.split(" ");
+                                        var res = "";
+                                        for (let i = 1; i < resultado.length; i++) {
+                                            res += resultado[i] + " ";
+                                        }
+                                        view.textContent = res;
+                                        $("#" + day + "CheckBox").prop("checked", true);
+                                    }
+                                }
+
+
+                                $(document).ready(function () {
+                                    var elements = document.getElementsByClassName("k-link-date");
+                                    for (var i = 0; i < elements.length; ++i) {
+                                        parent = elements[i].parentNode
+                                        var pwidth = parent.clientWidth / 2;
+                                        parent.style.width = pwidth + "px";
+
+                                        var clock = parent.querySelector('.k-link-time')
+                                        clock.style.width = "100%";
+                                        elements[i].style.display = "none";
+                                        var id = parent.parentNode.parentNode.parentNode.id;
+
+
+                                        var component = document.getElementById(id);
+                                        
+                                        var view = document.createElement("div");
+                                        view.setAttribute("id", id + "View");
+
+                                        var cs = getComputedStyle(component);
+                                        var paddingX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+
+                                        view.style.width = (component.clientWidth - pwidth - paddingX - 2) + "px";
+                                        view.style.height = component.clientHeight*0.90 + "px";
+                                        
+                                        view.style.display = "flex";
+                                        view.style.alignItems = "center";
+                                        view.style.justifyContent = "center";
+
+                                        view.style.boxShadow = "0px 0px 0px 1px rgba(0,0,0,0.1)";
+
+                                        var timer = document.getElementById(id + "DateTimeUtc_timeview");
+                                        timer.addEventListener('click', (event) => {
+                                            id = event.target.id.replace("DateTimeUtc_option_selected", "")
+                                            const resultado = document.getElementById(id + "View");
+                                            const resultado2 = document.getElementById(id + "DateTimeUtc").value.split(" ");
+                                            resultado.textContent = resultado2[1] + " " + resultado2[2] + " " + resultado2[3];
+                                        });
+                                        
+
+                                        var newContent = document.createTextNode("");
+                                        view.appendChild(newContent);
+
+                                        replacablecomponent = parent.parentNode.parentNode.parentNode.querySelector('.k-picker-wrap');
+                                        replacablecomponent.append(view);
+                                        document.getElementById(id + "DateTimeUtc").style.display="none"
+                                        fillInfo(id)
+                                    }
+                                });
+                            </script>
+                         </div>
                     </div>
                 </div>
                 @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.StoreDetailsBottom, additionalData = Model })

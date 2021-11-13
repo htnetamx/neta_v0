@@ -165,6 +165,10 @@ namespace Nop.Web.Infrastructure
                 pattern: $"addproducttocart/catalog/{{productId:min(0)}}/{{shoppingCartTypeId:min(0)}}/{{quantity:min(0)}}",
                 defaults: new { controller = "ShoppingCart", action = "AddProductToCart_Catalog" });
 
+            endpointRouteBuilder.MapControllerRoute(name: "AddProductToCart-CatalogMin",
+                pattern: $"addproducttocart/catalog/{{productId:min(0)}}/{{shoppingCartTypeId:min(0)}}/{{quantity:min(-1)}}/{{isMinusQty}}",
+                defaults: new { controller = "ShoppingCart", action = "AddProductToCart_Catalog" });
+
             //add product to cart (with attributes and options). used on the product details pages. (AJAX)
             endpointRouteBuilder.MapControllerRoute(name: "AddProductToCart-Details",
                 pattern: $"addproducttocart/details/{{productId:min(0)}}/{{shoppingCartTypeId:min(0)}}",
@@ -696,6 +700,11 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapControllerRoute(name: "PageNotFound",
                 pattern: $"{lang}/page-not-found",
                 defaults: new { controller = "Common", action = "PageNotFound" });
+
+            //ZipCodeUpdate
+            endpointRouteBuilder.MapControllerRoute(name: "ZipCodeUpdate",
+                pattern: $"{lang}/zipcodeupdate",
+                defaults: new { controller = "Customer", action = "ZipCodeUpdate" });
         }
 
         #endregion

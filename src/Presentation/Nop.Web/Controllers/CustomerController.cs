@@ -471,6 +471,9 @@ namespace Nop.Web.Controllers
                     PasswordFormat.Clear,
                     (await _storeContext.GetCurrentStoreAsync()).Id,
                     true));
+
+                await _genericAttributeService.SaveAttributeAsync(newCustomer, NopCustomerDefaults.ZipPostalCodeAttribute, "0");
+                return await _customerRegistrationService.SignInCustomerAsync(newCustomer, Url.RouteUrl("ZipCodeUpdate") , model.RememberMe);
             }
             if (loginResult == CustomerLoginResults.NotActive)
             {
@@ -535,6 +538,32 @@ namespace Nop.Web.Controllers
             //model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
             //return View(model);
         }
+
+        public virtual IActionResult ZipCodeUpdate()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public virtual async Task<IActionResult> ZipCodeUpdate(string zipCode, string returnUrl)
+        {
+            if (string.IsNullOrEmpty(zipCode))
+            {
+                ModelState.AddModelError("", "Zipcode is required");
+                return View();
+            }
+            else
+            {
+                var customer = await _workContext.GetCurrentCustomerAsync();
+                await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ZipPostalCodeAttribute, zipCode);
+                
+                if (!string.IsNullOrEmpty(returnUrl))
+                    return new RedirectResult(returnUrl);
+
+                return new RedirectToRouteResult("ShoppingCart", null);
+            }
+        }
+
 
         /// <summary>
         /// The entry point for injecting a plugin component of type "MultiFactorAuth"

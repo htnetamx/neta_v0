@@ -235,7 +235,7 @@
                             {
                                 <div class="term-login h-lg">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1" checked>
                                         <label class="custom-control-label" for="customCheck1">Acepto los <b id="show-term-popup">Terminos y Condiciones</b> de Neta.mx para crear una nueva cuenta</label>
                                     </div>
                                 </div>
@@ -244,7 +244,7 @@
                             {
                                 <div class="term-login">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1" checked>
                                         <label class="custom-control-label" for="customCheck1">Acepto los <b id="show-term-popupdesk">Terminos y Condiciones</b> de Neta.mx para crear una nueva cuenta</label>
                                     </div>
                                 </div>
@@ -288,11 +288,11 @@
                     <div class="ver-content">
                         <div asp-validation-summary="ModelOnly" class="message-error"></div>
                         @*<div class="code">
-                                <input />
-                                <input />
-                                <input />
-                                <input />
-                            </div>*@
+            <input />
+            <input />
+            <input />
+            <input />
+        </div>*@
                         <div class="code-verfication-input">
                             <input id="codeVerif" name="codeVerif" type="password" class="text" required />
                             <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
@@ -300,7 +300,11 @@
                             <input type="hidden" id="hidPassword" name="Password" />
                         </div>
                         <p>Ingresa el código de verificación que<br /> enviamos al <b id="inputMobile"></b></p>
-                        <a class="link" onclick="$('#btnCodeVerif').click()">Enviar de nuevo</a>
+                        <p>Puede tardar hasta 2 minutos</p>
+                        <a class="link" id="resendCodeVerif" onclick="$('#btnCodeVerif').click()" style="text-decoration: underline">Haz click aquí para enviar de nuevo</a>
+                        <a id="placeholder">Haz click aquí para enviar de nuevo</a>
+                        <p></p>
+                        <p id="countdown"></p>
                     </div>
                     <div class="buttons button-fix">
                         <button id="btnLogin" type="submit" class="button-1 login-button btn-black">@T("Account.Login.LoginButton")</button>
@@ -375,9 +379,27 @@
             $(".confirm-overlayer").removeClass("active");
         }
 
+        function enableTimer() {
+            var timeleft = 45;
+            var downloadTimer = setInterval(function () {
+                if (timeleft <= 0) {
+                    clearInterval(downloadTimer);
+                    document.getElementById("countdown").innerHTML = "";
+                    $("#resendCodeVerif").show();
+                    $("#placeholder").hide();
+
+                } else {
+                    document.getElementById("countdown").innerHTML = "Envío disponible nuevamente en " + timeleft + " segundos";
+                    $("#resendCodeVerif").hide();
+                    $("#placeholder").show();
+                }
+                timeleft -= 1;
+            }, 1000);}
+
         try {
         $(document).ready(function () {
             $("#btnCodeVerif").click(() => {
+                enableTimer();
                 if ($("#customCheck1").prop('checked') == false) {
                     $("#tandcrequired").addClass("active");
                     $(".confirm-overlayer").addClass("active");
@@ -413,6 +435,7 @@
                                     $("#codeVerifContainer").show();
                                     $("#btnCodeVerif").hide();
                                     $(".verification-popup").addClass('active');
+
                                 },
                                 error: function (err) {
                                 },

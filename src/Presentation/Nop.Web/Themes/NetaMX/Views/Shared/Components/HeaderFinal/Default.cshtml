@@ -1,0 +1,134 @@
+﻿@model HeaderFinalModel
+@using Nop.Core.Domain.Customers
+@inject Nop.Core.IStoreContext storeContext
+@inject Nop.Core.IWebHelper webHelper
+
+@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksBefore })
+<ul id="auth_list">
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksBefore })
+    @if (Model.IsAuthenticated)
+    {
+        @*<li><a href="@Url.RouteUrl("CustomerInfo")" class="ico-account">@T("Account.MyAccount")</a></li>
+            <li><a href="@Url.RouteUrl("Logout")" class="ico-logout">@T("Account.Logout")</a></li>*@
+    }
+    else
+    {
+        var returnUrl = Context.Request.Query.TryGetValue("returnUrl", out var url) && !StringValues.IsNullOrEmpty(url)
+            ? url.ToString()
+            : webHelper.GetRawUrl(Context.Request);
+
+        @if (Model.RegistrationType != UserRegistrationType.Disabled)
+        {
+            @*<li><a href="@Url.RouteUrl("Register", new { returnUrl })" class="ico-register">@T("Account.Register")</a></li>*@
+        }
+        @*<li><a href="@Url.RouteUrl("Login", new { returnUrl })" class="ico-login">@T("Account.Login")</a></li>*@
+    }
+    @if (Model.AllowPrivateMessages)
+    {
+        @*<li>
+                <a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })" class="ico-inbox">
+                    <span class="inbox-label">@T("PrivateMessages.Inbox")</span>
+                    <span class="inbox-unread">@Model.UnreadPrivateMessages</span>
+                </a>
+            </li>*@
+    }
+    @if (Model.WishlistEnabled)
+    {
+        @*<li>
+                <a href="@Url.RouteUrl("Wishlist")" class="ico-wishlist">
+                    <span class="wishlist-label">@T("Wishlist")</span>
+                    <span class="wishlist-qty">@T("Wishlist.HeaderQuantity", Model.WishlistItems)</span>
+                </a>
+            </li>*@
+    }
+</ul>
+
+@if (Model.ShoppingCartEnabled)
+{
+    string absoluteurl = Context.Request.Path;
+    //if (!absoluteurl.Contains("cart") && !absoluteurl.Contains("checkout"))
+    if (!absoluteurl.Contains("checkout") && !absoluteurl.Contains("zipcodeupdate"))
+    {
+        <div id="headerV21" class="header-main">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid" style="padding: 0px">
+                    <a class="navbar-brand" href="/" style="display: flex ">
+                        <img src="~/Themes/NetaMX/Content/images/logo.png" alt="" width="80" height="24" class="d-inline-block align-text-top logo">
+                    </a>
+                </div>
+            </nav>
+        </div>
+        <div class="new-header">
+            <div class="_flex">
+                <div class="store-name"><a href="/">@Model.Store.Name</a><span  id="storeName" class="store-popup-open"></span></div>
+                <div class="store-popup">
+                    <a class="loc">@Model.Store.CompanyAddress</a>
+                </div>
+                <div class="new_flex">
+                    <div class="search-icon"></div>
+                    <div id="CartProductQuantity" class="navbar-nav" style="position:relative">
+                        <a href="@Url.RouteUrl("ShoppingCart")" style="height: 100%;width:100%">
+                            <img src="images/header2/Shopping-cart.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                        </a>
+                        <span style="background-color: #FE4C4B;width: 18px;height: 18px;border-radius: 50%;display:inline-block;position:absolute;left:20px;top:13px;text-align:center;color:white;align-items:center;justify-content:center;display:flex;font-size: 12px">@Model.ShoppingCartItems.ToString("N0")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-header" id="cartInfo">
+            <div class="_flex">
+                <div class="cart-left">
+                    @await Component.InvokeAsync("CustomerSaving")
+                    <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
+                </div>
+                <a class="cart-right" href="@Url.RouteUrl("ShoppingCart")">
+                    @T("Home.GotoCart")
+                </a>
+            </div>
+        </div>
+    }
+}
+
+@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksAfter })
+@if (Model.AllowPrivateMessages && !string.IsNullOrEmpty(Model.AlertMessage))
+{
+    //new private message notification
+    <script asp-location="Footer">
+            $(document).ready(function () {
+                displayPopupNotification('@Html.Raw(JavaScriptEncoder.Default.Encode(Model.AlertMessage))', 'success', false);
+            });
+    </script>
+}
+
+<script asp-location="Footer">
+    $(document).ready(function () {
+        $("#storeName").on("click", function () {
+            $(".store-popup").toggleClass("active");
+        });
+        $(".search-icon").on("click", function () {
+            $(".search-container").toggleClass("active");
+        });
+    }) 
+</script>
+
+
+@if (Model.ShoppingCartEnabled)
+{
+    <script asp-location="Footer">
+                                                                            //$(document).ready(function () {
+                                                                            //    $('.header').on('mouseenter', '#topcartlink', function () {
+                                                                            //        $('#flyout-cart').addClass('active');
+                                                                            //    });
+                                                                            //    $('.header').on('mouseleave', '#topcartlink', function () {
+                                                                            //        $('#flyout-cart').removeClass('active');
+                                                                            //    });
+                                                                            //    $('.header').on('mouseenter', '#flyout-cart', function () {
+                                                                            //        $('#flyout-cart').addClass('active');
+                                                                            //    });
+                                                                            //    $('.header').on('mouseleave', '#flyout-cart', function () {
+                                                                            //        $('#flyout-cart').removeClass('active');
+                                                                            //    });
+                                                                            //});
+    </script>
+}
+
