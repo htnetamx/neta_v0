@@ -39,7 +39,7 @@ namespace Nop.Services.Stores
             //    return;
 
             var stores = await _storeService.GetAllStoresAsync();
-            var fase1 = stores.Where(s => s.DisplayOrder == 1);
+            var fase1 = stores.Where(s => s.DisplayOrder == 1).ToList();
 
             var products = (await _productService.GetAllProductsAsync()).Where(v =>
                 v.Sku.EndsWith("LH") && 
@@ -52,7 +52,7 @@ namespace Nop.Services.Stores
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
                     var rta = await Send(info.CompanyPhoneNumber,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:shop_promos_f1_v2",
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:shop_promos_f1_v2", "11",
                         products.First().Name,
                         products.First().Price.ToString("N2"),
                         products.First().OldPrice.ToString("N2"),
@@ -62,7 +62,8 @@ namespace Nop.Services.Stores
                 }
             }
 
-            var fase2 = stores.Where(s => s.DisplayOrder == 2);
+            var stores1 = await _storeService.GetAllStoresAsync();
+            var fase2 = stores1.Where(s => s.DisplayOrder == 2).ToList();
 
             products = (await _productService.GetAllProductsAsync()).Where(v =>
                 DateTime.UtcNow >= v.MarkAsNewStartDateTimeUtc &&
@@ -75,7 +76,7 @@ namespace Nop.Services.Stores
                 if (!string.IsNullOrWhiteSpace(info.CompanyPhoneNumber) && string.Compare(info.CompanyPhoneNumber, "Sin numero") != 0)
                 {
                     var rta = await Send(info.CompanyPhoneNumber,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2",
+                        "02c89181_e473_461e_9e66_8f6b75af9b5e:promos_f3_2", "11",
                         info.Url,
                         info.Name,
                         prodList + " y muchas promos más!!");
@@ -83,7 +84,7 @@ namespace Nop.Services.Stores
             }
         }
    
-        private async Task<string> Send(string number, string template, params object[] data)
+        private async Task<string> Send(string number, string template, string channel = "10", params object[] data)
         {
             using (var client = new HttpClient())
             {
@@ -108,7 +109,7 @@ namespace Nop.Services.Stores
                         builder.Append($"vars[]={item}&");
                     }
                 }
-                builder.Append("channel_id=11&");
+                builder.Append($"channel_id={channel}&");
                 builder.Append("language=es_MX");
 
                 var response = await client.PostAsync(url + builder.ToString(), null);

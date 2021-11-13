@@ -427,8 +427,12 @@ namespace Nop.Web.Controllers
                 {
                     var parent = await _addressService.GetRelatedAddressByIdAsync(address.PhoneNumber);
                     var customer = await _workContext.GetCurrentCustomerAsync();
-                    customer.BillingAddressId = parent.First().Id;
-                    await _customerService.UpdateCustomerAsync(customer);
+                    var parentAddr = parent.FirstOrDefault();
+                    if (parentAddr != null)
+                    {
+                        customer.BillingAddressId = parentAddr.Id;
+                        await _customerService.UpdateCustomerAsync(customer);
+                    }
 
                     address.Email = $"_{address.Email}_";
                     address.PhoneNumber = $"_{address.PhoneNumber}_";
@@ -1612,7 +1616,7 @@ namespace Nop.Web.Controllers
                     });
                 }
 
-                string discountcouponcode = "BUEN_FIN_NETA";
+                string discountcouponcode = "BUEN_FIN_NETA_10";
                 await _customerService.RemoveDiscountCouponCodeAsync(
                     await _workContext.GetCurrentCustomerAsync(),
                     discountcouponcode);
@@ -1627,7 +1631,7 @@ namespace Nop.Web.Controllers
                         if (!usado)
                         {
                             var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
-                            if (total > 150)
+                            if (total > 100)
                             {
                                 var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
                                     .Where(d => d.RequiresCouponCode)
