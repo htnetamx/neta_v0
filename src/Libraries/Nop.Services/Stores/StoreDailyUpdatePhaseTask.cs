@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nop.Services.Logging;
 using Nop.Services.Orders;
 using Nop.Services.Tasks;
 
@@ -14,15 +15,17 @@ namespace Nop.Services.Stores
 
         private readonly IStoreService _storeService;
         private readonly IOrderService _orderService;
+        private readonly ILogger _logger;
 
         #endregion
 
         #region Ctor
 
-        public StoreDailyUpdatePhaseTask(IStoreService storeService, IOrderService orderService)
+        public StoreDailyUpdatePhaseTask(IStoreService storeService, IOrderService orderService, ILogger logger)
         {
             _storeService = storeService;
             _orderService = orderService;
+            _logger = logger;
         }
 
         #endregion
@@ -36,6 +39,9 @@ namespace Nop.Services.Stores
         {
             var stores = (await _storeService.GetAllStoresAsync())
                 .Where(s => s.DisplayOrder > 0);
+
+            List<string> storesUnlokcingBonus = new List<string>();
+            List<string> storesMovingToCompleteFase = new List<string>();
 
             foreach (var store in stores)
             {
@@ -51,11 +57,13 @@ namespace Nop.Services.Stores
                     //Evaluate if phase 1 (initial) stores can move up to phase 2 (growth)
 
                     //CONDITIONS to move from display order 1 (Initial Phase) to 2 (Growth Phase)
-                    // case1 : 7 days after first order or 
-                    // case2 : 500 GMV, 5 distinct customers
+                    // transition case : 7 days after first order
 
-                   var ordersFromStore = (await _orderService.GetOrdersByStoreIdsAsync(store.Id));
-                   var firstOrderDate = ordersFromStore.Select(x => x.CreatedOnUtc).Min();
+                    //If user meets, following condition, NetaCoin Bonus is activated, it remains on Initial Fase 
+                    // bonus case : 500 GMV, 8 distinct customers
+
+                    var ordersFromStore = (await _orderService.GetOrdersByStoreIdsAsync(store.Id));
+                    var firstOrderDate = ordersFromStore.Select(x => x.CreatedOnUtc).Min();
 
                     ////evaluate if there are 5 distinct clients
                     var disntinctCustomers = ordersFromStore.Select(x => x.CustomerId).Distinct();
@@ -64,21 +72,39 @@ namespace Nop.Services.Stores
                     ////SUM of order total value (all)
                     var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
 
-                    ////Case1 500 GMV, 5 distinct customers
-                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 5 && orderValueGMV > 500)
+                    ////Bonus CASE 500 GMV, 8 distinct customers
+                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 8 && orderValueGMV > 500 && !store.FirstGmvBonusApplied)
                     {
-                        store.DisplayOrder = 2;
-                        store.NetaCoin = 100;
+                        store.NetaCoin = 200;
+                        store.FirstGmvBonusApplied = true;
+                        storesUnlokcingBonus.Add(store.Name.ToString());
                     }
 
-                    //Case2
+                    //Transition Case
                     else if (store.DisplayOrder == 1 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
                     {
                         store.DisplayOrder = 2;
+                        storesMovingToCompleteFase.Add(store.Name.ToString());
                     }
                     await _storeService.UpdateStoreAsync(store);
+
                 }
+
             }
+
+            var messagePhase = string.Join(",", storesMovingToCompleteFase);
+
+            //Log de tiendas que cambian de Fase Limitada a Fase Completa
+            await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                "Tiendas que cambian de Fase Limitada a Fase Completa", messagePhase);
+
+            var messageBonus = string.Join(",", storesUnlokcingBonus);
+
+            //Log de tiendas que cambian de Fase Limitada a Fase Completa
+            await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                "Tiendas que activan bono de crecimiento rápido en Fase Limitada",
+                messageBonus);
+
         }
 
         #endregion

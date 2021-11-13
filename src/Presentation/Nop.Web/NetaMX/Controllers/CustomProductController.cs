@@ -78,15 +78,17 @@ namespace Nop.Web.Controllers
         {
             var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
             var totalSaving = decimal.Zero;
+            var totalCart = decimal.Zero;
             foreach (var sci in cart)
             {
                 var product = await _productService.GetProductByIdAsync(sci.ProductId);
                 var productSaving = (product.OldPrice - product.Price) * sci.Quantity;
+                totalCart += product.Price * sci.Quantity;
                 totalSaving += productSaving;
                 totalSaving = Math.Round(totalSaving, 2);
             }
 
-            return Json(new { totalSaving = totalSaving });
+            return Json(new { totalSaving = totalSaving, totalCart = totalCart });
         }
         #endregion
     }

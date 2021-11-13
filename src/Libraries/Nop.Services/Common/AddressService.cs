@@ -104,6 +104,15 @@ namespace Nop.Services.Common
             return await query.ToListAsync();
         }
 
+
+        public virtual async Task<IList<Address>> GetAllMainAccounts()
+        {
+            var query = from a in _addressRepository.Table
+                        where (a.Email == "" || a.Email==null || a.Email.Contains("@"))
+                        select a;
+
+            return await query.ToListAsync();
+        }
         /// <summary>
         /// Gets an address by address identifier
         /// </summary>

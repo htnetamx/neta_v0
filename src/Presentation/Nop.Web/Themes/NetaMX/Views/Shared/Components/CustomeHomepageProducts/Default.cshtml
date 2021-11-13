@@ -6,7 +6,7 @@
             <h2>Nuestra oferta de precios bajos!</h2>
         </div>
         <div id="HomePage_Product" class="item-grid">
-            @await Html.PartialAsync("_HomePageProduct", Model)
+            @await Html.PartialAsync("_HomePageProduct", Model.Where(v => !v.Sku.EndsWith("LH")).ToList())
         </div>
     </div>
     <div>

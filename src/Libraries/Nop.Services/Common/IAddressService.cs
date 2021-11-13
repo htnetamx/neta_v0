@@ -50,6 +50,8 @@ namespace Nop.Services.Common
 
         Task<IList<string>> GetAllAddressesAsync();
 
+        Task<IList<Address>> GetAllMainAccounts();
+
         /// <summary>
         /// Inserts an address
         /// </summary>

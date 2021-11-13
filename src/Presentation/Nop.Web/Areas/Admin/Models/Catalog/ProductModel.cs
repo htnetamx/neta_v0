@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Areas.Admin.Models.Settings;
@@ -467,6 +468,9 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         public ProductAttributeMappingSearchModel ProductAttributeMappingSearchModel { get; set; }
 
         public ProductAttributeCombinationSearchModel ProductAttributeCombinationSearchModel { get; set; }
+
+        [DisplayName("PerTaras")]
+        public string PerTaras { get; set; }
 
         #endregion
     }

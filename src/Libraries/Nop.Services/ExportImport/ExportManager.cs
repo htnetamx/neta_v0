@@ -1270,6 +1270,7 @@ namespace Nop.Services.ExportImport
                 new PropertyByName<Product>("ParentGroupedProductId", p => p.ParentGroupedProductId, await IgnoreExportProductPropertyAsync(p => p.ProductType)),
                 new PropertyByName<Product>("VisibleIndividually", p => p.VisibleIndividually, await IgnoreExportProductPropertyAsync(p => p.VisibleIndividually)),
                 new PropertyByName<Product>("Name", p => p.Name),
+                new PropertyByName<Product>("PerTaras", p => p.PerTaras),
                 new PropertyByName<Product>("ShortDescription", p => p.ShortDescription),
                 new PropertyByName<Product>("FullDescription", p => p.FullDescription),
                 //vendor can't change this field
