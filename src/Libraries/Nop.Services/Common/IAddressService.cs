@@ -47,7 +47,8 @@ namespace Nop.Services.Common
         Task<Address> GetAddressByIdAsync(int addressId);
 
         Task<IList<Address>> GetRelatedAddressByIdAsync(string phoneParent);
-
+        IList<Address> GetRelatedAddressByIdAsyncForControlSubaccounts(string phoneParent);
+        Task<IList<Address>> GetAllDeletedMainAccountsOrSubaccountsExtraChar();
         Task<IList<string>> GetAllAddressesAsync();
 
         Task<IList<Address>> GetAllMainAccounts();

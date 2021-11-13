@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
@@ -65,6 +66,37 @@ namespace Nop.Web.Areas.Admin.Models.Stores
 
         [DisplayName("Saldo NetaBono")]
         public decimal NetaCoin { get; set; }
+
+        [DisplayName("Lunes")]
+        public DateTime? MondayStartDateTimeUtc { get; set; }
+        [DisplayName("Lunes")]
+        public DateTime? MondayEndDateTimeUtc { get; set; }
+        [DisplayName("Martes")]
+        public DateTime? TuesdayStartDateTimeUtc { get; set; }
+        [DisplayName("Martes")]
+        public DateTime? TuesdayEndDateTimeUtc { get; set; }
+        [DisplayName("Miercoles")]
+        public DateTime? WednesdayStartDateTimeUtc { get; set; }
+        [DisplayName("Miercoles")]
+        public DateTime? WednesdayEndDateTimeUtc { get; set; }
+        [DisplayName("Jueves")]
+        public DateTime? ThursdayStartDateTimeUtc { get; set; }
+        [DisplayName("Jueves")]
+        public DateTime? ThursdayEndDateTimeUtc { get; set; }
+        [DisplayName("Viernes")]
+        public DateTime? FridayStartDateTimeUtc { get; set; }
+        [DisplayName("Viernes")]
+        public DateTime? FridayEndDateTimeUtc { get; set; }
+        [DisplayName("Sabado")]
+        public DateTime? SaturdayStartDateTimeUtc { get; set; }
+        [DisplayName("Sabado")]
+        public DateTime? SaturdayEndDateTimeUtc { get; set; }
+        [DisplayName("Domingo")]
+        public DateTime? SundayStartDateTimeUtc { get; set; }
+        [DisplayName("Domingo")]
+        public DateTime? SundayEndDateTimeUtc { get; set; }
+
+
 
         public IList<StoreLocalizedModel> Locales { get; set; }
 

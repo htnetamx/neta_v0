@@ -487,6 +487,20 @@ namespace Nop.Services.Customers
             return customer;
         }
 
+        public virtual async Task<Customer> GetCustomerByEmailForLoginAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            var query = from c in _customerRepository.Table
+                        orderby c.Id
+                        where c.Email == email && !c.Deleted
+                        select c;
+            var customer = await query.FirstOrDefaultAsync();
+
+            return customer;
+        }
+
         /// <summary>
         /// Get customer by system name
         /// </summary>
@@ -621,7 +635,7 @@ namespace Nop.Services.Customers
 
             var query = from c in _customerRepository.Table
                         orderby c.Id
-                        where c.Username == username && c.Email == username
+                        where !c.Deleted && c.Username == username && c.Email == username
                         select c;
             var customer = await query.FirstOrDefaultAsync();
 

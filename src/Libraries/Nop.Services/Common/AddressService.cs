@@ -104,6 +104,15 @@ namespace Nop.Services.Common
             return await query.ToListAsync();
         }
 
+        public virtual async Task<IList<Address>> GetAllDeletedMainAccountsOrSubaccountsExtraChar()
+        {
+            var query = (from a in _addressRepository.Table
+                         where a.Email.Contains("__") || a.PhoneNumber.Contains("__")
+                         select a);
+
+            return await query.ToListAsync();
+        }
+
 
         public virtual async Task<IList<Address>> GetAllMainAccounts()
         {
@@ -166,6 +175,23 @@ namespace Nop.Services.Common
             }
         }
 
+        public virtual IList<Address> GetRelatedAddressByIdAsyncForControlSubaccounts(string phoneParent)
+        {
+            if (string.IsNullOrWhiteSpace(phoneParent))
+                return new List<Address>();
+
+            var addressComp = new AddressComparer();
+
+            var query = (from a in _addressRepository.Table
+                         where a.PhoneNumber == phoneParent
+                         select a).Take(1).ToList();
+
+            var query2 = (from a in _addressRepository.Table
+                          where a.Email.Contains("\"\""+phoneParent+"\"\"") || a.Email.Contains("_" + phoneParent + "_") || a.Email == phoneParent
+                          select a).ToList();
+            query.AddRange(query2);
+            return query;
+        }
         /// <summary>
         /// Inserts an address
         /// </summary>

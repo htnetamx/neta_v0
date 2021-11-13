@@ -156,6 +156,7 @@ namespace Nop.Services.Customers
         /// The task result contains the customer
         /// </returns>
         Task<Customer> GetCustomerByEmailAsync(string email);
+        Task<Customer> GetCustomerByEmailForLoginAsync(string email);
 
         /// <summary>
         /// Get customer by system role

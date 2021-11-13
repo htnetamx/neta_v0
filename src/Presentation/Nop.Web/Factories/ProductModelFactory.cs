@@ -396,7 +396,10 @@ namespace Nop.Web.Factories
                             strikeThroughPrice = finalPriceWithoutDiscount;
 
                         if (strikeThroughPrice > decimal.Zero)
+                        {
                             priceModel.OldPrice = await _priceFormatter.FormatPriceAsync(strikeThroughPrice);
+                            priceModel.TotalSavingOnProduct = await _priceFormatter.FormatPriceAsync(strikeThroughPrice - finalPriceWithDiscount);
+                        }
 
                         priceModel.Price = await _priceFormatter.FormatPriceAsync(finalPriceWithDiscount);
                         priceModel.PriceValue = finalPriceWithDiscount;

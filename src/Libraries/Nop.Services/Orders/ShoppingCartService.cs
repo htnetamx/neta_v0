@@ -1478,7 +1478,7 @@ namespace Nop.Services.Orders
             ShoppingCartType shoppingCartType, int storeId, string attributesXml = null,
             decimal customerEnteredPrice = decimal.Zero,
             DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
-            int quantity = 1, bool addRequiredProducts = true)
+            int quantity = 1, bool addRequiredProducts = true, bool isMinusQty = false)
         {
             if (customer == null)
                 throw new ArgumentNullException(nameof(customer));
@@ -1504,11 +1504,13 @@ namespace Nop.Services.Orders
                 warnings.Add("Search engine can't add to cart");
                 return warnings;
             }
-
-            if (quantity <= 0)
+            if (!isMinusQty)
             {
-                warnings.Add(await _localizationService.GetResourceAsync("ShoppingCart.QuantityShouldPositive"));
-                return warnings;
+                if (quantity <= 0)
+                {
+                    warnings.Add(await _localizationService.GetResourceAsync("ShoppingCart.QuantityShouldPositive"));
+                    return warnings;
+                }
             }
 
             //reset checkout info
