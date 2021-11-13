@@ -340,12 +340,17 @@ namespace Nop.Web.Controllers
             //    "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion",
             //    12, form["code_generated"]);
 
-            NetaAuronixMessaging.Send_SMS(form["Password"], $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar", "15");
+            var responseResultToLog = await NetaAuronixMessaging.Send_SMS(form["Password"], 
+                $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar", "15");
 
             //BotmakerMessaging.Send("525545439866",
             //    "521" + form["Password"],
             //    "codigo_verificacion_usuario",
             //    new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
+
+            await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                "AuronixOTP", responseResultToLog + form["code_generated"],
+                await _customerService.GetCustomerByUsernameAsync( (string) form["Password"]  ) ) ;
 
             return Content("{'rta': true }", "application/json");
         }
@@ -1204,18 +1209,18 @@ namespace Nop.Web.Controllers
                             buscar = "pasado mañana,";
                     }
 
-                    NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
-                        name,
-                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
-                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
-                        buscar,
-                        (await _storeContext.GetCurrentStoreAsync()).Name,
-                        //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
-                        "5pm", (orders.Count + 1).ToString(), "10",
-                        (await _storeContext.GetCurrentStoreAsync()).Url);
-                    
-                    
+                    var responseResultToLog = NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
+                           "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
+                           name,
+                           "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
+                           placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                           buscar,
+                           (await _storeContext.GetCurrentStoreAsync()).Name,
+                           //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
+                           "5pm", (orders.Count + 1).ToString(), "10",
+                           (await _storeContext.GetCurrentStoreAsync()).Url);
+
+
                     //BotmakerMessaging.Send("525545439866",
                     //    "521" + telusuario,
                     //    "confirmacion_compra",
@@ -1226,6 +1231,11 @@ namespace Nop.Web.Controllers
                     //                                     { "Tienda", (await _storeContext.GetCurrentStoreAsync()).Name  },
                     //                                     { "6", 6 },
                     //                                     { "Link", (await _storeContext.GetCurrentStoreAsync()).Url } } );
+
+
+                    await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                        "AuronixOTP", responseResultToLog.Result.ToString(),
+                        await _workContext.GetCurrentCustomerAsync());
 
 
 
