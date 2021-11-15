@@ -78,19 +78,19 @@ namespace Nop.Web.Components
             if (!products.Any())
                 return Content("");
 
-            var discounts = await _discountService.GetAllDiscountsAsync1(
-                (await _storeContext.GetCurrentStoreAsync()).Id,
-                System.DateTime.UtcNow, System.DateTime.UtcNow);
+            //var discounts = await _discountService.GetAllDiscountsAsync1(
+            //    (await _storeContext.GetCurrentStoreAsync()).Id,
+            //    System.DateTime.UtcNow, System.DateTime.UtcNow);
 
-            //Descuentos con productos asociados
-            var discProducts = discounts.Where(v => v.DiscountTypeId == 2).ToList();
+            ////Descuentos con productos asociados
+            //var discProducts = discounts.Where(v => v.DiscountTypeId == 2).ToList();
 
-            //Descuentos con para la orden completa
-            if (discounts.Where(v => v.DiscountTypeId == 1).Any())
-            {
-                var first = discounts.Where(v => v.DiscountTypeId == 1).First();
-                ViewBag.RoyaltyMessage = $"{first.DiscountPercentage.ToString()}% de descuento parejo para nuestros clientes los más neta!";
-            }
+            ////Descuentos con para la orden completa
+            //if (discounts.Where(v => v.DiscountTypeId == 1).Any())
+            //{
+            //    var first = discounts.Where(v => v.DiscountTypeId == 1).First();
+            //    ViewBag.RoyaltyMessage = $"{first.DiscountPercentage.ToString()}% de descuento parejo para nuestros clientes los más neta!";
+            //}
 
             var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true, productThumbPictureSize)).ToList();
 
