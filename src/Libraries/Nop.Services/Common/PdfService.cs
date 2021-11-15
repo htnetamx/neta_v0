@@ -1086,7 +1086,7 @@ namespace Nop.Services.Common
 
             foreach (var orderItem in orderItems)
             {
-                foreach(var oItem in orderItems[orderItem.Key])
+                foreach (var oItem in orderItems[orderItem.Key])
                 {
                     var product = oItem;
 

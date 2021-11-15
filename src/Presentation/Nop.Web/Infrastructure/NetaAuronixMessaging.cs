@@ -3,12 +3,16 @@ using System.Text;
 using System.Net.Http;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Nop.Services.Logging;
 
 namespace Nop.Web.Infrastructure
 {
     public class NetaAuronixMessaging
     {
-        public static async void Send(string number, string template, int channelId=10, params object[] data)
+
+        public static async Task<string> Send(string number, string template, int channelId = 10, params object[] data)
         {
             using (var client = new HttpClient())
             {
@@ -38,10 +42,11 @@ namespace Nop.Web.Infrastructure
 
                 var response = await client.PostAsync(url + builder.ToString(), null);
                 string result = await response.Content.ReadAsStringAsync();
+                return result;
             }
         }
 
-        public static async void Send_SMS(string number, string message, string channel = "5")
+        public static async Task<string> Send_SMS(string number, string message, string channel = "5")
         {
             using (var client = new HttpClient())
             {
@@ -55,6 +60,7 @@ namespace Nop.Web.Infrastructure
 
                 var response = await client.PostAsync(url + builder.ToString(), null);
                 string result = await response.Content.ReadAsStringAsync();
+                return result;
             }
         }
     }

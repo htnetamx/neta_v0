@@ -30,6 +30,9 @@
     var cnt = children.Count;
     var maxSubaccounts = 2;
 
+    var firstChild = children.Count <= 0 ? 0 : children.First().Id;
+    var lastChild = children.Count <= 0 ? 0 : children.Last().Id;
+
 
     if (string.IsNullOrWhiteSpace(name))
     {
@@ -105,7 +108,7 @@
 
                     @*<button id="save-address-button" style="display: none" type="button" class="button-1" onclick="Billing.saveEditAddress('@(storeLocation)checkout/SaveEditAddress/'); return false;">@T("Common.Save")</button>*@
                     
-                    <button type="button" style="@cnt == 1 ? 'display: block' : 'display: none'" name="save" class="button-1 new-address-next-step-button btn-black" onclick="billingSaveWithValidation(@children.Count,@children[0].Id,@children[children.Count - 1].Id,'@(storeLocation)',@maxSubaccounts)"> @T("Common.Continue") </button>
+                    <button type="button" style="@cnt == 1 ? 'display: block' : 'display: none'" name="save" class="button-1 new-address-next-step-button btn-black" onclick="billingSaveWithValidation(@cnt,@firstChild,@lastChild,'@(storeLocation)',@maxSubaccounts)"> @T("Common.Continue") </button>
                     <script>
                             function billingSaveWithValidation(childrenCount, firstChildId,lastChildId, storeLocation, maxSubaccounts) {
                                 var creatingScreen = document.getElementById('AddNewAddressback').style.display != 'none';
@@ -126,7 +129,8 @@
                                     }
                                 }
                                 else {
-                                    Billing.save(firstChildId);
+                                    if (firstChildId !== 0)
+                                        Billing.save(firstChildId);
                                 }
                                 
                             }

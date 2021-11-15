@@ -226,7 +226,9 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                 var dataProtectionKeysFolder = new System.IO.DirectoryInfo(dataProtectionKeysPath);
 
                 //configure the data protection system to persist keys to the specified directory
-                services.AddDataProtection().PersistKeysToFileSystem(dataProtectionKeysFolder);
+                services.AddDataProtection()
+                    .PersistKeysToFileSystem(dataProtectionKeysFolder)
+                    .SetApplicationName("Nop.Web");
             }
         }
 
