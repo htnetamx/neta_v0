@@ -63,6 +63,7 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
             StockQuantityHistorySearchModel = new StockQuantityHistorySearchModel();
             ProductAttributeMappingSearchModel = new ProductAttributeMappingSearchModel();
             ProductAttributeCombinationSearchModel = new ProductAttributeCombinationSearchModel();
+            
         }
 
         #endregion
@@ -472,6 +473,8 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         [DisplayName("PerTaras")]
         public string PerTaras { get; set; }
 
+        [DisplayName("Deprecated")]
+        public bool Deprecated { get; set; }
         #endregion
     }
 

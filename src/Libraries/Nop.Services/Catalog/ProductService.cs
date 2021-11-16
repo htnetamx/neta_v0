@@ -925,7 +925,13 @@ namespace Nop.Services.Catalog
                     (priceMin == null || p.Price >= priceMin) &&
                     (priceMax == null || p.Price <= priceMax)
                 select p;
- 
+            //Filter products by deprecated flag
+            var currentUser = _workContext.GetCurrentCustomerAsync().Result;
+            if (currentUser.DeprecateProducts)
+            {
+                productsQuery= productsQuery.Where(p => !(p.Deprecated));
+            }
+            
             if (!string.IsNullOrEmpty(keywords))
             {
                 var langs = await _languageService.GetAllLanguagesAsync(showHidden: true);

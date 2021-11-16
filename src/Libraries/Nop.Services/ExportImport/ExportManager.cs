@@ -948,6 +948,7 @@ namespace Nop.Services.ExportImport
                 await xmlWriter.WriteStartElementAsync("Product");
 
                 await xmlWriter.WriteStringAsync("ProductId", product.Id);
+                await xmlWriter.WriteStringAsync("Deprecated", product.Deprecated);
                 await xmlWriter.WriteStringAsync("ProductTypeId", product.ProductTypeId, await IgnoreExportProductPropertyAsync(p => p.ProductType));
                 await xmlWriter.WriteStringAsync("ParentGroupedProductId", product.ParentGroupedProductId, await IgnoreExportProductPropertyAsync(p => p.ProductType));
                 await xmlWriter.WriteStringAsync("VisibleIndividually", product.VisibleIndividually, await IgnoreExportProductPropertyAsync(p => p.VisibleIndividually));
@@ -1263,6 +1264,7 @@ namespace Nop.Services.ExportImport
             var properties = new[]
             {
                 new PropertyByName<Product>("ProductId", p => p.Id),
+                new PropertyByName<Product>("Deprecated", p => p.Deprecated),
                 new PropertyByName<Product>("ProductType", p => p.ProductTypeId, await IgnoreExportProductPropertyAsync(p => p.ProductType))
                 {
                     DropDownElements = await ProductType.SimpleProduct.ToSelectListAsync(useLocalization: false)

@@ -486,6 +486,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                     _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.CannotBeInVendoRoleWithoutVendorAssociated"));
                 }
 
+                customer.DeprecateProducts = false;
+                model.DeprecateProducts = false;
                 //activity log
                 await _customerActivityService.InsertActivityAsync("AddNewCustomer",
                     string.Format(await _localizationService.GetResourceAsync("ActivityLog.AddNewCustomer"), customer.Id), customer);
@@ -620,7 +622,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                     //vendor
                     customer.VendorId = model.VendorId;
-
+                    customer.DeprecateProducts = model.DeprecateProducts;
                     //form fields
                     if (_dateTimeSettings.AllowCustomersToSetTimeZone)
                         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.TimeZoneIdAttribute, model.TimeZoneId);

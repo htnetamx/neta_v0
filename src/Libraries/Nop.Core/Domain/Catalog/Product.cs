@@ -617,5 +617,10 @@ namespace Nop.Core.Domain.Catalog
         /// Gets or sets a value indicating the amount of product to fill a Tara
         /// </summary>
         public decimal PerTaras { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating if product should be hidden
+        /// </summary>
+        public bool Deprecated { get; set; }
     }
 }

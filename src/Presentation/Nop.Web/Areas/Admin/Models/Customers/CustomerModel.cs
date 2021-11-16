@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
+using System.ComponentModel;
 
 namespace Nop.Web.Areas.Admin.Models.Customers
 {
@@ -251,6 +252,10 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         public CustomerBackInStockSubscriptionSearchModel CustomerBackInStockSubscriptionSearchModel { get; set; }
 
         public CustomerAssociatedExternalAuthRecordsSearchModel CustomerAssociatedExternalAuthRecordsSearchModel { get; set; }
+
+
+        [DisplayName("DeprecateProducts")]
+        public bool DeprecateProducts { get; set; }
 
         #endregion
 
