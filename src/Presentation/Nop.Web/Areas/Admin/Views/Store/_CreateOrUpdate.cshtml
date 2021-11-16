@@ -408,8 +408,8 @@
                                         var cs = getComputedStyle(component);
                                         var paddingX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
 
-                                        view.style.width = (component.clientWidth - pwidth - paddingX - 2) + "px";
-                                        view.style.height = component.clientHeight*0.90 + "px";
+                                        view.style.width = (component.clientWidth - pwidth/2) + "px";
+                                        view.style.height = component.clientHeight + "px";
                                         
                                         view.style.display = "flex";
                                         view.style.alignItems = "center";
