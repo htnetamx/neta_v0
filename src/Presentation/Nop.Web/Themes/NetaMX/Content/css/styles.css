@@ -1,5 +1,4 @@
 
-
 /*********** CSS RESET **********/
 
 
@@ -2050,7 +2049,7 @@ label, label + * {
 
  .info-header ._flex
  {
-  height: 36px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3843,7 +3842,7 @@ label, label + * {
 .return-request-page .button-1 {
   min-width: 140px;
   border: none;
-  background-color: #000;
+  background-color: #3870FF;
   padding: 10px 30px;
   text-align: center;
   font-size: 15px;
@@ -3870,7 +3869,7 @@ label, label + * {
 .account-page .button-1:focus,
 .return-request-page .button-1:hover,
 .return-request-page .button-1:focus {
-  background-color: #000;
+  background-color: #3870FF;
 }
 
 .return-request-page h1 a {
@@ -4561,7 +4560,7 @@ label, label + * {
   display: inline-block;
   min-width: 160px;
   border: none;
-  background-color: #000;
+  background-color: #3870FF;
   padding: 10px 20px;
   font-size: 16px;
   color: #fff;
@@ -4570,7 +4569,7 @@ label, label + * {
 
 .cart-footer .checkout-button:hover,
 .cart-footer .checkout-button:focus {
-  background-color: #000;
+  background-color: #3870FF;
 }
 
 .cart-footer .addon-buttons {
@@ -5288,7 +5287,7 @@ label, label + * {
 
 .opc .step {
   margin: 70px 0;
-  padding: 30px 0 0;
+  padding: 48px 0 0;
   text-align: left;
 }
 
@@ -6841,7 +6840,7 @@ pre {
 .is-admin .opc .step{margin:100px 0 70px;}
 
 .checkout-button-fix{position:fixed;left:0;bottom:0;width:100%;z-index:1010;background:#fff;padding: 15px !important;margin:0 !important;}
-.checkout-button-fix .btn-black{background:#000 !important;border-radius:8px;padding: 16px 30px !important;min-width:100% !important;}
+.checkout-button-fix .btn-black{background:#3870FF !important;border-radius:8px;padding: 16px 30px !important;min-width:100% !important;}
 
 .new-btn{text-align:center;}
 .new-btn a{font-weight:600;color:#000;display:inline-block;font-size:16px;text-decoration:none;}
@@ -6898,8 +6897,17 @@ pre {
 .prd-title{margin:0 0 24px;}
 .prd-title h2{font-size:20px;color:#212121;font-weight:700;margin:0;padding:0;text-align:left;}
 .owl-carousel .owl-item .owlimg {width:50% !important;}
+.extraDdiscount{display:block;}
+.notextraDdiscount{display:none;}
+@media all and (max-width: 360px)
+{
+    .customer-saving{font-size:10px;margin-right:8px;}
+  .cart-left span{font-size:10px;}
+  .cart-right{font-size:11px !important;}
+}
 @media all and (max-width: 769px)
 {
+    .extraDdiscount{font-size:10px;}
  .review-rating .name-description {
     text-align: center;
     width: 100%;
@@ -7154,8 +7162,6 @@ pre {
 
 
 @media all and (min-width: 481px) {
-
-
   /*** GLOBAL ***/
 
  .header-main .navbar,
@@ -8765,9 +8771,15 @@ pre {
     min-height: 200px;
     padding: 30px 0 0;
   }
+  .zipCode-page .returning-wrapper .form-fields {
+    min-height: 100px;
+  }
 
   .login-page .returning-wrapper .inputs label {
     width: 110px;
+  }
+  .zipCode-page .returning-wrapper .inputs label {
+    width: 175px;
   }
 
   .login-page .returning-wrapper input[type="text"],
@@ -9163,7 +9175,7 @@ pre {
  .mobile-layout .master-wrapper-content{width:100%;top:0 !important;}
  .mobile-layout #upper-page{display:none !important;}
 
- .btn-black{background:#000 !important;border-radius:8px;padding: 16px 30px !important;min-width:100% !important;}
+ .btn-black{background:#3870FF !important;border-radius:8px;padding: 16px 30px !important;min-width:100% !important;}
  .btn-zipCode {background-color: #CFCFCF !important;}
 
  .button-fix{position:fixed;left:0;bottom:0;width:100%;z-index:1010;background:#fff;padding: 15px !important;margin:0 !important;}
@@ -9203,7 +9215,7 @@ pre {
  .verification-popup p b{color:#000;font-weight:500;}
  .verification-popup .link { color: #538EFF; font-size:15px;text-decoration:none;}
  .verification-popup .code-verfication-input{margin:30px 0;}
- .verification-popup .code-verfication-input input{height:42px;border:1px solid #ddd;outline:0;font-size:15px;color:#000;padding:0 15px;text-align:center;border-radius:4px;}
+ .verification-popup .code-verfication-input input{height:42px;border:1px solid #ddd;outline:0;font-size:15px;color:#3870FF;padding:0 15px;text-align:center;border-radius:4px;}
  .zipCodeText{width:100%; text-align:left !important;}
  .zipcodelable{width:100%; text-align:left !important;}
  .mobile-cart{}
@@ -9234,7 +9246,7 @@ pre {
  .cart-footer .total-info{padding: 15px 15px 15px;border:1px solid #ddd; border-radius: 4px;}
  .cart-footer .checkout-buttons { padding: 15px; position: fixed; background:#fff;z-index:9; bottom: 0; left: 0; width: 100%;}
  .cart-footer .checkout-button:hover,
- .cart-footer .checkout-button{min-width: 100%;background-color: #000; padding: 13px 20px; }
+ .cart-footer .checkout-button{min-width: 100%;background-color: #3870FF; padding: 13px 20px; border-radius:11px;}
  .cart-total td{color:#000;padding:12px 0;}
  .cart-total tr.shipping-cost td{padding-bottom:24px;}
  .cart-total tr.order-total td{border-top:1px solid #ddd;padding-top:24px;font-weight:600;}

@@ -55,7 +55,7 @@
         <div class="description">
             @Html.Raw(Model.ShortDescription)
         </div>
-        @if (Model.MarkAsNew)
+        @*@if (Model.MarkAsNew)
         {
             @try
             {
@@ -65,7 +65,7 @@
             {
                 <div>@exc.Message</div>
             }
-        }
+        }*@
         <div class="add-info">
             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoBefore, additionalData = Model })
             <div class="price-Qs">

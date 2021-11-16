@@ -732,18 +732,8 @@ namespace Nop.Services.Common
                 totalsTable.AddCell(pDiscount);
             }
 
-            //discount total
-            var comission = subTotal * 10 / 100;
-            var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
-            var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
-
-            var pComission = GetPdfCell($"Tus ganancias con Neta: {orderComissionStr}", titleFont);
-            pComission.HorizontalAlignment = Element.ALIGN_RIGHT;
-            pComission.Border = Rectangle.NO_BORDER;
-            totalsTable.AddCell(pComission);
-
             var montoBono = current_store.NetaCoin;
-            var total_antes_bono = subTotal - comission - subDiscount;
+            var total_antes_bono = subTotal - subDiscount;
             decimal total_despues_bono = 0;
             decimal remainderBono = 0;
 
@@ -768,7 +758,17 @@ namespace Nop.Services.Common
             pBono.Border = Rectangle.NO_BORDER;
             totalsTable.AddCell(pBono);
 
+            //discount total
+            var comission = total_despues_bono * 10 / 100;
+            var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
+            var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
 
+            var pComission = GetPdfCell($"Tus ganancias con Neta: {orderComissionStr}", titleFont);
+            pComission.HorizontalAlignment = Element.ALIGN_RIGHT;
+            pComission.Border = Rectangle.NO_BORDER;
+            totalsTable.AddCell(pComission);
+
+            total_despues_bono = total_despues_bono - comission;
 
             //Space between items and total
             var space = GetPdfCell($"---------------------------------------------", font);
@@ -1086,7 +1086,7 @@ namespace Nop.Services.Common
 
             foreach (var orderItem in orderItems)
             {
-                foreach(var oItem in orderItems[orderItem.Key])
+                foreach (var oItem in orderItems[orderItem.Key])
                 {
                     var product = oItem;
 
@@ -1690,7 +1690,7 @@ namespace Nop.Services.Common
             }
 
             sumDiscount += products.Values.Sum(p => p.Values.Sum(p1 => p1.Discount));
-            sumTotal += products.Values.Sum(p => p.Values.Sum(p1 => (p1.Quantity * p1.Price) - p1.Discount));
+            sumTotal += products.Values.Sum(p => p.Values.Sum(p1 => (p1.Quantity * p1.Price)));
 
             //by default _pdfSettings contains settings for the current active store
             //and we need PdfSettings for the store which was used to place an order

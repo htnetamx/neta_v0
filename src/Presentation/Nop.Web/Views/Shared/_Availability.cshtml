@@ -81,7 +81,7 @@
             }
             else
             {
-                <div class="stock" style="padding-top: 10px">
+                <div class="stock" style="padding-top: 10px;display: none">
                     <span class="label">@T("Products.Availability"):</span>
                     <span class="value" id="stock-availability-value-@Model.Id">@Model.StockAvailability</span>
                 </div>
@@ -96,7 +96,7 @@
     }
 }
 else { 
-    <div class="availability" id="legendCtrl-@Model.Id">
+    <div class="availability" id="legendCtrl-@Model.Id" style="display: none">
         <div class="stock" style="padding-top: 10px">
             <span class="label">@T("Products.Availability"):</span>
             <span class="value" id="stock-availability-value-@Model.Id">Sin Stock</span>

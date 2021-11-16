@@ -164,14 +164,21 @@ namespace Nop.Services.Common
                              where (a.Email == addr.Email || a.PhoneNumber == addr.Email) && a.Email.Contains("@")
                              orderby a.Id
                              select a;
-                var addr1 = query1.ToList().First();
+                var addr1 = query1.ToList().FirstOrDefault();
+                if (addr1 == null)
+                {
+                    return new List<Address>();
+                } 
+                else
+                {
+                    var query2 = from a in _addressRepository.Table
+                                 where a.Id == addr1.Id || (a.Email == addr.Email || a.PhoneNumber == addr.Email) && !a.Email.Contains("@")
+                                 orderby a.Id
+                                 select a;
 
-                var query2 = from a in _addressRepository.Table
-                             where a.Id==addr1.Id || (a.Email == addr.Email || a.PhoneNumber == addr.Email) && !a.Email.Contains("@")
-                             orderby a.Id
-                             select a;
+                    return (await query2.ToListAsync()).Distinct(addressComp).Take(5).ToList();
 
-                return (await query2.ToListAsync()).Distinct(addressComp).Take(5).ToList();
+                }
             }
         }
 
