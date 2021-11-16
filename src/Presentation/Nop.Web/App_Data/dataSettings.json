@@ -1,5 +1,5 @@
 ﻿{
-  "DataConnectionString": "server=localhost;database=netamx;allowuservariables=True;user id=root;password=Temp@1324",
+  "DataConnectionString": "server=ec2-3-12-34-25.us-east-2.compute.amazonaws.com;database=netamx;allowuservariables=True;user id=hteijiz;password=NetaMx@1324",
   "DataProvider": "mysql",
   "SQLCommandTimeout": null,
   "RawDataSettings": {}
