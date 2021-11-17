@@ -1238,7 +1238,7 @@ namespace Nop.Web.Controllers
 
 
                     await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                        "AuronixOTP", responseResultToLog.Result.ToString(),
+                        "OrderConfirmation", responseResultToLog.Result.ToString(),
                         await _workContext.GetCurrentCustomerAsync());
 
 
@@ -2135,7 +2135,7 @@ namespace Nop.Web.Controllers
                             buscar = "pasado mañana,";
                     }
 
-                    NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
+                    var responseResultToLog = NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
                         "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
                         name,
                         "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
@@ -2148,6 +2148,10 @@ namespace Nop.Web.Controllers
 
                     //NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,
                     //    $"Gracias {"*" + name + "*"} por comprar en NetaMx, tu orden es la siguiente, {"\r" + string.Join("\r", list.ToArray()) + "\r"} Tu total es de ${"*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*"};pasa mañana a {"*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*"}, después de las {"5pm"}. Eres el cliente {(orders.Count + 1).ToString()} del pedido, recuerda que tenemos que llegar a 20 clientes para poder despachar. Comparte las promos y juntos lleguemos al mínimo de pedidos: {(await _storeContext.GetCurrentStoreAsync()).Url}");
+
+                    await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                   "OrderConfirmation", responseResultToLog.Result.ToString(),
+                   await _workContext.GetCurrentCustomerAsync());
 
                     var paymentMethod = await _paymentPluginManager
                         .LoadPluginBySystemNameAsync(placeOrderResult.PlacedOrder.PaymentMethodSystemName, await _workContext.GetCurrentCustomerAsync(), (await _storeContext.GetCurrentStoreAsync()).Id);
