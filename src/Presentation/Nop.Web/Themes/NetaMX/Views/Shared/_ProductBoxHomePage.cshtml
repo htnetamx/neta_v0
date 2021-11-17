@@ -160,7 +160,7 @@
                 }
                 <div class="add-quantity @activeClass" id="prdparent-@Model.Id">
                     <span data-quantity="minus" class="icon minus"></span>
-                    <input id="itemquantity@(Model.Id)" class="qty-input@(Model.Id)" type="text" value="@(currentQty)" />
+                    <input id="itemquantity@(Model.Id)" class="qty-input@(Model.Id)" type="text" value="@(currentQty)" readonly />
                     <span data-quantity="plus" class="icon plus"></span>
                 </div>
                 <script asp-location="Footer">
