@@ -132,5 +132,10 @@ namespace Nop.Core.Domain.Customers
         /// Gets or sets the shipping address identifier
         /// </summary>
         public int? ShippingAddressId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the variable of deprecated for productos
+        /// </summary>
+        public bool DeprecateProducts { get; set; }
     }
 }

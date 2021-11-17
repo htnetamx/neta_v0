@@ -775,6 +775,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                .ForMember(model => model.ActivityLogTypeName, options => options.Ignore());
 
             CreateMap<Customer, CustomerModel>()
+                .ForMember(model => model.DeprecateProducts, options => options.Ignore())
                 .ForMember(model => model.Email, options => options.Ignore())
                 .ForMember(model => model.FullName, options => options.Ignore())
                 .ForMember(model => model.Company, options => options.Ignore())
@@ -845,6 +846,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.CustomerBackInStockSubscriptionSearchModel, options => options.Ignore());
 
             CreateMap<CustomerModel, Customer>()
+                .ForMember(entity => entity.DeprecateProducts, options => options.Ignore())
                 .ForMember(entity => entity.CustomerGuid, options => options.Ignore())
                 .ForMember(entity => entity.CreatedOnUtc, options => options.Ignore())
                 .ForMember(entity => entity.LastActivityDateUtc, options => options.Ignore())

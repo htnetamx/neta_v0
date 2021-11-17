@@ -698,7 +698,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare grid
             searchModel.SetGridPageSize();
-
             return searchModel;
         }
 

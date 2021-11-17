@@ -1,6 +1,7 @@
 ﻿@model CustomerModel
-
 @using Newtonsoft.Json
+@inject Nop.Services.Customers.ICustomerService customerService
+@inject IWorkContext workContext
 @if (Model.CountryEnabled && Model.StateProvinceEnabled)
 {
     <script>
@@ -63,7 +64,7 @@
         </div>
         <div class="col-md-9">
             <div class="input-group">
-                <nop-editor asp-for="Password" autocomplete="new-password"/>
+                <nop-editor asp-for="Password" autocomplete="new-password" />
                 <div class="input-group-append">
                     @if (Model.Id > 0)
                     {
@@ -92,6 +93,15 @@
         <div class="col-md-9">
             <nop-editor asp-for="LastName" />
             <span asp-validation-for="LastName"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <nop-label asp-for="DeprecateProducts" />
+        </div>
+        <div class="col-md-9" onclick="updateDeprecateProducts()">
+            <nop-editor asp-for="DeprecateProducts" />
+            <span asp-validation-for="DeprecateProducts"></span>
         </div>
     </div>
     @if (Model.GenderEnabled)
@@ -326,7 +336,7 @@
             <nop-label asp-for="SelectedCustomerRoleIds" />
         </div>
 
-        <div class="col-md-9">            
+        <div class="col-md-9">
             <div class="input-group-append input-group-required">
                 <div class="input-group">
                     <nop-select asp-for="SelectedCustomerRoleIds" asp-items="Model.AvailableCustomerRoles" asp-multiple="true" />
@@ -399,7 +409,7 @@
             </div>
             <div class="col-md-9">
                 <div class="input-group">
-                    <nop-editor asp-for="MultiFactorAuthenticationProvider" asp-disabled="true"/>
+                    <nop-editor asp-for="MultiFactorAuthenticationProvider" asp-disabled="true" />
                     <div class="input-group-append">
                         @if (Model.Id > 0)
                         {

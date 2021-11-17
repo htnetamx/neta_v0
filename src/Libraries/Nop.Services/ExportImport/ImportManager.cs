@@ -1316,6 +1316,9 @@ namespace Nop.Services.ExportImport
                         case "PerTaras":
                             product.PerTaras = property.DecimalValue;
                             break;
+                        case "Deprecated":
+                            product.Deprecated = property.BooleanValue;
+                            break;
                         case "ShortDescription":
                             product.ShortDescription = property.StringValue;
                             break;
