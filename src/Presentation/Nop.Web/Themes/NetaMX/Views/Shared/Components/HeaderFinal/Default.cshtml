@@ -60,7 +60,7 @@
         </div>
         <div class="new-header">
             <div class="_flex">
-                <div class="store-name"><a href="/">@Model.Store.Name</a><span  id="storeName" class="store-popup-open"></span></div>
+                <div class="store-name"><a href="/">@Model.Store.Name</a><span id="storeName" class="store-popup-open"></span></div>
                 <div class="store-popup">
                     <a class="loc">@Model.Store.CompanyAddress</a>
                 </div>
@@ -86,6 +86,9 @@
                 </a>
             </div>
         </div>
+        <div class="customer-banner">
+            <span style="font-size: 13px">Recibe un descuento de 10$ en tu primera orden del día mayor a $100.</span>
+        </div>
     }
 }
 
@@ -108,27 +111,27 @@
         $(".search-icon").on("click", function () {
             $(".search-container").toggleClass("active");
         });
-    }) 
+    })
 </script>
 
 
 @if (Model.ShoppingCartEnabled)
 {
     <script asp-location="Footer">
-                                                                            //$(document).ready(function () {
-                                                                            //    $('.header').on('mouseenter', '#topcartlink', function () {
-                                                                            //        $('#flyout-cart').addClass('active');
-                                                                            //    });
-                                                                            //    $('.header').on('mouseleave', '#topcartlink', function () {
-                                                                            //        $('#flyout-cart').removeClass('active');
-                                                                            //    });
-                                                                            //    $('.header').on('mouseenter', '#flyout-cart', function () {
-                                                                            //        $('#flyout-cart').addClass('active');
-                                                                            //    });
-                                                                            //    $('.header').on('mouseleave', '#flyout-cart', function () {
-                                                                            //        $('#flyout-cart').removeClass('active');
-                                                                            //    });
-                                                                            //});
+                                                                                //$(document).ready(function () {
+                                                                                //    $('.header').on('mouseenter', '#topcartlink', function () {
+                                                                                //        $('#flyout-cart').addClass('active');
+                                                                                //    });
+                                                                                //    $('.header').on('mouseleave', '#topcartlink', function () {
+                                                                                //        $('#flyout-cart').removeClass('active');
+                                                                                //    });
+                                                                                //    $('.header').on('mouseenter', '#flyout-cart', function () {
+                                                                                //        $('#flyout-cart').addClass('active');
+                                                                                //    });
+                                                                                //    $('.header').on('mouseleave', '#flyout-cart', function () {
+                                                                                //        $('#flyout-cart').removeClass('active');
+                                                                                //    });
+                                                                                //});
     </script>
 }
 

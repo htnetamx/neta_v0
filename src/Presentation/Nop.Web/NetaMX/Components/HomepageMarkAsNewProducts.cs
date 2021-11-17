@@ -71,8 +71,8 @@ namespace Nop.Web.Components
             }
             else if (fase.DisplayOrder == 2)
             {
-                //products = products.Where(v => !(v.Sku.EndsWith("LH") /*|| v.Sku.EndsWith("L1")*/)).ToList();
-                products = products.Where(v => !v.Sku.ToUpper().EndsWith("LH")).ToList();
+                products = products.Where(v => !(v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1"))).ToList();
+                //products = products.Where(v => !v.Sku.ToUpper().EndsWith("LH")).ToList();
             }
             
             if (!products.Any())

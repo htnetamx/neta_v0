@@ -249,7 +249,7 @@
                 try {
                 $.ajax({
                     cache: false,
-                    url: "@(storeConext.GetCurrentStore().Url)checkout/PostVerifyMessage/",
+                    url: "@(storeConext.GetCurrentStore().Url.Replace("http", "https"))checkout/PostVerifyMessage/",
                     data: $("#formVerifData").serialize(),
                     type: 'POST',
                     success: function (response) {
