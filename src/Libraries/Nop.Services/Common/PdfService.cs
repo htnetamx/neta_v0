@@ -1086,46 +1086,50 @@ namespace Nop.Services.Common
 
             foreach (var orderItem in orderItems)
             {
-                foreach (var oItem in orderItems[orderItem.Key])
+                try
                 {
-                    var product = oItem;
+                    foreach (var oItem in orderItems[orderItem.Key])
+                    {
+                        var product = oItem;
 
-                    var pAttribTable = new PdfPTable(1) { RunDirection = GetDirection(lang) };
-                    pAttribTable.DefaultCell.Border = Rectangle.NO_BORDER;
+                        var pAttribTable = new PdfPTable(1) { RunDirection = GetDirection(lang) };
+                        pAttribTable.DefaultCell.Border = Rectangle.NO_BORDER;
 
-                    //product name
-                    var name = orderItem.Key;
-                    pAttribTable.AddCell(new Paragraph(name, font));
-                    cellProductItem.AddElement(new Paragraph(name, font));
-                    productsTable.AddCell(pAttribTable);
+                        //product name
+                        var name = orderItem.Key;
+                        pAttribTable.AddCell(new Paragraph(name, font));
+                        cellProductItem.AddElement(new Paragraph(name, font));
+                        productsTable.AddCell(pAttribTable);
 
-                    //price
-                    string unitPrice;
-                    var unitPriceInclTaxInCustomerCurrency =
-                        _currencyService.ConvertCurrency(oItem.Value.Price, 1);
-                    unitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true,
-                        "PES", lang.Id, true);
+                        //price
+                        string unitPrice;
+                        var unitPriceInclTaxInCustomerCurrency =
+                            _currencyService.ConvertCurrency(oItem.Value.Price, 1);
+                        unitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true,
+                            "PES", lang.Id, true);
 
-                    cellProductItem = GetPdfCell(unitPrice, font);
-                    cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
-                    productsTable.AddCell(cellProductItem);
+                        cellProductItem = GetPdfCell(unitPrice, font);
+                        cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
+                        productsTable.AddCell(cellProductItem);
 
-                    //qty
-                    cellProductItem = GetPdfCell(oItem.Value.Quantity, font);
-                    cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
-                    productsTable.AddCell(cellProductItem);
+                        //qty
+                        cellProductItem = GetPdfCell(oItem.Value.Quantity, font);
+                        cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
+                        productsTable.AddCell(cellProductItem);
 
-                    //total
-                    string subTotal;
-                    var priceInclTaxInCustomerCurrency =
-                        _currencyService.ConvertCurrency(oItem.Value.Price * oItem.Value.Quantity, 1);
-                    subTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, "PES",
-                        lang.Id, true);
+                        //total
+                        string subTotal;
+                        var priceInclTaxInCustomerCurrency =
+                            _currencyService.ConvertCurrency(oItem.Value.Price * oItem.Value.Quantity, 1);
+                        subTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, "PES",
+                            lang.Id, true);
 
-                    cellProductItem = GetPdfCell(subTotal, font);
-                    cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
-                    productsTable.AddCell(cellProductItem);
+                        cellProductItem = GetPdfCell(subTotal, font);
+                        cellProductItem.HorizontalAlignment = Element.ALIGN_LEFT;
+                        productsTable.AddCell(cellProductItem);
+                    }
                 }
+                catch { }
             }
             doc.Add(productsTable);
         }
