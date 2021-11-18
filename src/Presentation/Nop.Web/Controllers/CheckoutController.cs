@@ -340,7 +340,7 @@ namespace Nop.Web.Controllers
             //    "02c89181_e473_461e_9e66_8f6b75af9b5e:codigo_confirmacion",
             //    12, form["code_generated"]);
 
-            var responseResultToLog = await NetaAuronixMessaging.Send_SMS(form["Password"], 
+            var responseResultToLog = await NetaAuronixMessaging.Send_SMS(form["Password"],
                 $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar", "15");
 
             //BotmakerMessaging.Send("525545439866",
@@ -350,7 +350,7 @@ namespace Nop.Web.Controllers
 
             await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
                 "AuronixOTP", responseResultToLog + form["code_generated"],
-                await _customerService.GetCustomerByUsernameAsync( (string) form["Password"]  ) ) ;
+                await _customerService.GetCustomerByUsernameAsync((string)form["Password"]));
 
             return Content("{'rta': true }", "application/json");
         }
@@ -1218,9 +1218,9 @@ namespace Nop.Web.Controllers
                            name,
                            "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
                            placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                           buscar,
                            (await _storeContext.GetCurrentStoreAsync()).Name,
-                            buscar,
-                           "5pm", 
+                           "5pm",
                            (await _storeContext.GetCurrentStoreAsync()).Url);
 
 
@@ -2139,8 +2139,8 @@ namespace Nop.Web.Controllers
                                   name,
                                   "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
                                   placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                                  buscar,
                                   (await _storeContext.GetCurrentStoreAsync()).Name,
-                                   buscar,
                                   "5pm",
                                   (await _storeContext.GetCurrentStoreAsync()).Url);
 
