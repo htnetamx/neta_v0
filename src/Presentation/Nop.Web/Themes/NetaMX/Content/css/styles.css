@@ -2532,11 +2532,14 @@ label, label + * {
   overflow: hidden;
   padding: 10px;
 }
-
-.overview .availability .stock,
-.variant-overview .availability .stock {
-  margin: 0 0 10px;
-}
+  .availability .stock{
+      display:none;
+      padding-top:10px;
+  }
+  .overview .availability .stock,
+  .variant-overview .availability .stock {
+    margin: 0 0 10px;
+  }
 
 .overview .availability .back-in-stock-subscription,
 .variant-overview .availability .back-in-stock-subscription {
