@@ -1129,7 +1129,9 @@ namespace Nop.Services.Common
                         productsTable.AddCell(cellProductItem);
                     }
                 }
-                catch { }
+                catch 
+                {
+                }
             }
             doc.Add(productsTable);
         }
@@ -1673,10 +1675,16 @@ namespace Nop.Services.Common
                     {
                         products[name].Add(orderItem.UnitPriceExclTax, new OrderStoreTotal());
                     }
+                    try
+                    {
+                        products[name][orderItem.UnitPriceExclTax].Price = orderItem.UnitPriceExclTax;
+                        products[name][orderItem.UnitPriceExclTax].Quantity += orderItem.Quantity;
+                        products[name][orderItem.UnitPriceExclTax].Discount += orderItem.DiscountAmountExclTax;
+                    } 
+                    catch
+                    {
 
-                    products[name][orderItem.UnitPriceExclTax].Price = orderItem.UnitPriceExclTax;
-                    products[name][orderItem.UnitPriceExclTax].Quantity += orderItem.Quantity;
-                    products[name][orderItem.UnitPriceExclTax].Discount += orderItem.DiscountAmountExclTax;
+                    }
                 }
 
                 if (order.OrderDiscount != 0)
@@ -1685,11 +1693,18 @@ namespace Nop.Services.Common
                     if (!products.ContainsKey(name))
                     {
                         products.Add(name, new Dictionary<decimal, OrderStoreTotal>());
-                        products[name].Add(order.OrderDiscount, new OrderStoreTotal());
+                        products[name].Add(1, new OrderStoreTotal());
                     }
-                    products[name][order.OrderDiscount].Price = 0;
-                    products[name][order.OrderDiscount].Quantity += 1;
-                    products[name][order.OrderDiscount].Discount += order.OrderDiscount;
+                    try
+                    {
+                        products[name][1].Price = 0;
+                        products[name][1].Quantity = 1;
+                        products[name][1].Discount += order.OrderDiscount;
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 
