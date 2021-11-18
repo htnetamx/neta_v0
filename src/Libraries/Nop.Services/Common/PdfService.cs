@@ -1437,7 +1437,12 @@ namespace Nop.Services.Common
                 Reference = store.Name
             };
 
-            var cellHeader = GetPdfCell(string.Format(await _localizationService.GetResourceAsync("PDFInvoice.Order#", lang.Id), order.CustomOrderNumber), titleFont);
+            var cellHeader = GetPdfCell("Ruta: "+order.Route, titleFont);
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
+            cellHeader.Phrase.Add(string.Format(await _localizationService.GetResourceAsync("PDFInvoice.Order#", lang.Id), order.CustomOrderNumber));
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
             cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
             cellHeader.Phrase.Add(new Phrase(anchor));
             cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
@@ -1469,7 +1474,7 @@ namespace Nop.Services.Common
             doc.Add(headerTable);
         }
 
-        protected virtual async Task PrintHeaderAsync1(PdfSettings pdfSettingsByStore, Language lang, string storeName, Font font, Font titleFont, Document doc)
+        protected virtual async Task PrintHeaderAsync1(PdfSettings pdfSettingsByStore, Language lang, string route,string storeName, Font font, Font titleFont, Document doc)
         {
             //logo
             var logoPicture = await _pictureService.GetPictureByIdAsync(pdfSettingsByStore.LogoPictureId);
@@ -1488,7 +1493,13 @@ namespace Nop.Services.Common
                 Reference = storeName
             };
 
-            var cellHeader = GetPdfCell(string.Format(await _localizationService.GetResourceAsync("PDFInvoice.Order#", lang.Id), ""), titleFont);
+
+            var cellHeader = GetPdfCell("Ruta: " + route, titleFont);
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
+            cellHeader.Phrase.Add(string.Format(await _localizationService.GetResourceAsync("PDFInvoice.Order#", lang.Id), ""));
+            cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
             cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
             cellHeader.Phrase.Add(new Phrase(anchor));
             cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
@@ -1628,10 +1639,12 @@ namespace Nop.Services.Common
             doc.Close();
         }
 
-        public virtual async Task PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
+        public virtual async Task PrintAcumOrdersToPdfAsync(Document doc2, Stream stream2, PdfWriter pdfWriter2, Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
+            if (stream2 == null)
+                throw new ArgumentNullException(nameof(stream2));
 
             if (orders == null)
                 throw new ArgumentNullException(nameof(orders));
@@ -1641,9 +1654,14 @@ namespace Nop.Services.Common
             if (_pdfSettings.LetterPageSizeEnabled)
                 pageSize = PageSize.Letter;
 
+
+            var filteredRoutes = orders.Where(o => o.Route != null && o.Route != "").GroupBy(o => o.Route).Select(o => o.FirstOrDefault()).Select(o=>o.Route).ToList();
+            var route = String.Join(",", filteredRoutes);
+
             var doc = new Document(pageSize);
             var pdfWriter = PdfWriter.GetInstance(doc, stream);
             doc.Open();
+            
 
             //fonts
             var titleFont = GetFont();
@@ -1719,27 +1737,30 @@ namespace Nop.Services.Common
             var currentStore = await _storeService.GetStoreByIdAsync(orders.First().StoreId);
 
             //header
-            await PrintHeaderAsync1(pdfSettingsByStore, lang, currentStore.Name, font, titleFont, doc);
+            await PrintHeaderAsync1(pdfSettingsByStore, lang, route, currentStore.Name, font, titleFont, doc);
+            await PrintHeaderAsync1(pdfSettingsByStore, lang, route, currentStore.Name, font, titleFont, doc2);
 
             //addresses
             await PrintAddressesAsync1(vendorId, lang, titleFont, currentStore, font, doc);
+            await PrintAddressesAsync1(vendorId, lang, titleFont, currentStore, font, doc2);
 
             //products
             await PrintProductsAsync1(vendorId, lang, titleFont, doc, products, font, attributesFont);
-
+            await PrintProductsAsync1(vendorId, lang, titleFont, doc2, products, font, attributesFont);
             //checkout attributes
             //PrintCheckoutAttributes(vendorId, order, doc, lang, font);
 
             //totals
             await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, currentStore, font, titleFont, doc);
-
+            await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, currentStore, font, titleFont, doc2);
             //order notes
             //await PrintOrderNotesAsync(pdfSettingsByStore, order, lang, titleFont, doc, font);
 
             //footer
             PrintFooter(pdfSettingsByStore, pdfWriter, pageSize, lang, font);
-
+            PrintFooter(pdfSettingsByStore, pdfWriter2, pageSize, lang, font);
             doc.Close();
+            doc2.NewPage();
         }
 
         /// <summary>

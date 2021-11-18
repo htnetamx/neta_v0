@@ -203,6 +203,17 @@ namespace Nop.Services.Orders
                 cache => cache.PrepareKeyForShortTermCache(NopEntityCacheDefaults<Order>.ByIdCacheKey, orderId));
         }
 
+        public async Task<IList<Order>> GetOrdersByIdAsync(List<int> idArray)
+        {
+            if (idArray == null)
+                throw new ArgumentNullException(nameof(idArray));
+
+            var query = _orderRepository.Table;
+            query = query.Where(o => idArray.Contains(o.Id));
+
+            return await query.ToListAsync();
+        }
+
         /// <summary>
         /// Gets an order
         /// </summary>
@@ -219,6 +230,13 @@ namespace Nop.Services.Orders
             return await _orderRepository.Table
                 .FirstOrDefaultAsync(o => o.CustomOrderNumber == customOrderNumber);
         }
+
+
+        public virtual async Task<List<Order>> GetAllOrdersAsync()
+        {
+            return await _orderRepository.Table.ToListAsync();
+        }
+
 
         /// <summary>
         /// Gets an order by order item identifier
@@ -363,13 +381,11 @@ namespace Nop.Services.Orders
             DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
             List<int> osIds = null, List<int> psIds = null, List<int> ssIds = null,
             string billingPhone = null, string billingEmail = null, string billingLastName = "",
-            string orderNotes = null, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
+            string orderNotes = null, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false,bool orderByStoreId = false, bool orderByRoute = false)
         {
             var query = _orderRepository.Table;
-
             if (storeId > 0)
                 query = query.Where(o => o.StoreId == storeId);
-
             if (vendorId > 0)
             {
                 query = from o in query
@@ -380,16 +396,16 @@ namespace Nop.Services.Orders
 
                 query = query.Distinct();
             }
-
+            
             if (customerId > 0)
                 query = query.Where(o => o.CustomerId == customerId);
-
+            
             if (productId > 0)
                 query = from o in query
                     join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
                     where oi.ProductId == productId
                     select o;
-
+            
             if (warehouseId > 0)
             {
                 var manageStockInventoryMethodId = (int)ManageInventoryMethod.ManageStock;
@@ -408,31 +424,29 @@ namespace Nop.Services.Orders
                         ((p.ManageInventoryMethodId != manageStockInventoryMethodId || !p.UseMultipleWarehouses) && p.WarehouseId == warehouseId)
                     select o;
             }
-
+            
             if (!string.IsNullOrEmpty(paymentMethodSystemName))
                 query = query.Where(o => o.PaymentMethodSystemName == paymentMethodSystemName);
-
+            
             if (affiliateId > 0)
                 query = query.Where(o => o.AffiliateId == affiliateId);
-
+            
             if (createdFromUtc.HasValue)
                 query = query.Where(o => createdFromUtc.Value <= o.CreatedOnUtc);
-
             if (createdToUtc.HasValue)
                 query = query.Where(o => createdToUtc.Value >= o.CreatedOnUtc);
-
             if (osIds != null && osIds.Any())
                 query = query.Where(o => osIds.Contains(o.OrderStatusId));
-
+            
             if (psIds != null && psIds.Any())
                 query = query.Where(o => psIds.Contains(o.PaymentStatusId));
-
+            
             if (ssIds != null && ssIds.Any())
                 query = query.Where(o => ssIds.Contains(o.ShippingStatusId));
-
+            
             if (!string.IsNullOrEmpty(orderNotes))
                 query = query.Where(o => _orderNoteRepository.Table.Any(oNote => oNote.OrderId == o.Id && oNote.Note.Contains(orderNotes)));
-
+            
             query = from o in query
                 join oba in _addressRepository.Table on o.BillingAddressId equals oba.Id
                 where
@@ -441,9 +455,31 @@ namespace Nop.Services.Orders
                     (string.IsNullOrEmpty(billingEmail) || (!string.IsNullOrEmpty(oba.Email) && oba.Email.Contains(billingEmail))) &&
                     (string.IsNullOrEmpty(billingLastName) || (!string.IsNullOrEmpty(oba.LastName) && oba.LastName.Contains(billingLastName)))
                 select o;
-
+            
             query = query.Where(o => !o.Deleted);
-            query = query.OrderByDescending(o => o.CreatedOnUtc);
+            
+            if (orderByStoreId || orderByRoute)
+            {
+                if (orderByStoreId && orderByRoute)
+                {
+                    query = query.OrderBy(o => o.Route).ThenBy(o=>o.StoreId);
+                }
+                else{
+                    if (orderByStoreId)
+                    {
+                        query = query.OrderBy(o => o.StoreId);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(o => o.Route);
+                    }
+                }
+            }
+            else
+            {
+                query = query.OrderByDescending(o => o.CreatedOnUtc);
+            }
+            
 
             //database layer paging
             return await query.ToPagedListAsync(pageIndex, pageSize, getOnlyTotalCount);

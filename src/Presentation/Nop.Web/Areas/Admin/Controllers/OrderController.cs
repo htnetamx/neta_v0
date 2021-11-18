@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
@@ -50,6 +52,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IDownloadService _downloadService;
         private readonly IEncryptionService _encryptionService;
         private readonly IExportManager _exportManager;
+        private readonly IImportManager _importManager;
         private readonly INopFileProvider _fileProvider;
         private readonly IGiftCardService _giftCardService;
         private readonly ILocalizationService _localizationService;
@@ -85,6 +88,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IDownloadService downloadService,
             IEncryptionService encryptionService,
             IExportManager exportManager,
+            IImportManager importManager,
             INopFileProvider fileProvider,
             IGiftCardService giftCardService,
             ILocalizationService localizationService,
@@ -116,6 +120,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _downloadService = downloadService;
             _encryptionService = encryptionService;
             _exportManager = exportManager;
+            _importManager = importManager;
             _fileProvider = fileProvider;
             _giftCardService = giftCardService;
             _localizationService = localizationService;
@@ -433,6 +438,114 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
             }
         }
+
+        [HttpPost, ActionName("ExportExcelOrderByStoreId")]
+        [FormValueRequired("exportexcel-all-OrderByStoreId")]
+        public virtual async Task<IActionResult> ExportExcelAllOrderByStoreId(OrderSearchModel model)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var startDateValue = model.StartDate == null ? null
+                            : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
+
+            var endDateValue = model.EndDate == null ? null
+                            : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
+
+            //a vendor should have access only to his products
+            if (await _workContext.GetCurrentVendorAsync() != null)
+            {
+                model.VendorId = (await _workContext.GetCurrentVendorAsync()).Id;
+            }
+
+            var orderStatusIds = model.OrderStatusIds != null && !model.OrderStatusIds.Contains(0)
+                ? model.OrderStatusIds.ToList()
+                : null;
+            var paymentStatusIds = model.PaymentStatusIds != null && !model.PaymentStatusIds.Contains(0)
+                ? model.PaymentStatusIds.ToList()
+                : null;
+            var shippingStatusIds = model.ShippingStatusIds != null && !model.ShippingStatusIds.Contains(0)
+                ? model.ShippingStatusIds.ToList()
+                : null;
+
+            var filterByProductId = 0;
+            var product = await _productService.GetProductByIdAsync(model.ProductId);
+            if (product != null && (await _workContext.GetCurrentVendorAsync() == null || product.VendorId == (await _workContext.GetCurrentVendorAsync()).Id))
+                filterByProductId = model.ProductId;
+
+            //load orders
+            var orders = await _orderService.SearchOrdersAsync(storeId: model.StoreId,
+                vendorId: model.VendorId,
+                productId: filterByProductId,
+                warehouseId: model.WarehouseId,
+                paymentMethodSystemName: model.PaymentMethodSystemName,
+                createdFromUtc: startDateValue,
+                createdToUtc: endDateValue,
+                osIds: orderStatusIds,
+                psIds: paymentStatusIds,
+                ssIds: shippingStatusIds,
+                billingPhone: model.BillingPhone,
+                billingEmail: model.BillingEmail,
+                billingLastName: model.BillingLastName,
+                billingCountryId: model.BillingCountryId,
+                orderNotes: model.OrderNotes,
+                orderByStoreId: true);
+
+            //ensure that we at least one order selected
+            if (!orders.Any())
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Orders.NoOrders"));
+                return RedirectToAction("List");
+            }
+
+            try
+            {
+                var bytes = await _exportManager.ExportOrdersToXlsxAsync(orders,true);
+                return File(bytes, MimeTypes.TextXlsx, "orders.xlsx");
+            }
+            catch (Exception exc)
+            {
+                await _notificationService.ErrorNotificationAsync(exc);
+                return RedirectToAction("List");
+            }
+        }
+
+
+        [HttpPost]
+        public virtual async Task<IActionResult> ImportExcel(IFormFile importexcelfile)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            if (await _workContext.GetCurrentVendorAsync() != null)
+                //a vendor can not import products
+                return AccessDeniedView();
+
+            try
+            {
+                if (importexcelfile != null && importexcelfile.Length > 0)
+                {
+                    await _importManager.ImportOrdersFromXlsxAsync(importexcelfile.OpenReadStream());
+                }
+                else
+                {
+                    _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Common.UploadFile"));
+
+                    return RedirectToAction("List");
+                }
+
+                _notificationService.SuccessNotification("Las Ordenes fueron cargadas satisfactoriamente");
+
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                await _notificationService.ErrorNotificationAsync(exc);
+
+                return RedirectToAction("List");
+            }
+        }
+
 
         [HttpPost]
         public virtual async Task<IActionResult> ExportExcelSelected(string selectedIds)
@@ -859,6 +972,52 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
         }
 
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("btnSaveRoute")]
+        public virtual async Task<IActionResult> ChangeRoute(int id, OrderModel model)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            //try to get an order with the specified id
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            //a vendor does not have access to this functionality
+            if (await _workContext.GetCurrentVendorAsync() != null)
+                return RedirectToAction("Edit", "Order", new { id });
+
+            try
+            {
+                order.Route = model.Route;
+                await _orderService.UpdateOrderAsync(order);
+
+                //add a note
+                await _orderService.InsertOrderNoteAsync(new OrderNote
+                {
+                    OrderId = order.Id,
+                    Note = $"Order route has been edited. New route: "+order.Route,
+                    DisplayToCustomer = false,
+                    CreatedOnUtc = DateTime.UtcNow
+                });
+
+                await LogEditOrderAsync(order.Id);
+
+                //prepare model
+                model = await _orderModelFactory.PrepareOrderModelAsync(model, order);
+
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                //prepare model
+                model = await _orderModelFactory.PrepareOrderModelAsync(model, order);
+                await _notificationService.ErrorNotificationAsync(exc);
+                return View(model);
+            }
+        }
+
         #endregion
 
         #region Edit, delete
@@ -984,7 +1143,10 @@ namespace Nop.Web.Areas.Admin.Controllers
                 billingEmail: model.BillingEmail,
                 billingLastName: model.BillingLastName,
                 billingCountryId: model.BillingCountryId,
-                orderNotes: model.OrderNotes);
+                orderNotes: model.OrderNotes,
+                orderByStoreId: true,
+                orderByRoute: true
+                );
 
             //ensure that we at least one order selected
             if (!orders.Any())
@@ -1007,7 +1169,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                 }
 
                 var storeList = orders.Select(v => v.StoreId).Distinct();
-                foreach(var store in storeList)
+                var pageSize = PageSize.A4;
+                var doc2 = new Document(pageSize);
+                var stream2 = new MemoryStream();
+                var pdfWriter2 = PdfWriter.GetInstance(doc2, stream2);
+                doc2.Open();
+                foreach (var store in storeList)
                 {
                     var storeData = await _storeService.GetStoreByIdAsync(store);
                     if (storeData != null)
@@ -1016,13 +1183,13 @@ namespace Nop.Web.Areas.Admin.Controllers
                         {
                             await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                             SaveStreamAsFile(tempDirectory, stream, $"orders-{storeData.Name.Replace("\"", "")}.pdf");
-
-                            await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
+                            await _pdfService.PrintAcumOrdersToPdfAsync(doc2, stream2, pdfWriter2, stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                             SaveStreamAsFile(tempDirectory, stream, $"invoice-{storeData.Name.Replace("\"", "")}.pdf");
                         }
                     }
                 }
-
+                doc2.Close();
+                SaveStreamAsFile(tempDirectory, stream2, "All-Invoices.pdf");
                 var zipFileName = $"invoices{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.zip";
                 var zipFileDownload = System.IO.Path.Combine(tempDirectoryDownload, zipFileName);
                 System.IO.Compression.ZipFile.CreateFromDirectory(tempDirectory, zipFileDownload);

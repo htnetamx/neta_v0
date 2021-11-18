@@ -26,6 +26,8 @@ namespace Nop.Services.Orders
 
         Task<int[]> GetOrderSkuCountAsync(int addressId, int productId, string phoneNumber, int customerId);
 
+        Task<List<Order>> GetAllOrdersAsync();
+        Task<IList<Order>> GetOrdersByIdAsync(List<int> idArray);
         /// <summary>
         /// Gets an order
         /// </summary>
@@ -111,7 +113,7 @@ namespace Nop.Services.Orders
             DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
             List<int> osIds = null, List<int> psIds = null, List<int> ssIds = null,
             string billingPhone = null, string billingEmail = null, string billingLastName = "",
-            string orderNotes = null, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
+            string orderNotes = null, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false, bool orderByStoreId = false, bool orderByRoute = false);
 
         /// <summary>
         /// Inserts an order

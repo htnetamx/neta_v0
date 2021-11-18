@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
+using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
@@ -18,7 +19,9 @@ using Nop.Core.Http;
 using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Services.Catalog;
+using Nop.Services.Orders;
 using Nop.Services.Directory;
+using Nop.Services.ExportImport;
 using Nop.Services.ExportImport.Help;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
@@ -66,6 +69,7 @@ namespace Nop.Services.ExportImport
         private readonly IPictureService _pictureService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
         private readonly IProductTagService _productTagService;
         private readonly IProductTemplateService _productTemplateService;
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -102,6 +106,7 @@ namespace Nop.Services.ExportImport
             IPictureService pictureService,
             IProductAttributeService productAttributeService,
             IProductService productService,
+            IOrderService orderService,
             IProductTagService productTagService,
             IProductTemplateService productTemplateService,
             IServiceScopeFactory serviceScopeFactory,
@@ -134,6 +139,7 @@ namespace Nop.Services.ExportImport
             _pictureService = pictureService;
             _productAttributeService = productAttributeService;
             _productService = productService;
+            _orderService = orderService;
             _productTagService = productTagService;
             _productTemplateService = productTemplateService;
             _serviceScopeFactory = serviceScopeFactory;
@@ -165,6 +171,25 @@ namespace Nop.Services.ExportImport
             }
 
             specificationAttributeManager.ReadFromXlsx(worksheet, iRow, ExportProductAttribute.ProducAttributeCellOffset);
+
+            if (specificationAttributeManager.IsCaption)
+            {
+                return ExportedAttributeType.SpecificationAttribute;
+            }
+
+            return ExportedAttributeType.NotSpecified;
+        }
+
+        private static ExportedAttributeType GetTypeOfExportedAttribute(ExcelWorksheet worksheet, PropertyManager<ExportOrderAttribute> orderAttributeManager, PropertyManager<ExportSpecificationAttribute> specificationAttributeManager, int iRow)
+        {
+            orderAttributeManager.ReadFromXlsx(worksheet, iRow, ExportOrderAttribute.OrderAttributeCellOffset);
+
+            if (orderAttributeManager.IsCaption)
+            {
+                return ExportedAttributeType.OrderAttribute;
+            }
+
+            specificationAttributeManager.ReadFromXlsx(worksheet, iRow, ExportOrderAttribute.OrderAttributeCellOffset);
 
             if (specificationAttributeManager.IsCaption)
             {
@@ -598,6 +623,25 @@ namespace Nop.Services.ExportImport
 
         /// <returns>A task that represents the asynchronous operation</returns>
         protected virtual async Task SetOutLineForProductAttributeRowAsync(object cellValue, ExcelWorksheet worksheet, int endRow)
+        {
+            try
+            {
+                var aid = Convert.ToInt32(cellValue ?? -1);
+
+                var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(aid);
+
+                if (productAttribute != null)
+                    worksheet.Row(endRow).OutlineLevel = 1;
+            }
+            catch (FormatException)
+            {
+                if ((cellValue ?? string.Empty).ToString() == "AttributeId")
+                    worksheet.Row(endRow).OutlineLevel = 1;
+            }
+        }
+
+        /// <returns>A task that represents the asynchronous operation</returns>
+        protected virtual async Task SetOutLineForOrderAttributeRowAsync(object cellValue, ExcelWorksheet worksheet, int endRow)
         {
             try
             {
@@ -1089,6 +1133,186 @@ namespace Nop.Services.ExportImport
                 AllSku = allSku
             };
         }
+
+        /// <returns>A task that represents the asynchronous operation</returns>
+        private async Task<ImportOrderMetadata> PrepareImportOrderDataAsync(ExcelWorksheet worksheet)
+        {
+            //the columns
+            var properties = GetPropertiesByExcelCells<Order>(worksheet);
+
+            var manager = new PropertyManager<Order>(properties, _catalogSettings);
+
+            var orderAttributeProperties = new[]
+            {
+                new PropertyByName<ExportOrderAttribute>("ProducAttributeCellOffset"),
+                new PropertyByName<ExportOrderAttribute>("AttributeId"),
+                new PropertyByName<ExportOrderAttribute>("AttributeRoute"),
+                new PropertyByName<ExportOrderAttribute>("Id"),
+                new PropertyByName<ExportOrderAttribute>("Route"),
+            };
+
+            var orderAttributeManager = new PropertyManager<ExportOrderAttribute>(orderAttributeProperties, _catalogSettings);
+
+            var specificationAttributeProperties = new[]
+            {
+                new PropertyByName<ExportSpecificationAttribute>("AttributeType", p => p.AttributeTypeId),
+                new PropertyByName<ExportSpecificationAttribute>("SpecificationAttribute", p => p.SpecificationAttributeId),
+                new PropertyByName<ExportSpecificationAttribute>("CustomValue", p => p.CustomValue),
+                new PropertyByName<ExportSpecificationAttribute>("SpecificationAttributeOptionId", p => p.SpecificationAttributeOptionId),
+                new PropertyByName<ExportSpecificationAttribute>("AllowFiltering", p => p.AllowFiltering),
+                new PropertyByName<ExportSpecificationAttribute>("DisplayOrder", p => p.DisplayOrder)
+            };
+
+            var specificationAttributeManager = new PropertyManager<ExportSpecificationAttribute>(specificationAttributeProperties, _catalogSettings);
+
+            var endRow = 2;
+            var allIds = new List<int>();
+            var wrongIds = new List<string>();
+            var allRoutes = new List<string>();
+
+            var tempProperty = manager.GetProperty("Id");
+            var idCellNum = tempProperty?.PropertyOrderPosition ?? -1;
+
+            tempProperty = manager.GetProperty("Route");
+            var routeCellNum = tempProperty?.PropertyOrderPosition ?? -1;
+            var allOrders = await _orderService.GetAllOrdersAsync();
+
+            if (_catalogSettings.ExportImportUseDropdownlistsForAssociatedEntities)
+            {
+                orderAttributeManager.SetSelectList("AttributeControlType", await AttributeControlType.TextBox.ToSelectListAsync(useLocalization: false));
+                orderAttributeManager.SetSelectList("AttributeValueType", await AttributeValueType.Simple.ToSelectListAsync(useLocalization: false));
+
+                specificationAttributeManager.SetSelectList("AttributeType", await SpecificationAttributeType.Option.ToSelectListAsync(useLocalization: false));
+                specificationAttributeManager.SetSelectList("SpecificationAttribute", (await _specificationAttributeService
+                    .GetSpecificationAttributesAsync())
+                    .Select(sa => sa as BaseEntity)
+                    .ToSelectList(p => (p as SpecificationAttribute)?.Name ?? string.Empty));
+            }
+
+            var allAttributeIds = new List<int>();
+            var allSpecificationAttributeOptionIds = new List<int>();
+
+            var attributeIdCellNum = 1 + ExportOrderAttribute.OrderAttributeCellOffset;
+            var specificationAttributeOptionIdCellNum =
+                specificationAttributeManager.GetIndex("SpecificationAttributeOptionId") +
+                ExportOrderAttribute.OrderAttributeCellOffset;
+
+            var ordersInFile = new List<int>();
+
+            //find end of data
+            var typeOfExportedAttribute = ExportedAttributeType.NotSpecified;
+            while (true)
+            {
+                var allColumnsAreEmpty = manager.GetProperties
+                    .Select(property => worksheet.Cells[endRow, property.PropertyOrderPosition])
+                    .All(cell => string.IsNullOrEmpty(cell?.Value?.ToString()));
+
+                if (allColumnsAreEmpty)
+                    break;
+
+                if (new[] { 1, 2 }.Select(cellNum => worksheet.Cells[endRow, cellNum])
+                        .All(cell => string.IsNullOrEmpty(cell?.Value?.ToString())) &&
+                    worksheet.Row(endRow).OutlineLevel == 0)
+                {
+                    var cellValue = worksheet.Cells[endRow, attributeIdCellNum].Value;
+                    await SetOutLineForOrderAttributeRowAsync(cellValue, worksheet, endRow);
+                    await SetOutLineForSpecificationAttributeRowAsync(cellValue, worksheet, endRow);
+                }
+
+                if (worksheet.Row(endRow).OutlineLevel != 0)
+                {
+                    var newTypeOfExportedAttribute = GetTypeOfExportedAttribute(worksheet, orderAttributeManager, specificationAttributeManager, endRow);
+
+                    //skip caption row
+                    if (newTypeOfExportedAttribute != ExportedAttributeType.NotSpecified && newTypeOfExportedAttribute != typeOfExportedAttribute)
+                    {
+                        typeOfExportedAttribute = newTypeOfExportedAttribute;
+                        endRow++;
+                        continue;
+                    }
+
+                    switch (typeOfExportedAttribute)
+                    {
+                        case ExportedAttributeType.OrderAttribute:
+                            orderAttributeManager.ReadFromXlsx(worksheet, endRow,
+                                ExportOrderAttribute.OrderAttributeCellOffset);
+                            if (int.TryParse((worksheet.Cells[endRow, attributeIdCellNum].Value ?? string.Empty).ToString(), out var aid))
+                            {
+                                allAttributeIds.Add(aid);
+                            }
+
+                            break;
+                        case ExportedAttributeType.SpecificationAttribute:
+                            specificationAttributeManager.ReadFromXlsx(worksheet, endRow, ExportOrderAttribute.OrderAttributeCellOffset);
+
+                            if (int.TryParse((worksheet.Cells[endRow, specificationAttributeOptionIdCellNum].Value ?? string.Empty).ToString(), out var saoid))
+                            {
+                                allSpecificationAttributeOptionIds.Add(saoid);
+                            }
+
+                            break;
+                    }
+
+                    endRow++;
+                    continue;
+                }
+
+
+
+                if (idCellNum > 0)
+                {
+                    var id = worksheet.Cells[endRow, idCellNum].Value?.ToString() ?? string.Empty;
+
+                    if (!string.IsNullOrEmpty(id))
+                        try
+                        {
+                            var intid = Int32.Parse(id);
+                            if (allOrders.Where(o => o.Id == intid).Count() > 0)
+                            {
+                                allIds.Add(intid);
+                            }
+                            else
+                            {
+                                wrongIds.Add(id);
+                            }
+                        }
+                        catch (Exception e) {
+                            wrongIds.Add(id);
+                        }
+                }
+
+                if (routeCellNum > 0)
+                {
+                    var route = worksheet.Cells[endRow, routeCellNum].Value?.ToString() ?? string.Empty;
+
+                    if (!string.IsNullOrEmpty(route))
+                        allRoutes.Add(route);
+                }
+
+                //counting the number of Orders
+                ordersInFile.Add(endRow);
+
+                endRow++;
+            }
+
+            if (wrongIds.Count>0)
+            {
+                throw new ArgumentException("Los Id " + string.Join(",", wrongIds.Select(x => x)) + "no existen" );
+            }
+
+            return new ImportOrderMetadata
+            {
+                EndRow = endRow,
+                Manager = manager,
+                Properties = properties,
+                OrdersInFile = ordersInFile,
+                OrderAttributeManager = orderAttributeManager,
+                SpecificationAttributeManager = specificationAttributeManager,
+                IdCellNum = idCellNum,
+                Allids = allIds
+            };
+        }
+
 
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ImportProductsFromSplitedXlsxAsync(ExcelWorksheet worksheet, ImportProductMetadata metadata)
@@ -1801,6 +2025,75 @@ namespace Nop.Services.ExportImport
 
             //activity log
             await _customerActivityService.InsertActivityAsync("ImportProducts", string.Format(await _localizationService.GetResourceAsync("ActivityLog.ImportProducts"), metadata.CountProductsInFile));
+        }
+
+
+
+        /// <summary>
+        /// Import orders from XLSX file
+        /// </summary>
+        /// <param name="stream">Stream</param>
+        /// <returns>A task that represents the asynchronous operation</returns>
+        public virtual async Task ImportOrdersFromXlsxAsync(Stream stream)
+        {
+            using var xlPackage = new ExcelPackage(stream);
+            // get the first worksheet in the workbook
+            var worksheet = xlPackage.Workbook.Worksheets.FirstOrDefault();
+            if (worksheet == null)
+                throw new NopException("No worksheet found");
+
+            var downloadedFiles = new List<string>();
+
+            var metadata = await PrepareImportOrderDataAsync(worksheet);
+            var allOrders = await _orderService.GetAllOrdersAsync();
+            var typeOfExportedAttribute = ExportedAttributeType.NotSpecified;
+            for (var iRow = 2; iRow < metadata.EndRow; iRow++)
+            {
+                //imports Order attributes
+                if (worksheet.Row(iRow).OutlineLevel != 0)
+                {
+
+                    var newTypeOfExportedAttribute = GetTypeOfExportedAttribute(worksheet, metadata.OrderAttributeManager, metadata.SpecificationAttributeManager, iRow);
+
+                    //skip caption row
+                    if (newTypeOfExportedAttribute != ExportedAttributeType.NotSpecified &&
+                        newTypeOfExportedAttribute != typeOfExportedAttribute)
+                    {
+                        typeOfExportedAttribute = newTypeOfExportedAttribute;
+                        continue;
+                    }
+                }
+
+                metadata.Manager.ReadFromXlsx(worksheet, iRow);
+
+                var order = metadata.IdCellNum > 0 ? allOrders.FirstOrDefault(p => p.Id == metadata.Manager.GetProperty("OrderId").IntValue) : null;
+
+                var isNew = order == null;
+
+                order ??= new Order();
+
+                foreach (var property in metadata.Manager.GetProperties)
+                {
+                    switch (property.PropertyName)
+                    {
+                        case "OrderId":
+                            order.Id = property.IntValue;
+                            order = await _orderService.GetOrderByIdAsync(order.Id);
+                            break;
+                        case "Route":
+                            order.Route = property.StringValue;
+                            break;
+                    }
+                }
+
+                //set some default values if not specified
+                if (isNew && metadata.Properties.All(p => p.PropertyName != "Route"))
+                    order.Route = null;
+                await _orderService.UpdateOrderAsync(order);
+            }
+
+            //activity log
+            await _customerActivityService.InsertActivityAsync("ImportOrders", "Importando Rutas para las ordenes");
         }
 
         /// <summary>
