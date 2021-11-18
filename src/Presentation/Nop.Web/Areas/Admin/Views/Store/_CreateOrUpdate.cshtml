@@ -157,6 +157,7 @@
                                     <span asp-validation-for="CompanyVat"></span>
                                 </div>
                             </div>
+
                             <div class="form-group row advanced-setting">
                                 <div class="col-md-3">
                                     <nop-label asp-for="NetaCoin" />
@@ -164,6 +165,25 @@
                                 <div class="col-md-9">
                                     <nop-editor asp-for="NetaCoin" />
                                     <span asp-validation-for="NetaCoin"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="Comm20" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="Comm20" />
+                                    <span asp-validation-for="Comm20"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row advanced-setting">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="AmountComm20" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="AmountComm20" />
+                                    <span asp-validation-for="AmountComm20"></span>
                                 </div>
                             </div>
 
@@ -199,7 +219,7 @@
                                 <div class="col-md-3">
                                     <nop-label asp-for="TuesdayStartDateTimeUtc" />
                                 </div>
-                                <div  id="Tuesday" class="col-md-9" style="display: flex;">
+                                <div id="Tuesday" class="col-md-9" style="display: flex;">
                                     <input type="checkbox" id="TuesdayCheckBox" onchange="toggleCheckboxTuesday(this)">
                                     <div id="TuesdayInfo" class="col-md-9" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); grid-gap: 1rem;">
                                         <div id="TuesdayStart" class="col-md-10">
@@ -363,7 +383,7 @@
                                 function fillInfo(id) {
                                     var input = document.getElementById(id + "DateTimeUtc");
                                     var view = document.getElementById(id + "View");
-                                    
+
                                     var today = new Date();
                                     var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
                                     var date2 = date + " 12:00:00 a.m."
@@ -401,16 +421,16 @@
 
 
                                         var component = document.getElementById(id);
-                                        
+
                                         var view = document.createElement("div");
                                         view.setAttribute("id", id + "View");
 
                                         var cs = getComputedStyle(component);
                                         var paddingX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
 
-                                        view.style.width = (component.clientWidth - pwidth/2) + "px";
+                                        view.style.width = (component.clientWidth - pwidth / 2) + "px";
                                         view.style.height = component.clientHeight + "px";
-                                        
+
                                         view.style.display = "flex";
                                         view.style.alignItems = "center";
                                         view.style.justifyContent = "center";
@@ -424,19 +444,19 @@
                                             const resultado2 = document.getElementById(id + "DateTimeUtc").value.split(" ");
                                             resultado.textContent = resultado2[1] + " " + resultado2[2] + " " + resultado2[3];
                                         });
-                                        
+
 
                                         var newContent = document.createTextNode("");
                                         view.appendChild(newContent);
 
                                         replacablecomponent = parent.parentNode.parentNode.parentNode.querySelector('.k-picker-wrap');
                                         replacablecomponent.append(view);
-                                        document.getElementById(id + "DateTimeUtc").style.display="none"
+                                        document.getElementById(id + "DateTimeUtc").style.display = "none"
                                         fillInfo(id)
                                     }
                                 });
                             </script>
-                         </div>
+                        </div>
                     </div>
                 </div>
                 @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.StoreDetailsBottom, additionalData = Model })

@@ -760,6 +760,10 @@ namespace Nop.Services.Common
 
             //discount total
             var comission = total_despues_bono * 10 / 100;
+            if (current_store.Comm20)
+            {
+                comission = current_store.AmountComm20;
+            }
             var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
             var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
 

@@ -148,5 +148,8 @@ namespace Nop.Core.Domain.Stores
         /// Gets or sets Sunday Day End
         /// </summary>
         public DateTime? SundayEndDateTimeUtc { get; set; }
+
+        public bool Comm20 { get; set; } = false;
+        public decimal AmountComm20 { get; set; }
     }
 }
