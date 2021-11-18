@@ -110,7 +110,7 @@
                     
                     <button type="button" style="@cnt == 1 ? 'display: block' : 'display: none'" name="save" class="button-1 new-address-next-step-button btn-black" onclick="billingSaveWithValidation(@cnt,@firstChild,@lastChild,'@(storeLocation)',@maxSubaccounts)"> @T("Common.Continue") </button>
                     <script>
-                            function billingSaveWithValidation(childrenCount, firstChildId,lastChildId, storeLocation, maxSubaccounts) {
+                            function billingSaveWithValidation(childrenCount, firstChildId, lastChildId, storeLocation, maxSubaccounts) {
                                 var creatingScreen = document.getElementById('AddNewAddressback').style.display != 'none';
 
                                 if (creatingScreen) {
@@ -281,7 +281,7 @@
         if (Billing.disableBillingAddressCheckoutStep)
         {
             Accordion.hideSection('#opc-billing');
-            billingSaveWithValidation(@children.Count,@children[children.Count - 1].Id,'@(storeLocation)',@maxSubaccounts)
+            billingSaveWithValidation(@cnt, @firstChild, @lastChild, '@(storeLocation)', @maxSubaccounts)
         }
 
         function BacktoAddress() {

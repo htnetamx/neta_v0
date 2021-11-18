@@ -71,13 +71,10 @@ namespace Nop.Services.Tasks
 
                     var serviceScopeFactory = EngineContext.Current.Resolve<IServiceScopeFactory>();
                     using var scope = serviceScopeFactory.CreateScope();
-                    var logger = EngineContext.Current.Resolve<ILogger>(scope);
-                    await logger.InformationAsync("Clear Cache: Executing");
 
                     //send post data
                     var data = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>(nameof(taskType), taskType) });
                     await client.PostAsync(_scheduleTaskUrl, data);
-                    await logger.InformationAsync("Clear Cache: Executed");
                 }
                 catch (Exception ex)
                 {
