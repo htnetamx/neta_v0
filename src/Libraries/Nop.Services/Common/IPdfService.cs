@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
@@ -33,7 +35,7 @@ namespace Nop.Services.Common
         /// <param name="vendorId">Vendor identifier to limit products; 0 to print all products. If specified, then totals won't be printed</param>
         /// <returns>A task that represents the asynchronous operation</returns>
         Task PrintOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
-        Task PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
+        Task PrintAcumOrdersToPdfAsync(Document doc2, Stream stream2, PdfWriter pdfWriter2, Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
 
         /// <summary>
         /// Print packaging slips to PDF

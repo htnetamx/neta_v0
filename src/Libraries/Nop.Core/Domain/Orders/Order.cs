@@ -333,6 +333,10 @@ namespace Nop.Core.Domain.Orders
             set => CustomerTaxDisplayTypeId = (int)value;
         }
 
+        /// <summary>
+        /// Gets or sets the route for the order
+        /// </summary>
+        public string Route { get; set; }
         #endregion
     }
 }

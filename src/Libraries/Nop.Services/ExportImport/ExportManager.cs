@@ -1588,7 +1588,7 @@ namespace Nop.Services.ExportImport
         /// </summary>
         /// <param name="orders">Orders</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        public virtual async Task<byte[]> ExportOrdersToXlsxAsync(IList<Order> orders)
+        public virtual async Task<byte[]> ExportOrdersToXlsxAsync(IList<Order> orders,bool withoutProducts=false)
         {
             //a vendor should have access only to part of order information
             var ignore = await _workContext.GetCurrentVendorAsync() != null;
@@ -1602,6 +1602,7 @@ namespace Nop.Services.ExportImport
             {
                 new PropertyByName<Order>("OrderId", p => p.Id),
                 new PropertyByName<Order>("StoreId", p => p.StoreId),
+                new PropertyByName<Order>("Route", p => p.Route),
                 new PropertyByName<Order>("OrderGuid", p => p.OrderGuid, ignore),
                 new PropertyByName<Order>("CustomerId", p => p.CustomerId, ignore),
                 new PropertyByName<Order>("OrderStatusId", p => p.OrderStatusId, ignore),
@@ -1657,6 +1658,11 @@ namespace Nop.Services.ExportImport
                 new PropertyByName<Order>("ShippingPhoneNumber", async p => (await orderAddress(p))?.PhoneNumber ?? string.Empty),
                 new PropertyByName<Order>("ShippingFaxNumber", async p => (await orderAddress(p))?.FaxNumber ?? string.Empty)
             };
+
+            if (withoutProducts)
+            { 
+                return await new PropertyManager<Order>(properties, _catalogSettings).ExportToXlsxAsync(orders);
+            }
 
             return _orderSettings.ExportWithProducts
                 ? await ExportOrderToXlsxWithProductsAsync(properties, orders)

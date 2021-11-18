@@ -1135,6 +1135,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
 
                 model.OrderGuid = order.OrderGuid;
+                model.Route = order.Route;
                 model.CustomOrderNumber = order.CustomOrderNumber;
                 model.CustomerIp = order.CustomerIp;
                 model.CustomerId = customer.Id;

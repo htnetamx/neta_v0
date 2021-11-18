@@ -18,6 +18,11 @@
         /// <summary>
         /// Specification attribute
         /// </summary>
-        SpecificationAttribute = 20
+        SpecificationAttribute = 20,
+
+        /// <summary>
+        /// Order Attribute
+        /// </summary>
+        OrderAttribute = 30,
     }
 }

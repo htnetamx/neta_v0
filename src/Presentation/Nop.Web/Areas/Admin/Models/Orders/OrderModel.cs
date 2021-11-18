@@ -236,7 +236,7 @@ namespace Nop.Web.Areas.Admin.Models.Orders
         public bool CanPartiallyRefundOffline { get; set; }
         public bool CanVoid { get; set; }
         public bool CanVoidOffline { get; set; }
-
+        public string Route { get; set; }
         public OrderShipmentSearchModel OrderShipmentSearchModel { get; set; }
 
         public OrderNoteSearchModel OrderNoteSearchModel { get; set; }
