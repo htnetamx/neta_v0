@@ -1218,10 +1218,9 @@ namespace Nop.Web.Controllers
                            name,
                            "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
                            placeOrderResult.PlacedOrder.OrderTotal.ToString(),
-                           buscar,
                            (await _storeContext.GetCurrentStoreAsync()).Name,
-                           //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
-                           "5pm", (orders.Count + 1).ToString(), "10",
+                            buscar,
+                           "5pm", 
                            (await _storeContext.GetCurrentStoreAsync()).Url);
 
 
@@ -2136,15 +2135,14 @@ namespace Nop.Web.Controllers
                     }
 
                     var responseResultToLog = NetaAuronixMessaging.Send((await _workContext.GetCurrentCustomerAsync()).Username,
-                        "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
-                        name,
-                        "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
-                        placeOrderResult.PlacedOrder.OrderTotal.ToString(),
-                        buscar,
-                        (await _storeContext.GetCurrentStoreAsync()).Name,
-                        //DateTime.UtcNow.AddHours(-5).Date.AddDays(1).ToString("dd/MM/yyyy"),
-                        "5pm", (orders.Count + 1).ToString(), "10",
-                        (await _storeContext.GetCurrentStoreAsync()).Url);
+                                  "02c89181_e473_461e_9e66_8f6b75af9b5e:confirmacion_de_compra_v3", 12,
+                                  name,
+                                  "\r" + (await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id + "\r",
+                                  placeOrderResult.PlacedOrder.OrderTotal.ToString(),
+                                  (await _storeContext.GetCurrentStoreAsync()).Name,
+                                   buscar,
+                                  "5pm",
+                                  (await _storeContext.GetCurrentStoreAsync()).Url);
 
                     //NetaAuronixMessaging.Send_SMS((await _workContext.GetCurrentCustomerAsync()).Username,
                     //    $"Gracias {"*" + name + "*"} por comprar en NetaMx, tu orden es la siguiente, {"\r" + string.Join("\r", list.ToArray()) + "\r"} Tu total es de ${"*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*"};pasa mañana a {"*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*"}, después de las {"5pm"}. Eres el cliente {(orders.Count + 1).ToString()} del pedido, recuerda que tenemos que llegar a 20 clientes para poder despachar. Comparte las promos y juntos lleguemos al mínimo de pedidos: {(await _storeContext.GetCurrentStoreAsync()).Url}");
