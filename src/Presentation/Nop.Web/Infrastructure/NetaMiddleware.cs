@@ -32,8 +32,8 @@ namespace Nop.Web.Infrastructure
                 var store = stores.Where(v => v.Hosts.Contains(httpContext.Request.Host.Host) && v.DisplayOrder != 0).Any();
                 if (!store)
                 {
-                    httpContext.Response.Redirect("https://api.whatsapp.com/send/?phone=525574174213&text=Hola%21+Cu%C3%A1l+es+la+nueva+liga+de+netamx&app_absent=0");
-                    //httpContext.Response.Redirect("https://wa.me/525574174213?text=Hola!%20Cuál%20es%20la%20nueva%20liga%20de%20netamx", permanent: true);
+                    httpContext.Response.Redirect("https://api.whatsapp.com/send/?phone=5545439866&text=Hola%21+Cu%C3%A1l+es+la+nueva+liga+de+netamx&app_absent=0");
+                    //httpContext.Response.Redirect("https://wa.me/5545439866?text=Hola!%20Cuál%20es%20la%20nueva%20liga%20de%20netamx", permanent: true);
                     return;
                 }
                 else
