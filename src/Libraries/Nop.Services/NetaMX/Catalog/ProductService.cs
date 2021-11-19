@@ -23,7 +23,8 @@ namespace Nop.Services.Catalog
                        where p.Published &&
                              !p.Deleted &&
                              p.ShowOnHomepage && 
-                             p.MarkAsNew
+                             p.MarkAsNew &&
+                             !p.IsPromotionProduct
                        select p;
             }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductsMarkAsNewHomepageCacheKey));
 
@@ -41,7 +42,8 @@ namespace Nop.Services.Catalog
                                  where p.Published &&
                                        !p.Deleted &&
                                        p.ShowOnHomepage &&
-                                      p.VisibleIndividually
+                                      p.VisibleIndividually &&
+                                      !p.IsPromotionProduct
                                 select p);
 
             var currentUser = (await _workContext.GetCurrentCustomerAsync()).Username;
@@ -50,11 +52,11 @@ namespace Nop.Services.Catalog
             
             if (storeDisplayOrder == 1)
             {
-                productsQuery = productsQuery.Where(v => v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1"));
+                productsQuery = productsQuery.Where(v => /*v.Sku.EndsWith("LH") ||*/ v.Sku.ToUpper().EndsWith("L1"));
             }
             else if (storeDisplayOrder == 2)
             {
-                productsQuery = productsQuery.Where(v => !(v.Sku.EndsWith("LH") || v.Sku.EndsWith("L1")));
+                productsQuery = productsQuery.Where(v => !(v.Sku.ToUpper().EndsWith("LH") || v.Sku.ToUpper().EndsWith("L1")));
             }
 
             return await productsQuery.ToPagedListAsync(pageIndex, pageSize);

@@ -1,0 +1,105 @@
+﻿@model PromotionProductListModel
+@using Nop.Core.Domain.Common
+@using Nop.Core.Domain.Seo
+@using Nop.Web.Models
+@inject Nop.Core.IWebHelper webHelper
+@inject SeoSettings seoSettings
+@inject CommonSettings commonSettings
+@{
+    Layout = "_ColumnsOne";
+
+    //page class
+    Html.AppendPageCssClassParts("html-category-page");
+
+    var promotionEndDateTime = Model.EndDate.ToString("MMM dd, yyyy HH:mm:ss");
+    var promotionid = Model.PromotionId;
+}
+
+<div class="page category-page">
+    <div class="page-title">
+        <h1>
+            <i class="fire-icon"></i>
+            @Model.PromotionName
+        </h1>
+        <span id="promotiontimer" class="time"></span>
+    </div>
+    <div class="page-body">
+        @*@await Html.PartialAsync("_CatalogProducts", Model.CatalogProductsModel, catalogProductsViewData)*@
+        @if (Model.Published)
+        {
+            if (Model.StartDate <= DateTime.Now)
+            {
+                if (Model.PromotionProductOverviewModel.Count > 0)
+                {
+                    foreach (var item in Model.PromotionProductOverviewModel)
+                    {
+                        <div class="item-box">
+                            @await Html.PartialAsync("_ProductBoxHomePage", item)
+                        </div>
+                    }
+                }
+            }
+            else
+            {
+                var message = string.Format(T("Promotion.StartMessage").Text, Model.PromotionName);
+                @Html.Raw(message)
+            }
+        }
+        else
+        {
+            var message = string.Format(T("Promotion.ClossedMessage").Text, Model.PromotionName);
+            @Html.Raw(message)
+        }
+
+    </div>
+</div>
+@if (Model.Published && Model.StartDate <= DateTime.Now)
+{
+    <script>
+    //var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
+    var countDownDate = new Date('@promotionEndDateTime').getTime();
+
+    // Update the count down every 1 second
+    var x = setInterval(function () {
+        var now = new Date().getTime();
+
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the element with id="demo"
+        document.getElementById("promotiontimer").innerHTML = days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
+
+        // If the count down is finished, write some text
+        if (distance < 0) {
+            clearInterval(x);
+            //document.getElementById("time").innerHTML = "EXPIRED";
+            document.getElementById("promotiontimer").innerHTML = "";
+            DeletePromotionProducts(@promotionid);
+        }
+    }, 1000);
+
+    function DeletePromotionProducts(id) {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.RouteUrl("DeletePromotionProducts"))",
+                data: {
+                    "id": id
+                },
+                success: function (data, textStatus, jqXHR) {
+                    if (data.Result == true) {
+                        location.reload();
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                }
+            });
+    }
+    </script>
+}

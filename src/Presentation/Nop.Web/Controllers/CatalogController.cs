@@ -115,6 +115,8 @@ namespace Nop.Web.Controllers
                 string.Format(await _localizationService.GetResourceAsync("ActivityLog.PublicStore.ViewCategory"), category.Name), category);
 
             //model
+            command.PageSize = int.MaxValue - 1;
+            command.PageNumber = 1;
             var model = await _catalogModelFactory.PrepareCategoryModelAsync(category, command);
 
             //template

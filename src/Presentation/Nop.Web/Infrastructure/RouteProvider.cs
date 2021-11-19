@@ -705,6 +705,15 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapControllerRoute(name: "ZipCodeUpdate",
                 pattern: $"{lang}/zipcodeupdate",
                 defaults: new { controller = "Customer", action = "ZipCodeUpdate" });
+
+            //promotions
+            endpointRouteBuilder.MapControllerRoute(name: "LoadPromotionProduct",
+                pattern: $"{lang}/PromotionProduct/{{id:min(0)}}",
+                defaults: new { controller = "CustomProduct", action = "PromotionProduct" });
+
+            endpointRouteBuilder.MapControllerRoute(name: "DeletePromotionProducts",
+                pattern: $"deletepromotionproduct",
+                defaults: new { controller = "CustomProduct", action = "DeletePromotionProduct" });
         }
 
         #endregion

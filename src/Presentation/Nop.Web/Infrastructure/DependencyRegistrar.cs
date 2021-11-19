@@ -2,6 +2,7 @@
 using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
 using Nop.Core.Infrastructure.DependencyManagement;
+using Nop.Services.Promotion;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Infrastructure.Installation;
@@ -25,11 +26,12 @@ namespace Nop.Web.Infrastructure
             services.AddScoped<IInstallationLocalizationService, InstallationLocalizationService>();
 
             //common factories
+            services.AddScoped<INetaPromotionService, NetaPromotionService>();
             services.AddScoped<IAclSupportedModelFactory, AclSupportedModelFactory>();
             services.AddScoped<IDiscountSupportedModelFactory, DiscountSupportedModelFactory>();
             services.AddScoped<ILocalizedModelFactory, LocalizedModelFactory>();
             services.AddScoped<IStoreMappingSupportedModelFactory, StoreMappingSupportedModelFactory>();
-
+            services.AddScoped<INetaPromotionService, NetaPromotionService>();
             //admin factories
             services.AddScoped<IBaseAdminModelFactory, BaseAdminModelFactory>();
             services.AddScoped<IActivityLogModelFactory, ActivityLogModelFactory>();
@@ -108,6 +110,7 @@ namespace Nop.Web.Infrastructure
             services.AddScoped<Factories.ITopicModelFactory, Factories.TopicModelFactory>();
             services.AddScoped<Factories.IVendorModelFactory, Factories.VendorModelFactory>();
             services.AddScoped<Factories.IWidgetModelFactory, Factories.WidgetModelFactory>();
+            services.AddScoped<Nop.Web.Areas.Admin.Factories.INetaPromotionModelFactory, Nop.Web.Areas.Admin.Factories.NetaPromotionModelFactory>();
         }
 
         /// <summary>
