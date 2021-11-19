@@ -319,11 +319,12 @@ namespace Nop.Services.Catalog
         {
             var categories = await _categoryRepository.GetAllAsync(query =>
             {
+                // TODO: Pankaj c.ShowOnHomepage commented because Jorge required to show all ctegory on home page
                 return from c in query
                        orderby c.DisplayOrder, c.Id
                        where c.Published &&
-                             !c.Deleted &&
-                             c.ShowOnHomepage
+                             !c.Deleted //&&
+                             //c.ShowOnHomepage
                        select c;
             }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.CategoriesHomepageCacheKey));
 

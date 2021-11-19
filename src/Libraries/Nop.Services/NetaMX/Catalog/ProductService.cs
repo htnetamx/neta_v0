@@ -23,7 +23,8 @@ namespace Nop.Services.Catalog
                        where p.Published &&
                              !p.Deleted &&
                              p.ShowOnHomepage && 
-                             p.MarkAsNew
+                             p.MarkAsNew &&
+                             !p.IsPromotionProduct
                        select p;
             }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductsMarkAsNewHomepageCacheKey));
 
@@ -41,7 +42,8 @@ namespace Nop.Services.Catalog
                                  where p.Published &&
                                        !p.Deleted &&
                                        p.ShowOnHomepage &&
-                                      p.VisibleIndividually
+                                      p.VisibleIndividually &&
+                                      !p.IsPromotionProduct
                                 select p);
 
             var currentUser = (await _workContext.GetCurrentCustomerAsync()).Username;

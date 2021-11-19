@@ -4,12 +4,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Services.Catalog;
+using Nop.Services.Common;
+using Nop.Services.Localization;
+using Nop.Services.Logging;
 using Nop.Services.Orders;
+using Nop.Services.Promotion;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Web.Factories;
+using Nop.Web.Framework;
+using Nop.Web.Models;
 
 namespace Nop.Web.Controllers
 {
@@ -23,9 +30,21 @@ namespace Nop.Web.Controllers
         private readonly IStoreMappingService _storeMappingService;
         private readonly IStoreContext _storeContext;
         private readonly CustomeSetting _customeSetting;
+        private readonly INetaPromotionService _netaPromotionService;
 
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IWorkContext _workContext;
+        #endregion
+
+
+        #region Fields
+
+        private readonly ICatalogModelFactory _catalogModelFactory;
+        private readonly ICategoryService _categoryService;
+        private readonly IWebHelper _webHelper;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly ILocalizationService _localizationService;
         #endregion
 
         #region Ctor
@@ -35,8 +54,17 @@ namespace Nop.Web.Controllers
             IStoreMappingService storeMappingService,
             IStoreContext storeContext,
             CustomeSetting customeSetting,
+            INetaPromotionService netaPromotionService,
             IShoppingCartService shoppingCartService,
-            IWorkContext workContext)
+            IWorkContext workContext,
+
+            ICatalogModelFactory catalogModelFactory,
+            ICategoryService categoryService,
+            IWebHelper webHelper,
+            IGenericAttributeService genericAttributeService,
+            ICustomerActivityService customerActivityService,
+            ILocalizationService localizationService
+            )
         {
             _aclService = aclService;
             _productModelFactory = productModelFactory;
@@ -44,8 +72,16 @@ namespace Nop.Web.Controllers
             _storeMappingService = storeMappingService;
             _storeContext = storeContext;
             _customeSetting = customeSetting;
+            _netaPromotionService = netaPromotionService;
             _shoppingCartService = shoppingCartService;
             _workContext = workContext;
+
+            _catalogModelFactory = catalogModelFactory;
+            _categoryService = categoryService;
+            _webHelper = webHelper;
+            _genericAttributeService = genericAttributeService;
+            _customerActivityService = customerActivityService;
+            _localizationService = localizationService;
 
         }
         #endregion
@@ -90,6 +126,35 @@ namespace Nop.Web.Controllers
 
             return Json(new { totalSaving = totalSaving, totalCart = totalCart });
         }
+
+        public virtual async Task<IActionResult> PromotionProduct(int id)
+        {
+            var model = new PromotionProductListModel();
+            var netapromotion = await _netaPromotionService.GetNetaPromotionByIdAsync(id);
+            var products = await _netaPromotionService.GetPromotionProductsByPromotionId(id);
+
+            var prepareproductOverviewModel = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true)).ToList();
+            model.PromotionId = netapromotion.Id;
+            model.PromotionName = netapromotion.Name;
+            model.StartDate = netapromotion.StartDateUtc;
+            model.EndDate = netapromotion.EndDateUtc;
+            model.PromotionProductOverviewModel = prepareproductOverviewModel;
+            model.Published = netapromotion.Published;
+            return View(model);
+        }
+
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
+        public virtual async Task<IActionResult> DeletePromotionProduct(int id)
+        {
+            await _netaPromotionService.DeletePromotionProductsByPromotionId(id);
+            
+            return Json(new
+            {
+                Result = true
+            });
+        }
+
         #endregion
     }
 }

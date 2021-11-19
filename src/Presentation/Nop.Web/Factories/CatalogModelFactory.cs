@@ -701,8 +701,12 @@ namespace Nop.Web.Factories
             //view mode
             await PrepareViewModesAsync(model, command);
             //page size
-            await PreparePageSizeOptionsAsync(model, command, category.AllowCustomersToSelectPageSize, 
-                category.PageSizeOptions, category.PageSize);
+
+            if (command.PageSize != int.MaxValue - 1)
+            {
+                await PreparePageSizeOptionsAsync(model, command, category.AllowCustomersToSelectPageSize,
+                    category.PageSizeOptions, category.PageSize);
+            }
 
             var categoryIds = new List<int> { category.Id };
 

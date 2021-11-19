@@ -1,0 +1,55 @@
+﻿@using Nop.Web.Areas.Admin.Models.Promotion
+@{
+    //page title
+    //ViewBag.PageTitle = T("Admin.Customers.Customers").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("NetaPromotion");
+}
+<form asp-controller="NetaPromotion" asp-action="List" method="post">
+
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            @T("Admin.Promotion.Promotion")
+        </h1>
+        <div class="float-right">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-square"></i>
+                @T("Admin.Common.AddNew")
+            </a>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+                <div class="cards-group">
+                    <div class="card card-default">
+                        <div class="card-body">
+                            @{
+                                var gridModel = new DataTablesModel
+                                {
+                                    Name = "promotion-grid",
+                                    UrlRead = new DataUrl("PromotionList", "NetaPromotion",null),
+                                    Length = 10,
+                                    LengthMenu = "10,20,30",
+                                };
+                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(NetaPromotionModel.Name))
+                                {
+                                    Title = T("Admin.Promotion.Fields.Name").Text
+                                });
+                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(NetaPromotionModel.Id))
+                                {
+                                    Title = T("Admin.Common.Edit").Text,
+                                    Width = "80",
+                                    ClassName = NopColumnClassDefaults.Button,
+                                    Render = new RenderButtonEdit(new DataUrl("Edit"))
+                                });
+                            }
+                            @await Html.PartialAsync("Table", gridModel)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>
