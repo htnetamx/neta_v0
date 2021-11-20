@@ -77,10 +77,22 @@
         </div>
         <div class="info-header" id="cartInfo">
             <div class="_flex">
-                <div class="cart-left">
-                    @await Component.InvokeAsync("CustomerSaving")
-                    <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
-                </div>
+                @if (Context.Request.Path.Value != "/")
+                {
+                    <a href="/" onclick="history.back()" style="text-decoration: none">
+                        <div class="cart-left">
+                            @await Component.InvokeAsync("CustomerSaving")
+                            <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <div class="cart-left1">
+                        @await Component.InvokeAsync("CustomerSaving")
+                        <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
+                    </div>
+                }
                 <a class="cart-right" href="@Url.RouteUrl("ShoppingCart")">
                     @T("Home.GotoCart")
                 </a>
