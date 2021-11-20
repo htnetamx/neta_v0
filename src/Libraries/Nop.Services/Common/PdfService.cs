@@ -760,11 +760,29 @@ namespace Nop.Services.Common
 
             //discount total
             var comission = total_despues_bono * 10 / 100;
+            var com = comission;
             if (current_store.Comm20)
             {
                 comission = current_store.AmountComm20;
+                decimal remainderComm;
+                if (total_despues_bono <= comission)
+                {
+                    remainderComm = comission - total_despues_bono;
+                    total_despues_bono = 0;
+                }
+                else
+                {
+                    remainderComm = 0;
+                    total_despues_bono = total_despues_bono - comission;
+                }
+                current_store.AmountComm20 = remainderComm;
+                await _storeService.UpdateStoreAsync(current_store);
+
+                com = comission - remainderComm;
             }
-            var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(comission, 1);
+
+
+            var orderComissionInCustomerCurrency = _currencyService.ConvertCurrency(com, 1);
             var orderComissionStr = await _priceFormatter.FormatPriceAsync(orderComissionInCustomerCurrency, true, "PES", false, languageId);
 
             var pComission = GetPdfCell($"Tus ganancias con Neta: {orderComissionStr}", titleFont);

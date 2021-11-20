@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Nop.Web.Infrastructure
 {
@@ -28,7 +29,7 @@ namespace Nop.Web.Infrastructure
         /// <param name="PlatformContactId"></param> Destinanation number
         /// <param name="RuleNameOrIdp"></param> Botmaker template name
         /// <param name="data"></param> params objetc
-        public static async void Send(string chatChannelNumber, string platformContactId, string ruleNameOrId, Dictionary<string, object> data)
+        public static async Task<string> Send(string chatChannelNumber, string platformContactId, string ruleNameOrId, Dictionary<string, object> data)
         {
             using (var client = new HttpClient())
             {
@@ -49,9 +50,8 @@ namespace Nop.Web.Infrastructure
 
                 var response = await client.PostAsJsonAsync("https://go.botmaker.com/api/v1.0/intent/v2", payload);
                 string result = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(response);
-                Console.WriteLine(result);
-                Console.WriteLine(payload);
+                
+                return result;
             }
         }
     }

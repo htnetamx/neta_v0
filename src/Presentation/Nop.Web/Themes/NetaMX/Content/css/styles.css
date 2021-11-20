@@ -2078,14 +2078,13 @@ label, label + * {
     font-weight: 700;
   }
 
-.info-header .cart-left
-{
- display: flex;
- align-items: center;
- color: #212121;
- font-size: 14px;
- font-weight: 700;
-}
+  .info-header .cart-left {
+    display: flex;
+    align-items: center;
+    color: #212121;
+    font-size: 14px;
+    font-weight: 700;
+ }
   .info-header .cart-left:before {
     content: '';
     background: url('../images/next-arrow.png')no-repeat center center;
@@ -2098,7 +2097,6 @@ label, label + * {
     -o-transform: rotate(180deg);
     transform: rotate(180deg);
   }
-
  .info-header .cart-right
  {
   font-size: 14px;
@@ -2150,11 +2148,12 @@ label, label + * {
 .add-quantity .icon.plus{background:url('../images/plus.png')no-repeat center center;background-size:17px;}
 .add-quantity .icon.plus:hover{background:url('../images/plus-hover.png')no-repeat center center;background-size:17px;}
 
-.customer-saving
-{
- margin-right: 15px;
- position: relative;
- padding-right: 15px;
+.customer-saving {
+  margin-right: 15px;
+  margin-left: 5px;
+  position: relative;
+  padding-right: 15px;
+  padding-left: 5px;
 }
 .customer-saving:before{content:'';height:18px;width:2px;background:#C1E7CB;position:absolute;right:0;top:2px;}
 .cart-total .customer-saving {

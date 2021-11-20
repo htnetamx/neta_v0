@@ -81,6 +81,7 @@
                 {
                     <a href="/" onclick="history.back()" style="text-decoration: none">
                         <div class="cart-left">
+                            <span>Regresar | </span>
                             @await Component.InvokeAsync("CustomerSaving")
                             <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
                         </div>
