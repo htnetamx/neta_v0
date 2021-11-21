@@ -172,6 +172,12 @@ label, label + * {
   top:0px !important;
 }
 
+.container-header
+{
+ width: 90%;
+ margin: 0 auto;
+}
+
 .master-column-wrapper {
   position: relative;
   z-index: 0;
@@ -2046,6 +2052,7 @@ label, label + * {
 .owl-carousel .item-box{width:156px !important;margin-left:0 !important;margin-right:0 !important;}
 
 .header-main{background:#fff;padding-top:15px;}
+.header-main img{height:auto;}
 .header-main .bg-light{background:#fff !important;padding-bottom:0;}
 .html-shopping-cart-page .header-main{display:none;}
 .search-container{max-width:1200px;margin:0 auto;}
@@ -7247,6 +7254,7 @@ pre {
 @media all and (min-width: 481px) {
   /*** GLOBAL ***/
 
+ .container-header,
  .header-main .navbar,
  .new-header ._flex,
  .info-header ._flex,
@@ -7255,6 +7263,7 @@ pre {
  .header-menu
  {
   width: 92.5%;
+  margin:0 auto;
  }
 
 
@@ -7437,6 +7446,7 @@ pre {
 
   /**** GLOBAL ***/
 
+ .container-header,
  .header-main .navbar,
  .new-header ._flex,
  .info-header ._flex,
@@ -8136,7 +8146,7 @@ pre {
 
   /*** GLOBAL STYLES ***/
 
-
+ .container-header,
  .header-main .navbar,
  .new-header ._flex,
  .info-header ._flex,
@@ -9085,6 +9095,7 @@ pre {
 
   /*** GLOBAL STYLES ***/
 
+ .container-header,
  .header-main .navbar, .new-header ._flex, .info-header ._flex, .search-container,
  .master-wrapper-content
  {
