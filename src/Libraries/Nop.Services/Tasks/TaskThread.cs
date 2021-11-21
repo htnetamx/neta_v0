@@ -73,8 +73,19 @@ namespace Nop.Services.Tasks
                     using var scope = serviceScopeFactory.CreateScope();
 
                     //send post data
-                    var data = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>(nameof(taskType), taskType) });
-                    await client.PostAsync(_scheduleTaskUrl, data);
+                    if(taskName == "Clear cache")
+                    {
+                        var data = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>(nameof(taskType), taskType) });
+                        for (int i = 1; i <= 6; i++)
+                        {
+                            await client.PostAsync($"https://server{i.ToString()}.netamx.app/{NopTaskDefaults.ScheduleTaskPath}", data);
+                        }
+                    }
+                    else
+                    {
+                        var data = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>(nameof(taskType), taskType) });
+                        await client.PostAsync(_scheduleTaskUrl, data);
+                    }
                 }
                 catch (Exception ex)
                 {
