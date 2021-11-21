@@ -81,7 +81,7 @@
                         <!--manufacturers-->
                         @*@await Html.PartialAsync("_ProductManufacturers", Model.ProductManufacturers)*@
                         <!--availability-->
-                        @await Html.PartialAsync("_Availability", Model)
+                        @*@await Html.PartialAsync("_Availability", Model)*@
                         <!--SKU, MAN, GTIN, vendor-->
                         @await Html.PartialAsync("_SKU_Man_GTIN_Ven", Model)
                         <!--delivery-->
@@ -123,11 +123,11 @@
                         <!--wishlist, compare, email a friend-->
                         <div class="overview-buttons">
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsBefore, additionalData = Model })
-                            @{
+                            @*@{
                                 var dataDictAddToWishlist = new ViewDataDictionary(ViewData);
                                 dataDictAddToWishlist.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
                                 @await Html.PartialAsync("_AddToWishlist", Model.AddToCart, dataDictAddToWishlist)
-                            }
+                            }*@
                             @await Html.PartialAsync("_CompareProductsButton", Model)
                             @await Html.PartialAsync("_ProductEmailAFriendButton", Model)
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsAfter, additionalData = Model })

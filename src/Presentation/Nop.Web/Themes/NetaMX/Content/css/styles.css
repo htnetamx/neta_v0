@@ -2047,7 +2047,7 @@ label, label + * {
 
 .header-main{background:#fff;padding-top:15px;}
 .header-main .bg-light{background:#fff !important;padding-bottom:0;}
-
+.html-shopping-cart-page .header-main{display:none;}
 .search-container{max-width:1200px;margin:0 auto;}
 .header-main .navbar{max-width:1200px;margin:0 auto;}
 .info-header
@@ -2057,13 +2057,13 @@ label, label + * {
  border-bottom: 2px solid #C1E7CB;
  margin:0;
  position:sticky;
- top:63px;
+ top:0;
  z-index:1010;
 }
 
  .info-header ._flex
  {
-  height: 40px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2155,6 +2155,7 @@ label, label + * {
   padding-right: 15px;
   padding-left: 5px;
 }
+
 .customer-saving:before{content:'';height:18px;width:2px;background:#C1E7CB;position:absolute;right:0;top:2px;}
 .cart-total .customer-saving {
     margin-right: 0;
@@ -2174,6 +2175,7 @@ label, label + * {
  top: 0;
  z-index: 101010;
 }
+.html-shopping-cart-page .new-header{display:none;}
  .new-header ._flex
  {
   display: flex;
@@ -6946,6 +6948,7 @@ pre {
   background: yellow !important;
   padding: 10px 0;
 }
+.html-shopping-cart-page .customer-banner{display:none;}
 
 .prd-title{margin:0 0 24px;}
 .prd-title h2{font-size:20px;color:#212121;font-weight:700;margin:0;padding:0;text-align:left;}
@@ -9247,7 +9250,7 @@ pre {
 @media all and (max-width: 767px)
 {
  .mb-h{display:none !important;}
- .mobile-top {z-index:1010; position:sticky;top:101px;left:0;  background: #fff;  box-shadow: 0 1px 2px 0 rgba(60, 64, 67,0.3), 0 2px 6px 2px rgba(60, 64, 67,0.15);  color: #202124;  display: flex;  justify-content:space-between;  align-items:center;  height: 64px;  padding:0 15px; }
+ .mobile-top {z-index:1010; position:sticky;top:42px;left:0;  background: #fff;  box-shadow: 0 1px 2px 0 rgba(60, 64, 67,0.3), 0 2px 6px 2px rgba(60, 64, 67,0.15);  color: #202124;  display: flex;  justify-content:space-between;  align-items:center;  height: 64px;  padding:0 15px; }
  .html-login-page .mobile-top{top:0;}
  .mobile-top h2{margin:0;font-weight:600;color:#000;text-align:left;}
  .mobile-top a {  cursor: pointer;  text-decoration: none;  width: 20px;  height: 20px;  background: #000;  color: #fff !important;  text-align: center;  line-height: 20px;  border-radius: 4px; }
