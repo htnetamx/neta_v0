@@ -31,7 +31,7 @@ namespace Nop.Services.Catalog
             //    return;
             var products = (await _productService.GetAllProductsDisplayedOnHomepageAsync())
                 .Where(p => p.MarkAsNew && 
-                            p.AvailableEndDateTimeUtc.Value.Date < DateTime.UtcNow.Date)
+                            p.AvailableEndDateTimeUtc.Value.Date <= DateTime.UtcNow.Date)
                 .ToList();
             foreach (var product in products)
             {
