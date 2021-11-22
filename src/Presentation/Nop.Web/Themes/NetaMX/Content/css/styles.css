@@ -2092,7 +2092,15 @@ label, label + * {
     font-size: 14px;
     font-weight: 700;
  }
-  .info-header .cart-left:before {
+  .info-header .cart-left-back {
+    font-size: 14px;
+    color: #05796B;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+  .info-header .cart-left-back:before {
     content: '';
     background: url('../images/next-arrow.png')no-repeat center center;
     width: 24px;
@@ -6988,6 +6996,8 @@ pre {
 .category-page .page-title h1 .fire-icon{width:14px;height:20px;display:inline-block;background:url('../images/fire.svg')no-repeat center center;position:relative;top:1px;margin-right:5px;}
 .category-page .page-title .time{color: #E5AB39;font-size: 16px;font-weight: 500; position:relative;display:inline-block;padding-left:25px;}
 .category-page .page-title .time:before{content:'';width:18px;height:18px;display:inline-block;background:url('../images/time.svg')no-repeat center center;position:absolute;left:0;top:0;}
+.info-header .mobile-back{display:none;}
+.info-header .desktop-back{display:block;}
 
 @media all and (max-width: 360px)
 {
@@ -6997,6 +7007,9 @@ pre {
 }
 @media all and (max-width: 769px)
 {
+    .item-box{height:360px;}
+    .info-header .mobile-back{display:flex;}
+  .info-header .desktop-back{display:none;}
     .extraDdiscount{font-size:10px;}
  .review-rating .name-description {
     text-align: center;
@@ -7442,19 +7455,15 @@ pre {
 
 
 @media all and (min-width: 769px) {
-
-
   /**** GLOBAL ***/
-
- .container-header,
- .header-main .navbar,
- .new-header ._flex,
- .info-header ._flex,
- .search-container,
- .master-wrapper-content
- {
-  width: 94%;
- }
+  .container-header,
+  .header-main .navbar,
+  .new-header ._flex,
+  .info-header ._flex,
+  .search-container,
+  .master-wrapper-content {
+    width: 94%;
+  }
 
   .home-page-polls li {
     min-width: 100px;

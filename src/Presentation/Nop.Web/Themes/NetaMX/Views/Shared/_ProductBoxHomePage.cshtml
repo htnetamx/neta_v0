@@ -30,6 +30,24 @@
     var addtowishlistlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
     var addtocomparelink = Url.RouteUrl("AddProductToCompare", new { productId = Model.Id });
     var outofStock = product.StockQuantity <= 0;
+
+    var isAddtoCart = true;
+    if (product.AvailableStartDateTimeUtc != null) 
+    {
+        var availableStartDateTime = DateTime.SpecifyKind(product.AvailableStartDateTimeUtc.Value, DateTimeKind.Utc);
+        if (availableStartDateTime.CompareTo(DateTime.UtcNow) > 0)
+        {
+            isAddtoCart = false;
+        }
+    }
+    if (product.AvailableEndDateTimeUtc != null)
+    {
+        var availableEndDateTime = DateTime.SpecifyKind(product.AvailableEndDateTimeUtc.Value, DateTimeKind.Utc);
+        if (availableEndDateTime.CompareTo(DateTime.UtcNow) < 0)
+        {
+            isAddtoCart = false;
+        }
+    }
 }
 <div class="product-item" data-productid="@Model.Id">
     <div class="picture" style="margin: 0px">
@@ -119,7 +137,7 @@
             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoMiddle, additionalData = Model })
             <div class="buttons">
                 @*<button type="button" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = Model.SeName })')">@T("Products.Details")</button>*@
-                @if (!Model.ProductPrice.DisableBuyButton && !outofStock)
+                @if (!Model.ProductPrice.DisableBuyButton && !outofStock && isAddtoCart)
                 {
                     var addToCartText = T("ShoppingCart.AddToCart").Text;
                     if (Model.ProductPrice.IsRental)
