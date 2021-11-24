@@ -2112,6 +2112,8 @@ label, label + * {
     -o-transform: rotate(180deg);
     transform: rotate(180deg);
   }
+
+  .html-shopping-cart-page .info-header .cart-right {display: none;}
  .info-header .cart-right
  {
   font-size: 14px;
@@ -7001,6 +7003,9 @@ pre {
 
 .whatsapp-link{position:fixed;right:15px;bottom:15px;z-index:1010;}
 .whatsapp-link a{cursor:pointer;text-decoration:none; display:inline-block;width:54px;height:54px;background:url('../images/whatsapp-icon.png')no-repeat center center;background-size:100%;}
+.html-shopping-cart-page .whatsapp-link{display:none;}
+.html-checkout-page .whatsapp-link{display:none;}
+.html-login-page .whatsapp-link{display:none;}
 
 @media all and (max-width: 360px)
 {

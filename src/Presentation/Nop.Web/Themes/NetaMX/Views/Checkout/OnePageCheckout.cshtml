@@ -73,7 +73,7 @@
     <div class="page-body checkout-data">
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OpcContentBefore })
         <ol class="opc" id="checkout-steps">
-            <li id="opc-billing" class="tab-section allow">
+            <li id="opc-billing" class="tab-section allow" style="display:none">
                 <div class="step-title">
                     @*<span class="number">@billingAddressStepNumber</span>*@
                     <h2 class="title"><span id="AddNewAddressback" style="display:none;" class="back" onclick="BacktoAddress(); return false;"></span>@T("Checkout.BillingAddress")</h2>
@@ -108,8 +108,11 @@
 
                     @*<button id="save-address-button" style="display: none" type="button" class="button-1" onclick="Billing.saveEditAddress('@(storeLocation)checkout/SaveEditAddress/'); return false;">@T("Common.Save")</button>*@
                     
-                    <button type="button" style="@cnt == 1 ? 'display: block' : 'display: none'" name="save" class="button-1 new-address-next-step-button btn-black" onclick="billingSaveWithValidation(@cnt,@firstChild,@lastChild,'@(storeLocation)',@maxSubaccounts)"> @T("Common.Continue") </button>
-                    <script>
+                    <button type="button" style="@cnt == 1 ? 'display: block' : 'display: none'" id="btnsaveBilling" name="save" class="button-1 new-address-next-step-button btn-black" onclick="billingSaveWithValidation(@cnt,@firstChild,@lastChild,'@(storeLocation)',@maxSubaccounts)"> @T("Common.Continue") </button>
+                    <script asp-location="Footer">
+                        $(document).ready(function () {
+                            billingSaveWithValidation(@cnt,@firstChild,@lastChild, '@(storeLocation)',@maxSubaccounts);
+                        });
                             function billingSaveWithValidation(childrenCount, firstChildId, lastChildId, storeLocation, maxSubaccounts) {
                                 var creatingScreen = document.getElementById('AddNewAddressback').style.display != 'none';
 
@@ -251,7 +254,7 @@
             </li>
             <li id="opc-confirm_order" class="tab-section">
                 <div class="step-title">
-                    <h2 class="title"><span class="back" onclick="BacktoAddress(); return false;"></span> @T("Checkout.ConfirmOrder")</h2>
+                    <h2 class="title"><a class="back" href="@Url.RouteUrl("ShoppingCart")"></a> @T("Checkout.ConfirmOrder")</h2>
                     <a href="@Url.RouteUrl("Homepage")">X</a>
                 </div>
                 <div id="checkout-step-confirm-order" class="step a-item" style="display: none;">
