@@ -103,6 +103,12 @@
                     </li>
                 </ul>
             </div>
+            <div class="btn-group">
+                <button class="btn btn-info" asp-action="PdfInvoiceSinglePdf" type="submit" name="pdf-invoice-all-SinglePdf">
+                    <i class="far fa-file-pdf"></i>
+                    All invoices (1 Pdf)
+                </button>
+            </div>
             @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.OrderListButtons })
         </div>
     </div>
