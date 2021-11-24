@@ -678,7 +678,9 @@ namespace Nop.Services.Common
             }
 
             //order total
-            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
+            //var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
+            var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
+            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.PriceInclTax), order.CurrencyRate);
             var orderTotalStr = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, order.CustomerCurrencyCode, false, languageId);
 
             var pTotal = GetPdfCell($"{await _localizationService.GetResourceAsync("PDFInvoice.OrderTotal", languageId)} {orderTotalStr}", titleFont);
