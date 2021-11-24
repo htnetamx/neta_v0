@@ -1163,7 +1163,11 @@ namespace Nop.Web.Controllers
                 processPaymentRequest.PaymentMethodSystemName = await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(),
                     NopCustomerDefaults.SelectedPaymentMethodAttribute, (await _storeContext.GetCurrentStoreAsync()).Id);
                 HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
+
+                //Place Order Asynchronously
                 var placeOrderResult = await _orderProcessingService.PlaceOrderAsync(processPaymentRequest);
+                
+                ///Order has been placed
                 if (placeOrderResult.Success)
                 {
                     HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", null);
@@ -1228,7 +1232,7 @@ namespace Nop.Web.Controllers
                                             "521" + telusuario,
                                             "confirmacion_compra",
                                             new Dictionary<string, object> { { "Nombre", (await _workContext.GetCurrentCustomerAsync()).Username },
-                                                         { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id},
+                                                         { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + placeOrderResult.PlacedOrder.Id.ToString()},
                                                          { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
                                                          { "Dia", buscar },
                                                          { "Tienda", (await _storeContext.GetCurrentStoreAsync()).Name  },
@@ -2152,7 +2156,7 @@ namespace Nop.Web.Controllers
                         "521" + telusuario,
                         "confirmacion_compra",
                         new Dictionary<string, object> { { "Nombre", (await _workContext.GetCurrentCustomerAsync()).Username },
-                                                         { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + orders.First().Id},
+                                                         { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + placeOrderResult.PlacedOrder.Id.ToString()},
                                                          { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
                                                          { "Dia", buscar },
                                                          { "Tienda", (await _storeContext.GetCurrentStoreAsync()).Name  },
