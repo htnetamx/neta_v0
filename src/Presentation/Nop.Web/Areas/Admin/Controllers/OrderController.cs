@@ -1143,6 +1143,107 @@ namespace Nop.Web.Areas.Admin.Controllers
                 billingEmail: model.BillingEmail,
                 billingLastName: model.BillingLastName,
                 billingCountryId: model.BillingCountryId,
+                orderNotes: model.OrderNotes
+                );
+
+            //ensure that we at least one order selected
+            if (!orders.Any())
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Orders.NoOrders"));
+                return RedirectToAction("List");
+            }
+
+            try
+            {
+                var tempDirectory = _fileProvider.MapPath(UPLOADS_TEMP_PATH);
+                _fileProvider.CreateDirectory(tempDirectory);
+                var tempDirectoryDownload = _fileProvider.MapPath(DOWNLOADS_TEMP_PATH);
+                _fileProvider.CreateDirectory(tempDirectoryDownload);
+
+                System.IO.DirectoryInfo di = new DirectoryInfo(tempDirectory);
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+
+                var storeList = orders.Select(v => v.StoreId).Distinct();
+                foreach (var store in storeList)
+                {
+                    var storeData = await _storeService.GetStoreByIdAsync(store);
+                    if (storeData != null)
+                    {
+                        await using (var stream = new MemoryStream())
+                        {
+                            await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
+                            SaveStreamAsFile(tempDirectory, stream, $"orders-{storeData.Name.Replace("\"", "")}.pdf");
+                            await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
+                            SaveStreamAsFile(tempDirectory, stream, $"invoice-{storeData.Name.Replace("\"", "")}.pdf");
+                        }
+                    }
+                }
+                var zipFileName = $"invoices{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.zip";
+                var zipFileDownload = System.IO.Path.Combine(tempDirectoryDownload, zipFileName);
+                System.IO.Compression.ZipFile.CreateFromDirectory(tempDirectory, zipFileDownload);
+
+                var bytes = System.IO.File.ReadAllBytes(zipFileDownload);
+                return File(bytes, "application/zip", zipFileName);
+            }
+            catch (Exception exc)
+            {
+                await _notificationService.ErrorNotificationAsync(exc);
+                return RedirectToAction("List");
+            }
+        }
+
+        [HttpPost, ActionName("PdfInvoiceSinglePdf")]
+        [FormValueRequired("pdf-invoice-all-SinglePdf")]
+        public virtual async Task<IActionResult> PdfInvoiceAllSinglePdf(OrderSearchModel model)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            //a vendor should have access only to his products
+            if (await _workContext.GetCurrentVendorAsync() != null)
+            {
+                model.VendorId = (await _workContext.GetCurrentVendorAsync()).Id;
+            }
+
+            var startDateValue = model.StartDate == null ? null
+                            : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
+
+            var endDateValue = model.EndDate == null ? null
+                            : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
+
+            var orderStatusIds = model.OrderStatusIds != null && !model.OrderStatusIds.Contains(0)
+                ? model.OrderStatusIds.ToList()
+                : null;
+            var paymentStatusIds = model.PaymentStatusIds != null && !model.PaymentStatusIds.Contains(0)
+                ? model.PaymentStatusIds.ToList()
+                : null;
+            var shippingStatusIds = model.ShippingStatusIds != null && !model.ShippingStatusIds.Contains(0)
+                ? model.ShippingStatusIds.ToList()
+                : null;
+
+            var filterByProductId = 0;
+            var product = await _productService.GetProductByIdAsync(model.ProductId);
+            if (product != null && (await _workContext.GetCurrentVendorAsync() == null || product.VendorId == (await _workContext.GetCurrentVendorAsync()).Id))
+                filterByProductId = model.ProductId;
+
+            //load orders
+            var orders = await _orderService.SearchOrdersAsync(storeId: model.StoreId,
+                vendorId: model.VendorId,
+                productId: filterByProductId,
+                warehouseId: model.WarehouseId,
+                paymentMethodSystemName: model.PaymentMethodSystemName,
+                createdFromUtc: startDateValue,
+                createdToUtc: endDateValue,
+                osIds: orderStatusIds,
+                psIds: paymentStatusIds,
+                ssIds: shippingStatusIds,
+                billingPhone: model.BillingPhone,
+                billingEmail: model.BillingEmail,
+                billingLastName: model.BillingLastName,
+                billingCountryId: model.BillingCountryId,
                 orderNotes: model.OrderNotes,
                 orderByStoreId: true,
                 orderByRoute: true
@@ -1179,13 +1280,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     var storeData = await _storeService.GetStoreByIdAsync(store);
                     if (storeData != null)
                     {
-                        await using (var stream = new MemoryStream())
-                        {
-                            await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
-                            SaveStreamAsFile(tempDirectory, stream, $"orders-{storeData.Name.Replace("\"", "")}.pdf");
-                            await _pdfService.PrintAcumOrdersToPdfAsync(doc2, stream2, pdfWriter2, stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
-                            SaveStreamAsFile(tempDirectory, stream, $"invoice-{storeData.Name.Replace("\"", "")}.pdf");
-                        }
+                        await _pdfService.PrintAcumOrdersToPdfAsyncSinglePdf(doc2, stream2, pdfWriter2, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                     }
                 }
                 doc2.Close();
