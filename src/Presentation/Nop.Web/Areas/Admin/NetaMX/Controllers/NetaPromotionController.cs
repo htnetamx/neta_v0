@@ -221,6 +221,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //fill entity from product
             promotionProduct.DisplayOrder = model.DisplayOrder;
+            promotionProduct.AllowToShowProductOnlyPromotion = model.AllowToShowProductOnlyPromotion;
             await _netaPromotionService.UpdatePromotionProductAsync(promotionProduct);
 
             return new NullJsonResult();
@@ -285,7 +286,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                     {
                         Neta_PromotionId = model.PromotionId,
                         ProductId = product.Id,
-                        DisplayOrder = 1
+                        DisplayOrder = 1,
+                        AllowToShowProductOnlyPromotion = true
                     });
                 }
             }

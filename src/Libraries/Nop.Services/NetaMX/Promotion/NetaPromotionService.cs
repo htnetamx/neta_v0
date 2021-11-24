@@ -111,8 +111,6 @@ namespace Nop.Services.Promotion
                        join np in netaPromotionProductMapping on p.Id equals np.ProductId
                        where p.Published &&
                              !p.Deleted &&
-                             p.ShowOnHomepage &&
-                             p.IsPromotionProduct &&
                              np.Neta_PromotionId == promotionId
                        select p;
             });
@@ -121,7 +119,7 @@ namespace Nop.Services.Promotion
         }
 
         public async Task<IPagedList<Neta_Promotion_ProductMapping>> GetPromotionProductsByPromotionId(int promotionId, int pageIndex = 0, int pageSize = int.MaxValue)
-        {   
+        {
             var result = await _netaPromotionProductMappingRepository.GetAllPagedAsync(query =>
             {
                 return from p in query
@@ -139,17 +137,26 @@ namespace Nop.Services.Promotion
         public async Task UpdatePromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping)
         {
             await _netaPromotionProductMappingRepository.UpdateAsync(neta_Promotion_ProductMapping);
+            var product = _productRepository.Table.Where(x => x.Id == neta_Promotion_ProductMapping.ProductId).FirstOrDefault();
+            if (product != null)
+            {
+                product.IsPromotionProduct = neta_Promotion_ProductMapping.AllowToShowProductOnlyPromotion;
+                await _productRepository.UpdateAsync(product);
+            }
         }
 
         public async Task InsertPromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping)
         {
             await _netaPromotionProductMappingRepository.InsertAsync(neta_Promotion_ProductMapping);
 
-            var product = _productRepository.Table.Where(x => x.Id == neta_Promotion_ProductMapping.ProductId).FirstOrDefault();
-            if (product != null)
+            if (neta_Promotion_ProductMapping.AllowToShowProductOnlyPromotion)
             {
-                product.IsPromotionProduct = true;
-                await _productRepository.UpdateAsync(product);
+                var product = _productRepository.Table.Where(x => x.Id == neta_Promotion_ProductMapping.ProductId).FirstOrDefault();
+                if (product != null)
+                {
+                    product.IsPromotionProduct = true;
+                    await _productRepository.UpdateAsync(product);
+                }
             }
         }
 

@@ -57,7 +57,8 @@ namespace Nop.Web.Areas.Admin.Factories
                     {
                         Id = promotionProduct.Id,
                         ProductId = promotionProduct.ProductId,
-                        DisplayOrder = promotionProduct.DisplayOrder
+                        DisplayOrder = promotionProduct.DisplayOrder,
+                        AllowToShowProductOnlyPromotion = promotionProduct.AllowToShowProductOnlyPromotion
                     };
 
                     //fill in additional values (not existing in the entity)

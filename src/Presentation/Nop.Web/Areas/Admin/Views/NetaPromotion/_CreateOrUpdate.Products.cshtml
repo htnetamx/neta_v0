@@ -26,6 +26,15 @@
                         Editable = true,
                         EditType = EditType.Number
                     },
+                    new ColumnProperty(nameof(PromotionProductModel.AllowToShowProductOnlyPromotion))
+                    {
+                        Title = T("Admin.Catalog.Categories.Products.Fields.AllowToShowProductOnlyPromotion").Text,
+                        Width = "150",
+                        ClassName = NopColumnClassDefaults.CenterAll,
+                        Render = new RenderBoolean(),
+                        Editable = true,
+                        EditType = EditType.Checkbox
+                    },
                     new ColumnProperty(nameof(PromotionProductModel.ProductId))
                     {
                         Title = T("Admin.Common.View").Text,

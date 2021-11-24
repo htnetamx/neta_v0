@@ -6999,6 +6999,9 @@ pre {
 .info-header .mobile-back{display:none;}
 .info-header .desktop-back{display:block;}
 
+.whatsapp-link{position:fixed;right:15px;bottom:15px;z-index:1010;}
+.whatsapp-link a{cursor:pointer;text-decoration:none; display:inline-block;width:54px;height:54px;background:url('../images/whatsapp-icon.png')no-repeat center center;background-size:100%;}
+
 @media all and (max-width: 360px)
 {
  .customer-saving{font-size:10px;margin-right:8px;}
@@ -9270,11 +9273,14 @@ pre {
 @media all and (max-width: 767px)
 {
  .mb-h{display:none !important;}
- .mobile-top {z-index:1010; position:sticky;top:100px;left:0;  background: #fff;  box-shadow: 0 1px 2px 0 rgba(60, 64, 67,0.3), 0 2px 6px 2px rgba(60, 64, 67,0.15);  color: #202124;  display: flex;  justify-content:space-between;  align-items:center;  height: 64px;  padding:0 15px; }
+ .mobile-top {z-index:1010; position:sticky;top:100px;width:100%; left:0;  background: #fff;  box-shadow: 0 1px 2px 0 rgba(60, 64, 67,0.3), 0 2px 6px 2px rgba(60, 64, 67,0.15);  color: #202124;  display: flex;  justify-content:space-between;  align-items:center;  height: 64px;  padding:0 15px; }
  .html-login-page .mobile-top{top:0;}
  .mobile-top h2{margin:0;font-weight:600;color:#000;text-align:left;}
  .mobile-top a {  cursor: pointer;  text-decoration: none;  width: 20px;  height: 20px;  background: #000;  color: #fff !important;  text-align: center;  line-height: 20px;  border-radius: 4px; }
   
+ .html-shopping-cart-page .mobile-top{position:fixed;}
+  .html-shopping-cart-page .master-column-wrapper{padding-top: 75px;}
+
  .mobile-layout .master-wrapper-content{width:100%;top:0 !important;}
  .mobile-layout #upper-page{display:none !important;}
 
@@ -9289,7 +9295,23 @@ pre {
  .login-page .inputs label {  text-align: left; }
  .login-page .inputs input{height:42px;border-radius:4px;}
 
- .whatsapp-info{display:flex;border:1px solid #E9F3FF;border-radius:8px;padding:15px;text-align:left;}
+ .html-login-page .search-container,
+ .html-login-page .customer-banner,
+ .html-login-page .info-header,
+ .html-login-page .new-header,
+ .html-login-page .header-main
+ {
+  display: none;
+ }
+
+ .whatsapp-info
+ {
+  display: flex;
+  border: 1px solid #E9F3FF;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: left;
+ }
  .whatsapp-info .icon{width:40px;height:40px;border-radius:180px;background-color:#E9F3FF;background-image:url('../images/bell.png');background-position:center center;background-repeat:no-repeat;background-size:23px;margin-right:10px;min-width:40px;}
  .whatsapp-info label {  color: #4786FF; line-height:18px;}
 

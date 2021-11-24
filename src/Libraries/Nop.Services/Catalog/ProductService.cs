@@ -892,7 +892,8 @@ namespace Nop.Services.Catalog
             if (pageSize == int.MaxValue)
                 pageSize = int.MaxValue - 1;
 
-            var productsQuery = _productRepository.Table.Where(p => p.IsPromotionProduct == false);
+            //TODO: EU-106
+            var productsQuery = _productRepository.Table; //.Where(p => p.IsPromotionProduct == false);
 
             if (!showHidden)
                 productsQuery = productsQuery.Where(p => p.Published);

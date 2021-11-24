@@ -21,6 +21,9 @@ namespace Nop.Web.Areas.Admin.Models.Promotion
         [NopResourceDisplayName("Admin.Catalog.Categories.Products.Fields.DisplayOrder")]
         public int DisplayOrder { get; set; }
 
+        [NopResourceDisplayName("Admin.Catalog.Categories.Products.Fields.AllowToShowProductOnlyPromotion")]
+        public bool AllowToShowProductOnlyPromotion { get; set; }
+
         #endregion
     }
 }

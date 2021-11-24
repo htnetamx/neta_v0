@@ -32,7 +32,7 @@
     var outofStock = product.StockQuantity <= 0;
 
     var isAddtoCart = true;
-    if (product.AvailableStartDateTimeUtc != null) 
+    if (product.AvailableStartDateTimeUtc != null)
     {
         var availableStartDateTime = DateTime.SpecifyKind(product.AvailableStartDateTimeUtc.Value, DateTimeKind.Utc);
         if (availableStartDateTime.CompareTo(DateTime.UtcNow) > 0)
@@ -59,10 +59,13 @@
         <div class="prd-top">
             @if (!string.IsNullOrEmpty(Model.ProductPrice.TotalSavingOnProduct))
             {
-            <div class="left">
-                <img class="owlimg" src="\Themes\NetaMX\Content\images\Dis.icon.png" />
-                <span style="float:right;">-@Model.ProductPrice.TotalSavingOnProduct</span>
-            </div>
+                var saveText = string.Format(T("Product.saveText").Text, Model.ProductPrice.TotalSavingOnProduct);
+                <div class="left">
+                    @saveText
+                    @*<img class="owlimg" src="\Themes\NetaMX\Content\images\Dis.icon.png" />
+                        <span style="float:right; padding:0 5px;">@Model.ProductPrice.TotalSavingOnProduct</span>*@
+
+                </div>
             }
             @*<div class="right">300 Unidades</div>*@
         </div>
@@ -127,10 +130,10 @@
                     }
                 </div>
             </div>
-            <div class="prices">
-                <span class="price">En Carrito:</span>
-                <span class="price quantity" id="currentQty_@Model.Id">@Model.Details.CurrentProductQuantity</span>
-            </div>
+            @*<div class="prices">
+                    <span class="price">En Carrito:</span>
+                    <span class="price quantity" id="currentQty_@Model.Id">@Model.Details.CurrentProductQuantity</span>
+                </div>*@
             <div class="new-product-title prd-title-new" style="">
                 <a href="@Url.RouteUrl("Product", new {SeName = Model.SeName})" style="text-decoration: none;">@Model.Name</a>
             </div>
@@ -172,7 +175,7 @@
                 {
                     @*<button type="button" class="button-2 add-to-wishlist-button" title="@T("ShoppingCart.AddToWishlist")" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">@T("ShoppingCart.AddToWishlist")</button>*@
                 }
-                @{ 
+                @{
                     var currentQty = Model.Details.CurrentProductQuantity;
                     var activeClass = Model.Details.CurrentProductQuantity > 0 ? "active" : "";
                 }
