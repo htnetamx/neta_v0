@@ -441,6 +441,8 @@ namespace Nop.Services.Common
             if (vendorId != 0)
                 return;
 
+            var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
+
             //subtotal
             var totalsTable = new PdfPTable(1)
             {
@@ -458,7 +460,7 @@ namespace Nop.Services.Common
                 //including tax
 
                 var orderSubtotalInclTaxInCustomerCurrency =
-                    _currencyService.ConvertCurrency(order.OrderSubtotalInclTax, order.CurrencyRate);
+                    _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.UnitPriceExclTax), order.CurrencyRate);
                 var orderSubtotalInclTaxStr = await _priceFormatter.FormatPriceAsync(orderSubtotalInclTaxInCustomerCurrency, true,
                     order.CustomerCurrencyCode, languageId, true);
 
@@ -472,7 +474,7 @@ namespace Nop.Services.Common
                 //excluding tax
 
                 var orderSubtotalExclTaxInCustomerCurrency =
-                    _currencyService.ConvertCurrency(order.OrderSubtotalExclTax, order.CurrencyRate);
+                    _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.UnitPriceExclTax), order.CurrencyRate);
                 var orderSubtotalExclTaxStr = await _priceFormatter.FormatPriceAsync(orderSubtotalExclTaxInCustomerCurrency, true,
                     order.CustomerCurrencyCode, languageId, false);
 
@@ -679,8 +681,7 @@ namespace Nop.Services.Common
 
             //order total
             //var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
-            var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
-            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.PriceInclTax), order.CurrencyRate);
+            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.UnitPriceExclTax) - order.OrderDiscount, order.CurrencyRate);
             var orderTotalStr = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, order.CustomerCurrencyCode, false, languageId);
 
             var pTotal = GetPdfCell($"{await _localizationService.GetResourceAsync("PDFInvoice.OrderTotal", languageId)} {orderTotalStr}", titleFont);
@@ -1030,7 +1031,7 @@ namespace Nop.Services.Common
                 {
                     //including tax
                     var priceInclTaxInCustomerCurrency =
-                        _currencyService.ConvertCurrency(orderItem.PriceInclTax, order.CurrencyRate);
+                        _currencyService.ConvertCurrency(orderItem.Quantity * orderItem.UnitPriceInclTax, order.CurrencyRate);
                     subTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode,
                         lang.Id, true);
                 }
@@ -1038,7 +1039,7 @@ namespace Nop.Services.Common
                 {
                     //excluding tax
                     var priceExclTaxInCustomerCurrency =
-                        _currencyService.ConvertCurrency(orderItem.PriceExclTax, order.CurrencyRate);
+                        _currencyService.ConvertCurrency(orderItem.Quantity * orderItem.UnitPriceExclTax, order.CurrencyRate);
                     subTotal = await _priceFormatter.FormatPriceAsync(priceExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode,
                         lang.Id, false);
                 }

@@ -14,7 +14,10 @@ namespace Nop.Tests.Nop.Web.Tests
         /// <param name="services">Collection of service descriptors</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            
+            services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+            {
+                options.ValueCountLimit = int.MaxValue;
+            });
         }
 
         /// <summary>
