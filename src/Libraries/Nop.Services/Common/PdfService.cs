@@ -441,6 +441,8 @@ namespace Nop.Services.Common
             if (vendorId != 0)
                 return;
 
+            var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
+
             //subtotal
             var totalsTable = new PdfPTable(1)
             {
@@ -458,7 +460,7 @@ namespace Nop.Services.Common
                 //including tax
 
                 var orderSubtotalInclTaxInCustomerCurrency =
-                    _currencyService.ConvertCurrency(order.OrderSubtotalInclTax, order.CurrencyRate);
+                    _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.UnitPriceExclTax), order.CurrencyRate);
                 var orderSubtotalInclTaxStr = await _priceFormatter.FormatPriceAsync(orderSubtotalInclTaxInCustomerCurrency, true,
                     order.CustomerCurrencyCode, languageId, true);
 
@@ -472,7 +474,7 @@ namespace Nop.Services.Common
                 //excluding tax
 
                 var orderSubtotalExclTaxInCustomerCurrency =
-                    _currencyService.ConvertCurrency(order.OrderSubtotalExclTax, order.CurrencyRate);
+                    _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.UnitPriceExclTax), order.CurrencyRate);
                 var orderSubtotalExclTaxStr = await _priceFormatter.FormatPriceAsync(orderSubtotalExclTaxInCustomerCurrency, true,
                     order.CustomerCurrencyCode, languageId, false);
 
@@ -678,7 +680,8 @@ namespace Nop.Services.Common
             }
 
             //order total
-            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
+            //var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
+            var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(orderItems.Sum(v => v.Quantity * v.UnitPriceExclTax) - order.OrderDiscount, order.CurrencyRate);
             var orderTotalStr = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, order.CustomerCurrencyCode, false, languageId);
 
             var pTotal = GetPdfCell($"{await _localizationService.GetResourceAsync("PDFInvoice.OrderTotal", languageId)} {orderTotalStr}", titleFont);
@@ -1028,7 +1031,7 @@ namespace Nop.Services.Common
                 {
                     //including tax
                     var priceInclTaxInCustomerCurrency =
-                        _currencyService.ConvertCurrency(orderItem.PriceInclTax, order.CurrencyRate);
+                        _currencyService.ConvertCurrency(orderItem.Quantity * orderItem.UnitPriceInclTax, order.CurrencyRate);
                     subTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode,
                         lang.Id, true);
                 }
@@ -1036,7 +1039,7 @@ namespace Nop.Services.Common
                 {
                     //excluding tax
                     var priceExclTaxInCustomerCurrency =
-                        _currencyService.ConvertCurrency(orderItem.PriceExclTax, order.CurrencyRate);
+                        _currencyService.ConvertCurrency(orderItem.Quantity * orderItem.UnitPriceExclTax, order.CurrencyRate);
                     subTotal = await _priceFormatter.FormatPriceAsync(priceExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode,
                         lang.Id, false);
                 }
@@ -1661,12 +1664,10 @@ namespace Nop.Services.Common
             doc.Close();
         }
 
-        public virtual async Task PrintAcumOrdersToPdfAsync(Document doc2, Stream stream2, PdfWriter pdfWriter2, Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
+        public virtual async Task PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
-            if (stream2 == null)
-                throw new ArgumentNullException(nameof(stream2));
 
             if (orders == null)
                 throw new ArgumentNullException(nameof(orders));
@@ -1760,28 +1761,134 @@ namespace Nop.Services.Common
 
             //header
             await PrintHeaderAsync1(pdfSettingsByStore, lang, route, currentStore.Name, font, titleFont, doc);
-            await PrintHeaderAsync1(pdfSettingsByStore, lang, route, currentStore.Name, font, titleFont, doc2);
 
             //addresses
             await PrintAddressesAsync1(vendorId, lang, titleFont, currentStore, font, doc);
-            await PrintAddressesAsync1(vendorId, lang, titleFont, currentStore, font, doc2);
 
             //products
             await PrintProductsAsync1(vendorId, lang, titleFont, doc, products, font, attributesFont);
-            await PrintProductsAsync1(vendorId, lang, titleFont, doc2, products, font, attributesFont);
             //checkout attributes
             //PrintCheckoutAttributes(vendorId, order, doc, lang, font);
 
             //totals
             await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, currentStore, font, titleFont, doc);
-            await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, currentStore, font, titleFont, doc2);
             //order notes
             //await PrintOrderNotesAsync(pdfSettingsByStore, order, lang, titleFont, doc, font);
 
             //footer
             PrintFooter(pdfSettingsByStore, pdfWriter, pageSize, lang, font);
-            PrintFooter(pdfSettingsByStore, pdfWriter2, pageSize, lang, font);
             doc.Close();
+        }
+
+        public virtual async Task PrintAcumOrdersToPdfAsyncSinglePdf(Document doc2, Stream stream2, PdfWriter pdfWriter2, IList<Order> orders, int languageId = 0, int vendorId = 0)
+        {
+            if (stream2 == null)
+                throw new ArgumentNullException(nameof(stream2));
+
+            if (orders == null)
+                throw new ArgumentNullException(nameof(orders));
+
+            var pageSize = PageSize.A4;
+
+            if (_pdfSettings.LetterPageSizeEnabled)
+                pageSize = PageSize.Letter;
+
+
+            var filteredRoutes = orders.Where(o => o.Route != null && o.Route != "").GroupBy(o => o.Route).Select(o => o.FirstOrDefault()).Select(o => o.Route).ToList();
+            var route = String.Join(",", filteredRoutes);
+
+
+            //fonts
+            var titleFont = GetFont();
+            titleFont.SetStyle(Font.BOLD);
+            titleFont.Color = BaseColor.Black;
+            var font = GetFont();
+            var attributesFont = GetFont();
+            attributesFont.SetStyle(Font.ITALIC);
+
+            var lang = await _languageService.GetLanguageByIdAsync(languageId);
+            if (lang == null || !lang.Published)
+                lang = await _workContext.GetWorkingLanguageAsync();
+
+            var products = new Dictionary<string, Dictionary<decimal, OrderStoreTotal>>();
+            decimal sumDiscount = 0;
+            decimal sumTotal = 0;
+            foreach (var order in orders)
+            {
+                var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendorId);
+                foreach (var orderItem in orderItems)
+                {
+                    var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+                    var name = await _localizationService.GetLocalizedAsync(product, x => x.Name, lang.Id);
+                    if (!products.ContainsKey(name))
+                    {
+                        products.Add(name, new Dictionary<decimal, OrderStoreTotal>());
+                    }
+                    if (!products[name].ContainsKey(orderItem.UnitPriceExclTax))
+                    {
+                        products[name].Add(orderItem.UnitPriceExclTax, new OrderStoreTotal());
+                    }
+                    try
+                    {
+                        products[name][orderItem.UnitPriceExclTax].Price = orderItem.UnitPriceExclTax;
+                        products[name][orderItem.UnitPriceExclTax].Quantity += orderItem.Quantity;
+                        products[name][orderItem.UnitPriceExclTax].Discount += orderItem.DiscountAmountExclTax;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                if (order.OrderDiscount != 0)
+                {
+                    var name = "Descuento de Orden";
+                    if (!products.ContainsKey(name))
+                    {
+                        products.Add(name, new Dictionary<decimal, OrderStoreTotal>());
+                        products[name].Add(1, new OrderStoreTotal());
+                    }
+                    try
+                    {
+                        products[name][1].Price = 0;
+                        products[name][1].Quantity = 1;
+                        products[name][1].Discount += order.OrderDiscount;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+
+            sumDiscount += products.Values.Sum(p => p.Values.Sum(p1 => p1.Discount));
+            sumTotal += products.Values.Sum(p => p.Values.Sum(p1 => (p1.Quantity * p1.Price)));
+
+            //by default _pdfSettings contains settings for the current active store
+            //and we need PdfSettings for the store which was used to place an order
+            //so let's load it based on a store of the current order
+            var pdfSettingsByStore = await _settingService.LoadSettingAsync<PdfSettings>(1);
+
+            var currentStore = await _storeService.GetStoreByIdAsync(orders.First().StoreId);
+
+            //header
+            await PrintHeaderAsync1(pdfSettingsByStore, lang, route, currentStore.Name, font, titleFont, doc2);
+
+            //addresses
+            await PrintAddressesAsync1(vendorId, lang, titleFont, currentStore, font, doc2);
+
+            //products
+            await PrintProductsAsync1(vendorId, lang, titleFont, doc2, products, font, attributesFont);
+            //checkout attributes
+            //PrintCheckoutAttributes(vendorId, order, doc, lang, font);
+
+            //totals
+            await PrintTotalsAsync1(vendorId, lang, sumTotal, sumDiscount, currentStore, font, titleFont, doc2);
+            //order notes
+            //await PrintOrderNotesAsync(pdfSettingsByStore, order, lang, titleFont, doc, font);
+
+            //footer
+            PrintFooter(pdfSettingsByStore, pdfWriter2, pageSize, lang, font);
             doc2.NewPage();
         }
 

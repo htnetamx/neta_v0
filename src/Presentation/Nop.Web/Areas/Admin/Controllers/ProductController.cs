@@ -35,6 +35,7 @@ using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Nop.Web.Infrastructure;
 
 namespace Nop.Web.Areas.Admin.Controllers
 {
@@ -930,6 +931,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
+        [RequestFormSizeLimit(valueCountLimit: 2048)]
         public virtual async Task<IActionResult> Edit(ProductModel model, bool continueEditing)
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
