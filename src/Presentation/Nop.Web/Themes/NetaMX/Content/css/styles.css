@@ -1900,6 +1900,7 @@ label, label + * {
  display: -webkit-box;
  -webkit-line-clamp: 2;
  -webkit-box-orient: vertical;
+ height:39px;
 }
 
 .not-ellipsis
@@ -7023,7 +7024,6 @@ pre {
 }
 @media all and (max-width: 769px)
 {
-    .item-box{height:360px;}
     .info-header .mobile-back{display:flex;}
   .info-header .desktop-back{display:none;}
     .extraDdiscount{font-size:10px;}

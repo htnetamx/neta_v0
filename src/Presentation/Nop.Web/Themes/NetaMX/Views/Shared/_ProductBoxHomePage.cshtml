@@ -61,12 +61,19 @@
             @if (!string.IsNullOrEmpty(Model.ProductPrice.TotalSavingOnProduct))
             {
                 var saveText = string.Format(T("Product.saveText").Text, Model.ProductPrice.TotalSavingOnProduct);
+                
                 <div class="left">
                     @saveText
                     @*<img class="owlimg" src="\Themes\NetaMX\Content\images\Dis.icon.png" />
-                        <span style="float:right; padding:0 5px;">@Model.ProductPrice.TotalSavingOnProduct</span>*@
+                <span style="float:right; padding:0 5px;">@Model.ProductPrice.TotalSavingOnProduct</span>*@
 
                 </div>
+            }
+            else
+            {
+            <div class="left">
+                &nbsp;
+            </div>
             }
             @*<div class="right">300 Unidades</div>*@
         </div>
