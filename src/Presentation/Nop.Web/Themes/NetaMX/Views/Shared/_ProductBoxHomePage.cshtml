@@ -156,11 +156,24 @@
                     <script>
                         function AddTocart_@(Model.Id)(url,element)
                         {
-                            if (@(product.StockQuantity) > @Model.Details.CurrentProductQuantity && @(product.OrderMaximumQuantity) > @Model.Details.CurrentProductQuantity) {
-                                AjaxCart.addproducttocart_catalog(url, element);
-                                $("#prdparent-@(Model.Id)").addClass("active");
-                                $("#itemquantity@(Model.Id)").val("1");
+                            @if(product.ManageInventoryMethod == ManageInventoryMethod.ManageStock){
+                                <text>
+                                    if (@(product.StockQuantity) > @Model.Details.CurrentProductQuantity && @(product.OrderMaximumQuantity) > @Model.Details.CurrentProductQuantity) {
+                                        AjaxCart.addproducttocart_catalog(url, element);
+                                        $("#prdparent-@(Model.Id)").addClass("active");
+                                        $("#itemquantity@(Model.Id)").val("1");
+                                    }
+                                </text>
                             }
+                            else
+                            {
+                                <text>
+                                        AjaxCart.addproducttocart_catalog(url, element);
+                                        $("#prdparent-@(Model.Id)").addClass("active");
+                                        $("#itemquantity@(Model.Id)").val("1");
+                                </text>
+                            }
+
                         }
                     </script>
                 }
@@ -198,16 +211,23 @@
                             // If is not undefined
                             if (!isNaN(currentVal)) {
                                 // Increment
-                                if (@(product.StockQuantity) > currentVal && @(product.OrderMaximumQuantity) > currentVal) {
+                                var isNotManageStock = true;
+                                @if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
+                                {
+                                    <text>
+                                        isNotManageStock = false;
+                                    </text>
+                                }
+                                if (isNotManageStock || @(product.StockQuantity) > currentVal && @(product.OrderMaximumQuantity) > currentVal) {
                                     var qty = currentVal + 1;
                                     $('#itemquantity@(Model.Id)').val(qty);
                                     AjaxCart.addproducttocart_catalog('@addtocartlink', $('#currentQty_@Model.Id'));
                                 }
                                 var qtyLimit = currentVal + 1;
-                                if (@(product.StockQuantity) < qtyLimit) {
+                                if (!isNotManageStock && @(product.StockQuantity) < qtyLimit) {
                                     displayBarNotification("@T("StockQtyLimit.message")", 'error', 0);
                                 }
-                                else if (@(product.OrderMaximumQuantity) < qtyLimit) {
+                                else if (!isNotManageStock && @(product.OrderMaximumQuantity) < qtyLimit) {
                                     displayBarNotification("@T("OrderMixQtyLimit.message")", 'error', 0);
                                 }
 
