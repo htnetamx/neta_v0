@@ -482,6 +482,12 @@ namespace Nop.Web.Controllers
                 return View(model);
             }
             var customer = await _customerService.GetCustomerByTelephoneAsync(model.Password);
+            var zipCode = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.ZipPostalCodeAttribute);
+            if (!string.IsNullOrEmpty(zipCode) && zipCode != "")
+                returnUrl = "/cart";
+            else
+                returnUrl = Url.RouteUrl("ZipCodeUpdate");
+
             return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, true);
 
             //if (ModelState.IsValid)

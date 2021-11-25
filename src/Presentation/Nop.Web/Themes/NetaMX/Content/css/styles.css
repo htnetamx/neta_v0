@@ -1898,7 +1898,7 @@ label, label + * {
  overflow: hidden;
  text-overflow: ellipsis;
  display: -webkit-box;
- -webkit-line-clamp: 1;
+ -webkit-line-clamp: 2;
  -webkit-box-orient: vertical;
 }
 
@@ -2057,15 +2057,17 @@ label, label + * {
 .html-shopping-cart-page .header-main{display:none;}
 .search-container{max-width:1200px;margin:0 auto;}
 .header-main .navbar{max-width:1200px;margin:0 auto;}
-.info-header
-{
- background-color: #EAF7EE;
- width: 100vw;
- border-bottom: 2px solid #C1E7CB;
- margin:0;
- position:sticky;
- top:0;
- z-index:1010;
+.html-shopping-cart-page .info-header {
+  top:0px;
+}
+.info-header {
+  background-color: #EAF7EE;
+  width: 100vw;
+  border-bottom: 2px solid #C1E7CB;
+  margin: 0;
+  position: sticky;
+  top: 63px;
+  z-index: 1010;
 }
 
  .info-header ._flex
@@ -6962,10 +6964,15 @@ pre {
   text-align: center;
   color: #000;
   font-weight: bold;
-  background: yellow !important;
+  background: rgba(234, 247, 238, 0.92);
   padding: 10px 0;
 }
-.html-shopping-cart-page .customer-banner{display:none;}
+  .customer-banner img{
+      padding:0 10px;
+  }
+  .html-shopping-cart-page .customer-banner {
+    display: none;
+  }
 
 .prd-title{margin:0 0 24px;}
 .prd-title h2{font-size:20px;color:#212121;font-weight:700;margin:0;padding:0;text-align:left;}
@@ -7006,6 +7013,7 @@ pre {
 .html-shopping-cart-page .whatsapp-link{display:none;}
 .html-checkout-page .whatsapp-link{display:none;}
 .html-login-page .whatsapp-link{display:none;}
+.html-order-completed-page .whatsapp-link{display:block;}
 
 @media all and (max-width: 360px)
 {
