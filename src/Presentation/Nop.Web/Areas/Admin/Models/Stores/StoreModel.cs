@@ -96,10 +96,10 @@ namespace Nop.Web.Areas.Admin.Models.Stores
         [DisplayName("Domingo")]
         public DateTime? SundayEndDateTimeUtc { get; set; }
 
-        [NopResourceDisplayName("Habilita Comisión 2.0")]
+        [DisplayName("Habilita Comisión 2.0")]
         public virtual bool Comm20 { get; set; }
 
-        [NopResourceDisplayName("Monto Comisión 2.0")]
+        [DisplayName("Monto Comisión 2.0")]
         public decimal AmountComm20 { get; set; }
 
         public IList<StoreLocalizedModel> Locales { get; set; }
