@@ -16,6 +16,7 @@ using Nop.Data;
 using Nop.Data.Extensions;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
+using Nop.Services.Google;
 using Nop.Services.Shipping;
 
 namespace Nop.Services.Orders
@@ -237,6 +238,22 @@ namespace Nop.Services.Orders
             return await _orderRepository.Table.ToListAsync();
         }
 
+
+        public virtual async Task<List<MonitoringSaleAnalysis>> GetAllOrdersWithProductInfoLastDayAsync()
+        {
+            var today = DateTime.UtcNow;
+            var date = new DateTime(2021, 11, 26, 17, 51, 22);
+            var date_end = date.Subtract(new TimeSpan(7, 0, 0, 0));
+            var date_start = date_end.Subtract(new TimeSpan(1, 0, 0, 0));
+            var query = await (from o in _orderRepository.Table
+                               where o.CreatedOnUtc >= date_start && o.CreatedOnUtc <= date_end
+                               join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
+                               join p in _productRepository.Table on oi.ProductId equals p.Id
+                               where oi.UnitPriceInclTax <= oi.OriginalProductCost
+                               select new MonitoringSaleAnalysis { OrderId = o.Id, ProductId = p.Id, Name = p.Name, Cost = oi.OriginalProductCost, Price = oi.UnitPriceInclTax }).ToListAsync();
+            var query2 = query.GroupBy(q => new{q.ProductId,q.Name}).Select(q=>q.First());
+            return await (query).ToListAsync();
+        }
 
         /// <summary>
         /// Gets an order by order item identifier

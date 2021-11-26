@@ -117,6 +117,20 @@ namespace Nop.Services.Google
         public List<object> ToStringList() => new List<object> { Store, UniqueCustomers_Day_Before , UniqueCustomers };
 
     }
+
+    public struct MonitoringSaleAnalysis
+    {
+        public int OrderId;
+        public int ProductId;
+        public string Name;
+        public decimal Cost;
+        public decimal Price;
+
+        public static List<object> Headers() => new List<object> { "Order Id", "Product Id", "Name", "Cost", "Price"};
+        public List<object> ToStringList() => new List<object> { OrderId, ProductId, Name,Cost, Price};
+
+    }
+
     public struct NineToNineOpsUniqueC10
     {
         public int Store;
