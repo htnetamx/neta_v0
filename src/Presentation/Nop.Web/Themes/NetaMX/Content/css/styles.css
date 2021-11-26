@@ -1708,7 +1708,7 @@ label, label + * {
  position: relative;
  width: 46%;
  float: left;
- margin: 0 2% 24px;
+ margin: 0 2% 10px;
  text-align: left;
 }
 
@@ -1794,7 +1794,7 @@ label, label + * {
 
 .item-box .details
 {
- padding: 15px 0;
+ padding: 15px 0 0 0;
  min-height: 165px;
 }
 
@@ -7069,8 +7069,10 @@ pre {
 
   /*** GLOBAL TABLES ***/
 
-
-  .cart {
+  .owl-carousel .item-box {
+    width: 144px !important;
+  }
+    .cart {
     display: block;
   }
 

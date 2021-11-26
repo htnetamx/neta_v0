@@ -30,7 +30,7 @@
     var addtowishlistlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
     var addtocomparelink = Url.RouteUrl("AddProductToCompare", new { productId = Model.Id });
     //var outofStock = product.StockQuantity <= 0;
-    var outofStock = false;
+    var outofStock =  product.StockQuantity <= 0 && product.ManageInventoryMethod == ManageInventoryMethod.ManageStock ? true : false;
 
     var isAddtoCart = true;
     if (product.AvailableStartDateTimeUtc != null)
@@ -146,21 +146,21 @@
                 <a href="@Url.RouteUrl("Product", new {SeName = Model.SeName})" style="text-decoration: none;">@Model.Name</a>
             </div>
             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoMiddle, additionalData = Model })
-            <div class="buttons">
-                @*<button type="button" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = Model.SeName })')">@T("Products.Details")</button>*@
-                @if (!Model.ProductPrice.DisableBuyButton && !outofStock && isAddtoCart)
+        <div class="buttons">
+            @*<button type="button" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = Model.SeName })')">@T("Products.Details")</button>*@
+            @if (!Model.ProductPrice.DisableBuyButton && !outofStock && isAddtoCart)
+            {
+                var addToCartText = T("ShoppingCart.AddToCart").Text;
+                if (Model.ProductPrice.IsRental)
                 {
-                    var addToCartText = T("ShoppingCart.AddToCart").Text;
-                    if (Model.ProductPrice.IsRental)
-                    {
-                        addToCartText = T("ShoppingCart.Rent").Text;
-                    }
-                    if (Model.ProductPrice.AvailableForPreOrder)
-                    {
-                        addToCartText = T("ShoppingCart.PreOrder").Text;
-                    }
-                    <button type="button" class="button-2 product-box-add-to-cart-button" onclick="AddTocart_@(Model.Id)('@addtocartlink',$('#currentQty_@Model.Id'));return false;">@(addToCartText)</button>
-                    <script>
+                    addToCartText = T("ShoppingCart.Rent").Text;
+                }
+                if (Model.ProductPrice.AvailableForPreOrder)
+                {
+                    addToCartText = T("ShoppingCart.PreOrder").Text;
+                }
+                <button type="button" class="button-2 product-box-add-to-cart-button" onclick="AddTocart_@(Model.Id)('@addtocartlink',$('#currentQty_@Model.Id'));return false;">@(addToCartText)</button>
+                <script>
                         function AddTocart_@(Model.Id)(url,element)
                         {
                             @if(product.ManageInventoryMethod == ManageInventoryMethod.ManageStock){
@@ -182,30 +182,30 @@
                             }
 
                         }
-                    </script>
-                }
-                else
-                {
-                    <button type="button" class="button-2 disableButton">@T("ShoppingCart.AddToCart.NoQty")</button>
-                }
-                @if (!Model.ProductPrice.DisableAddToCompareListButton)
-                {
-                    @*<button type="button" class="button-2 add-to-compare-list-button" title="@T("ShoppingCart.AddToCompareList")" onclick="AjaxCart.addproducttocomparelist('@addtocomparelink');return false;">@T("ShoppingCart.AddToCompareList")</button>*@
-                }
-                @if (!Model.ProductPrice.DisableWishlistButton)
-                {
-                    @*<button type="button" class="button-2 add-to-wishlist-button" title="@T("ShoppingCart.AddToWishlist")" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">@T("ShoppingCart.AddToWishlist")</button>*@
-                }
-                @{
-                    var currentQty = Model.Details.CurrentProductQuantity;
-                    var activeClass = Model.Details.CurrentProductQuantity > 0 ? "active" : "";
-                }
-                <div class="add-quantity @activeClass" id="prdparent-@Model.Id">
-                    <span data-quantity="minus" class="icon minus"></span>
-                    <input id="itemquantity@(Model.Id)" class="qty-input@(Model.Id)" type="text" value="@(currentQty)" readonly />
-                    <span data-quantity="plus" class="icon plus"></span>
-                </div>
-                <script asp-location="Footer">
+                </script>
+            }
+            else
+            {
+                <button type="button" class="button-2 disableButton">@T("ShoppingCart.AddToCart.NoQty")</button>
+            }
+            @if (!Model.ProductPrice.DisableAddToCompareListButton)
+            {
+                @*<button type="button" class="button-2 add-to-compare-list-button" title="@T("ShoppingCart.AddToCompareList")" onclick="AjaxCart.addproducttocomparelist('@addtocomparelink');return false;">@T("ShoppingCart.AddToCompareList")</button>*@
+            }
+            @if (!Model.ProductPrice.DisableWishlistButton)
+            {
+                @*<button type="button" class="button-2 add-to-wishlist-button" title="@T("ShoppingCart.AddToWishlist")" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">@T("ShoppingCart.AddToWishlist")</button>*@
+            }
+            @{
+                var currentQty = Model.Details.CurrentProductQuantity;
+                var activeClass = Model.Details.CurrentProductQuantity > 0 ? "active" : "";
+            }
+            <div class="add-quantity @activeClass" id="prdparent-@Model.Id">
+                <span data-quantity="minus" class="icon minus"></span>
+                <input id="itemquantity@(Model.Id)" class="qty-input@(Model.Id)" type="text" value="@(currentQty)" readonly />
+                <span data-quantity="plus" class="icon plus"></span>
+            </div>
+            <script asp-location="Footer">
                     $(document).ready(function () {
                         // This button will increment the value
                         $('[data-quantity="plus"]',"#prdparent-@Model.Id").click(function (e) {
@@ -271,8 +271,8 @@
                             }
                         });
                     });
-                </script>
-            </div>
+            </script>
+        </div>
             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoAfter, additionalData = Model })
         </div>
     </div>
