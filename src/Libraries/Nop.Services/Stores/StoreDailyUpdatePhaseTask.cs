@@ -38,7 +38,7 @@ namespace Nop.Services.Stores
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
             var stores = (await _storeService.GetAllStoresAsync())
-                .Where(s => s.DisplayOrder > 0);
+                .Where(s => s.DisplayOrder == 1);
 
             List<string> storesUnlokcingBonus = new List<string>();
             List<string> storesMovingToCompleteFase = new List<string>();
@@ -72,41 +72,103 @@ namespace Nop.Services.Stores
                     ////SUM of order total value (all)
                     var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
 
-                    ////Bonus CASE 500 GMV, 8 distinct customers
-                    if (store.DisplayOrder == 1 && disntinctCustomersCounter > 8 && orderValueGMV > 500 && !store.FirstGmvBonusApplied)
+                    if (store.DisplayOrder == 1)
                     {
-                        store.NetaCoin = 200;
-                        store.FirstGmvBonusApplied = true;
-                        storesUnlokcingBonus.Add(store.Name.ToString());
+                        ////Bonus CASE 500 GMV, 8 distinct customers
+                        if (disntinctCustomersCounter > 8 && orderValueGMV > 500 && !store.FirstGmvBonusApplied)
+                        {
+                            store.NetaCoin = 200;
+                            store.FirstGmvBonusApplied = true;
+                            storesUnlokcingBonus.Add(store.Name.ToString());
+                        }
+
+                        //Transition Case
+                        else if (DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
+                        {
+                            store.DisplayOrder = 2;
+                            storesMovingToCompleteFase.Add(store.Name.ToString());
+                        }
                     }
 
-                    //Transition Case
-                    else if (store.DisplayOrder == 1 && DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
-                    {
-                        store.DisplayOrder = 2;
-                        storesMovingToCompleteFase.Add(store.Name.ToString());
-                    }
                     await _storeService.UpdateStoreAsync(store);
 
                 }
 
             }
 
-            var messagePhase = string.Join(",", storesMovingToCompleteFase);
+            if (storesMovingToCompleteFase.Count > 0)
+            {
+                var messagePhase = string.Join(",", storesMovingToCompleteFase);
 
-            //Log de tiendas que cambian de Fase Limitada a Fase Completa
-            await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                "Tiendas que cambian de Fase Limitada a Fase Completa", messagePhase);
+                //Log de tiendas que cambian de Fase Limitada a Fase Completa
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "Tiendas que cambian de Fase Limitada a Fase Completa: " + storesMovingToCompleteFase.Count.ToString(), messagePhase);
 
-            var messageBonus = string.Join(",", storesUnlokcingBonus);
+                await SendMessageToAllRegisteredNumbers(storesMovingToCompleteFase.Count, messagePhase, "phase_advancement");
 
-            //Log de tiendas que cambian de Fase Limitada a Fase Completa
-            await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                "Tiendas que activan bono de crecimiento rápido en Fase Limitada",
-                messageBonus);
+            }
+            else
+            {
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "Tiendas que cambian de Fase Limitada a Fase Completa: 0", "Cero tiendas avanzaron a Fase Completa");
+
+                await SendMessageToAllRegisteredNumbers(storesMovingToCompleteFase.Count, "Cero tiendas avanzaron a Fase Completa", "phase_advancement");
+            }
+
+            if (storesUnlokcingBonus.Count > 0)
+            {
+                var messageBonus = string.Join(",", storesUnlokcingBonus);
+
+                //Log de tiendas que cambian de Fase Limitada a Fase Completa
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "Tiendas que activan bono de crecimiento rápido en Fase Limitada: " + storesUnlokcingBonus.Count.ToString(),
+                    messageBonus);
+
+                await SendMessageToAllRegisteredNumbers(storesUnlokcingBonus.Count, messageBonus, "rapid_growth_bonus_unlock");
+            }
+            else
+            {
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "Tiendas que activan bono de crecimiento rápido en Fase Limitada: 0",
+                    "Cero tiendas activan bono de crecimiento rápido en Fase Limitada");
+
+                await SendMessageToAllRegisteredNumbers(storesUnlokcingBonus.Count, "Cero tiendas activan bono de crecimiento rápido en Fase Limitada", "rapid_growth_bonus_unlock");
+            }
+
 
         }
 
+        public async Task<string> SendMessageToAllRegisteredNumbers(int numStores, string message, string template)
+        {
+            string allReponses = "";
+ 
+            //Registra a los usuarios que recibiran el mensaje. 
+            List<string> registeredNumbers = new List<string>();
+            registeredNumbers.Add("5216181028033"); //Jorge Garduno
+            registeredNumbers.Add("5215527369519"); //Enrique Roman
+            registeredNumbers.Add("5713144115632"); //Samuel Giraldo
+            registeredNumbers.Add("5213327428768"); //Miguel Zamora
+
+            DateTime timeUtc = DateTime.UtcNow;
+            TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+            DateTime cstTime = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, cstZone);
+
+                //Send Messages
+                foreach (var number in registeredNumbers)
+            {
+
+            string response = await BotmakerMessaging.Send("525545439866",
+                number,
+                template,
+                new Dictionary<string, object> { { "fecha", cstTime.ToString() +  " CST" },
+                                                         { "numero_de_tiendas", numStores},
+                                                         { "string_de_tiendas", message }
+                });
+
+                _ = allReponses.Concat(response);
+            }
+            return allReponses;
+        }
         #endregion
     }
 }
