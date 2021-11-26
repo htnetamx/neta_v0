@@ -445,6 +445,11 @@ namespace Nop.Web.Controllers
                     ? await _customerService.GetCustomerByUsernameAsync(model.Username)
                     : await _customerService.GetCustomerByEmailAsync(model.Email);
 
+                if (loginResult1 == CustomerLoginResults.WrongPassword)
+                {
+                    ModelState.AddModelError("", "Usuario o Contraseña Incorrectos");
+                    return View(model);
+                }
                 return await _customerRegistrationService.SignInCustomerAsync(customer1, returnUrl, true);
             }
 
