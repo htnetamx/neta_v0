@@ -1,5 +1,8 @@
 ﻿@model CatalogProductsModel
 
+@using Nop.Core
+@inject IStoreContext storeContext
+
 @if (!string.IsNullOrEmpty(Model.WarningMessage))
 {
     <div class="warning">
@@ -11,7 +14,7 @@
 {
     <div class="@(Model.ViewMode == "list" ? "product-list" : "product-grid")">
         <div class="item-grid">
-            @foreach (var product in Model.Products.Where(v => !v.MarkAsNew))
+            @foreach (var product in Model.Products.Where(v => !v.MarkAsNew && (storeContext.GetCurrentStore().DisplayOrder == 2 ? !v.Sku.EndsWith("LH") && !v.Sku.EndsWith("L1") : true)))
             {
                 <div class="item-box">
                     @await Html.PartialAsync("_ProductBoxHomePage", product)
@@ -37,7 +40,7 @@
                 <button id="More_Products" style="background-color: #4ab2f1; color: white; border-radius: 15px; padding: 2vh 3vw; margin: 0 2vw; width: 40vw" onclick=mostrarMas()>Haz click para ver más productos!</button>
             </div>
         </div>
-        
+
         <script asp-location="Footer">
             var incremento = @Model.Increment;
             var starting_products = @Model.StartingProducts;

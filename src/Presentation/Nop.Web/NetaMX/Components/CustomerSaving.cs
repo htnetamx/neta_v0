@@ -29,6 +29,7 @@ namespace Nop.Web.NetaMX.Components
             var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
             var totalSaving = decimal.Zero;
             var totalCart = decimal.Zero;
+            var giftBasedOnStoreAndCustomerCreationDates = decimal.Zero;
             foreach (var sci in cart)
             {
                 var product = await _productService.GetProductByIdAsync(sci.ProductId);
@@ -40,7 +41,23 @@ namespace Nop.Web.NetaMX.Components
                 totalSaving = Math.Round(totalSaving, 2);
             }
 
-            return View(new decimal[] { totalSaving, totalCart });
+            //Define potencial descuento con base en las caraterística de la tienda
+
+            var store = (await _storeContext.GetCurrentStoreAsync());
+
+            //Fecha de filtrado
+            var storeCreatedOn = store.CreatedOnUtc.AddHours(-6);
+
+            if ( (DateTime.UtcNow.AddHours(-6) - storeCreatedOn).Days < 8 )
+            {
+                giftBasedOnStoreAndCustomerCreationDates = 30;
+            }
+            else
+            {
+                giftBasedOnStoreAndCustomerCreationDates = 10;
+            }
+
+            return View(new decimal[] { totalSaving, totalCart, giftBasedOnStoreAndCustomerCreationDates });
         }
     }
 }

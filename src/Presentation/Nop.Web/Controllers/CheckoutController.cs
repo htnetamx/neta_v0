@@ -347,7 +347,7 @@ namespace Nop.Web.Controllers
                             "521" + form["Password"],
                             "codigo_verificacion_usuario",
                             new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
-            
+
             await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
                 "BotmakerOTP", responseResultToLog + form["code_generated"],
                 await _customerService.GetCustomerByUsernameAsync((string)form["Password"]));
@@ -1166,7 +1166,7 @@ namespace Nop.Web.Controllers
 
                 //Place Order Asynchronously
                 var placeOrderResult = await _orderProcessingService.PlaceOrderAsync(processPaymentRequest);
-                
+
                 ///Order has been placed
                 if (placeOrderResult.Success)
                 {
@@ -1628,12 +1628,37 @@ namespace Nop.Web.Controllers
                     });
                 }
 
-                string discountcouponcode = "BUEN_FIN_NETA_10";
+                #region CUPON 10 MXN o 30 MXN en primeros 100 MXN
+
+                //Define cupon de descuento con base en las caraterística del cliente
+
+                var customer = (await _workContext.GetCurrentCustomerAsync());
+                var store = (await _storeContext.GetCurrentStoreAsync());
+
+                //Fechas de filtrado
+
+                var customerCreatedOn = customer.CreatedOnUtc.AddHours(-6);
+                var storeCreatedOn = store.CreatedOnUtc.AddHours(-6);
+
+                string discountcouponcode = "";
+
+                //Cliente nuevo en tienda nueva
+                if (((customerCreatedOn - storeCreatedOn).Days < 8  //customer is created within 7 days of store creation
+                    && (DateTime.UtcNow.AddHours(-6) - storeCreatedOn).Days < 8)  // store is created within 7 days of current day
+                    || (customer.Username == "6181028033")) //testing user
+                {
+                    discountcouponcode = "NEW_CUSTOMER_NEW_STORE_30";
+                }
+
+                else
+                {
+                    discountcouponcode = "BUEN_FIN_NETA_10";
+                }
+
                 await _customerService.RemoveDiscountCouponCodeAsync(
                     await _workContext.GetCurrentCustomerAsync(),
                     discountcouponcode);
 
-                var customer = (await _workContext.GetCurrentCustomerAsync());
                 var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
                 if (addr != null)
                 {
@@ -1668,7 +1693,7 @@ namespace Nop.Web.Controllers
                         }
                     }
                 }
-
+                #endregion
 
                 //shipping is not required
                 await _genericAttributeService.SaveAttributeAsync<ShippingOption>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.SelectedShippingOptionAttribute, null, (await _storeContext.GetCurrentStoreAsync()).Id);
