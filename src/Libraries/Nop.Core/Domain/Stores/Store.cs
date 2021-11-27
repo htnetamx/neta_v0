@@ -84,9 +84,13 @@ namespace Nop.Core.Domain.Stores
         public string ZipCode { get; set; }
 
         /// <summary>
-        /// Gets or sets the bonus flag
+        /// Gets or sets the bonus GMV flag
         /// </summary>
         public bool FirstGmvBonusApplied { get; set; }
+        /// <summary>
+        /// Gets or sets the first goal 15 clients flag
+        /// </summary>
+        public bool FirstGoalCustomerBonusApplied { get; set; }
         /// Gets or sets Monday Day Start
         /// </summary>
         public DateTime? MondayStartDateTimeUtc { get; set; }

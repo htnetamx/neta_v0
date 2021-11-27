@@ -9,7 +9,7 @@ using Nop.Services.Tasks;
 
 namespace Nop.Services.Stores
 {
-    public partial class StoreDailyUpdatePhaseTask : IScheduleTask
+    public partial class StoreDailyBonusFirstWeek : IScheduleTask
     {
         #region Fields
 
@@ -21,7 +21,7 @@ namespace Nop.Services.Stores
 
         #region Ctor
 
-        public StoreDailyUpdatePhaseTask(IStoreService storeService, IOrderService orderService, ILogger logger)
+        public StoreDailyBonusFirstWeek(IStoreService storeService, IOrderService orderService, ILogger logger)
         {
             _storeService = storeService;
             _orderService = orderService;
@@ -41,7 +41,7 @@ namespace Nop.Services.Stores
                 .Where(s => s.DisplayOrder == 1);
 
             List<string> storesUnlokcingBonus = new List<string>();
-            List<string> storesMovingToCompleteFase = new List<string>();
+            List<string> storesUnlokcingBonusGoalCustomer = new List<string>();
 
             foreach (var store in stores)
             {
@@ -52,76 +52,51 @@ namespace Nop.Services.Stores
                     if (store.DisplayOrder == 3)
                         store.DisplayOrder = 2;
 
-                    //All stores are in the new phase scheme now
-                    //At least one order exists in the store.
-                    //Evaluate if phase 1 (initial) stores can move up to phase 2 (growth)
-
-                    //CONDITIONS to move from display order 1 (Initial Phase) to 2 (Growth Phase)
-                    // transition case : 7 days after first order
-
-                    //If user meets, following condition, NetaCoin Bonus is activated, it remains on Initial Fase 
-                    // bonus case : 500 GMV, 8 distinct customers
-
                     var ordersFromStore = (await _orderService.GetOrdersByStoreIdsAsync(store.Id));
                     var firstOrderDate = ordersFromStore.Select(x => x.CreatedOnUtc).Min();
 
-                    ////evaluate if there are 5 distinct clients
-                    var disntinctCustomers = ordersFromStore.Select(x => x.CustomerId).Distinct();
-                    var disntinctCustomersCounter = disntinctCustomers.Count();
-
-                    ////SUM of order total value (all)
-                    var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
-
-                    if (store.DisplayOrder == 1)
+                    // Bonus cases 7 days after first order && x customer qty achived
+                    if (DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
                     {
-                        ////Bonus CASE 500 GMV, 8 distinct customers
+
+                        ////evaluate if there are 8 or more distinct clients
+                        var disntinctCustomers = ordersFromStore.Select(x => x.CustomerId).Distinct();
+                        var disntinctCustomersCounter = disntinctCustomers.Count();
+
+                        ////SUM of order total value (all)
+                        var orderValueGMV = ordersFromStore.Select(x => x.OrderTotal).Sum();
+
+                        ////Bonus CASE 500 GMV, achive 8 distinct customers
                         if (disntinctCustomersCounter > 8 && orderValueGMV > 500 && !store.FirstGmvBonusApplied)
                         {
-                            store.NetaCoin = 200;
+                            store.NetaCoin += 200;
                             store.FirstGmvBonusApplied = true;
                             storesUnlokcingBonus.Add(store.Name.ToString());
                         }
 
-                        //Transition Case
-                        else if (DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
+                        ////Bonus CASE achive 15 distinct customers
+                        if (disntinctCustomersCounter > 14 && !store.FirstGoalCustomerBonusApplied)
                         {
-                            store.DisplayOrder = 2;
-                            storesMovingToCompleteFase.Add(store.Name.ToString());
+                            store.NetaCoin += 200;
+                            store.FirstGoalCustomerBonusApplied = true;
+                            storesUnlokcingBonusGoalCustomer.Add(store.Name.ToString());
                         }
-                    }
 
-                    await _storeService.UpdateStoreAsync(store);
+                        await _storeService.UpdateStoreAsync(store);
+
+                    }
 
                 }
 
-            }
-
-            if (storesMovingToCompleteFase.Count > 0)
-            {
-                var messagePhase = string.Join(",", storesMovingToCompleteFase);
-
-                //Log de tiendas que cambian de Fase Limitada a Fase Completa
-                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                    "Tiendas que cambian de Fase Limitada a Fase Completa: " + storesMovingToCompleteFase.Count.ToString(), messagePhase);
-
-                await SendMessageToAllRegisteredNumbers(storesMovingToCompleteFase.Count, messagePhase, "phase_advancement");
-
-            }
-            else
-            {
-                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                    "Tiendas que cambian de Fase Limitada a Fase Completa: 0", "Cero tiendas avanzaron a Fase Completa");
-
-                await SendMessageToAllRegisteredNumbers(storesMovingToCompleteFase.Count, "Cero tiendas avanzaron a Fase Completa", "phase_advancement");
             }
 
             if (storesUnlokcingBonus.Count > 0)
             {
                 var messageBonus = string.Join(",", storesUnlokcingBonus);
 
-                //Log de tiendas que cambian de Fase Limitada a Fase Completa
+                //Log de tiendas que cambian activan bono gmv en primera semana
                 await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                    "Tiendas que activan bono de crecimiento rápido en Fase Limitada: " + storesUnlokcingBonus.Count.ToString(),
+                    "Tiendas que activan bono de crecimiento rápido en primera semana: " + storesUnlokcingBonus.Count.ToString(),
                     messageBonus);
 
                 await SendMessageToAllRegisteredNumbers(storesUnlokcingBonus.Count, messageBonus, "rapid_growth_bonus_unlock");
@@ -129,13 +104,32 @@ namespace Nop.Services.Stores
             else
             {
                 await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                    "Tiendas que activan bono de crecimiento rápido en Fase Limitada: 0",
-                    "Cero tiendas activan bono de crecimiento rápido en Fase Limitada");
+                    "Tiendas que activan bono de crecimiento rápido en primera semana: 0",
+                    "Cero tiendas activan bono de crecimiento rápido en primera semana");
 
-                await SendMessageToAllRegisteredNumbers(storesUnlokcingBonus.Count, "Cero tiendas activan bono de crecimiento rápido en Fase Limitada", "rapid_growth_bonus_unlock");
+                await SendMessageToAllRegisteredNumbers(storesUnlokcingBonus.Count, "Cero tiendas activan bono de crecimiento rápido en primera semana", "rapid_growth_bonus_unlock");
             }
 
 
+            if (storesUnlokcingBonusGoalCustomer.Count > 0)
+            {
+                var messageBonus = string.Join(",", storesUnlokcingBonusGoalCustomer);
+
+                //Log de tiendas que logran 15 clientes en una semana
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "Tiendas que reciben bono por alcance de 15 clientes en primera semana: " + storesUnlokcingBonusGoalCustomer.Count.ToString(),
+                    messageBonus);
+
+                await SendMessageToAllRegisteredNumbers(storesUnlokcingBonusGoalCustomer.Count, messageBonus, "ultrarapid_growth_bonus_unlock");
+            }
+            else
+            {
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "Tiendas que reciben bono por alcance de 15 clientes en primera semana: 0",
+                    "Cero tiendas que reciben bono por alcance de 15 clientes en primera semana");
+
+                await SendMessageToAllRegisteredNumbers(storesUnlokcingBonusGoalCustomer.Count, "Cero tiendas que reciben bono por alcance de 15 clientes en primera semana", "ultrarapid_growth_bonus_unlock");
+            }
         }
 
         public async Task<string> SendMessageToAllRegisteredNumbers(int numStores, string message, string template)
