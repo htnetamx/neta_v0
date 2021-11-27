@@ -1,4 +1,8 @@
-﻿@{
+﻿
+@using Nop.Core
+@using Nop.Core.Infrastructure
+
+@{
     Layout = "_Root.Head";
 }
 @inject Nop.Core.IStoreContext storeContext
@@ -45,8 +49,7 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentAfter })
     </div>
     @*@await Component.InvokeAsync("Footer")*@
-    <script>
-        resizer();
+    <script>resizer();
         window.addEventListener('resize', resizer);
 
         function resizer() {
@@ -109,10 +112,7 @@
             catch {
                 console.log("Error Basic Resize");
             }
-        }
-
-
-    </script>
+        }</script>
 </div>
 @await Component.InvokeAsync("EuCookieLaw")
 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.BodyEndHtmlTagBefore })
@@ -121,8 +121,86 @@
     <a target="_blank" href='https://api.whatsapp.com/send/?phone=%2B525545439866&text=Hola%2CTengo+una+duda..&app_absent=0'></a>
 </div>
 
-<script asp-location="Footer">
-    $(window).scroll(function () {
+<script asp-location="Footer">$(window).scroll(function () {
         $(this).scrollTop() > 400 ? $("body").addClass('scroll-start') : $("body").removeClass('scroll-start')
-    });
-</script>
+    });</script>
+
+
+@{
+    //context data for user and stores
+    var workContext = EngineContext.Current.Resolve<IWorkContext>();
+    var storeContext = EngineContext.Current.Resolve<IStoreContext>();
+
+    var customer = await workContext.GetCurrentCustomerAsync();
+    var store = await storeContext.GetCurrentStoreAsync();
+
+    //Starting Identifying device amplitude
+    <script>
+        document.addEventListener("DOMContentLoaded", function (e) {
+            var identifyWithProperties = new amplitude.Identify()
+                .set('StoreID', @store.Id)
+                .set('Colonia', "@store.Colonia")
+                .set('Delegacion', "@store.Delegacion")
+                .set('StoreName', "@store.Name");
+                amplitude.getInstance().identify(identifyWithProperties); // makes identify call to amplitude with the properties of the identify object
+        });
+    </script>
+
+    //send userId for logged users
+    if (customer.Email != null)
+    {
+        <script asp-location="Footer">
+            amplitude.getInstance().setUserId(@customer.Id);
+        </script>
+    }
+
+    //Is in home page??
+    bool homePage = false;
+    var currentUrl = Url.ActionContext.RouteData.Values["action"];
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("home", StringComparison.InvariantCultureIgnoreCase) &&
+        currentUrl.ToString().Equals("index", StringComparison.InvariantCultureIgnoreCase))
+    {
+        homePage = true;
+    }
+
+    //Amplitude Global Events
+    if (homePage)
+    {
+        //AMPLITUDE::Home_Viewed
+        <script asp-location="Footer">document.addEventListener("DOMContentLoaded", function (e) {
+                var event = "Home_Viewed";
+                amplitude.getInstance().logEvent(event);
+            });</script>
+    }
+    else
+    {
+        <script asp-location="Footer">
+            document.addEventListener("DOMContentLoaded", function (e) {
+                var currentUrl = "@currentUrl";
+            console.log(currentUrl)
+                switch (currentUrl) {
+                    case "Cart":
+                        //AMPLITUDE::Cart_Page_Viewed
+                        var event = "Cart_Page_Viewed";
+                        amplitude.getInstance().logEvent(event);
+                        break;
+                    case "Login":
+                        //AMPLITUDE::Login_Page_Viewed
+                        var event = "Login_Page_Viewed";
+                        amplitude.getInstance().logEvent(event);
+                        break;
+                    case "ZipCodeUpdate":
+                        //AMPLITUDE::ZipCode_Page_Viewed
+                        var event = "ZipCode_Page_Viewed";
+                        amplitude.getInstance().logEvent(event);
+                        break;
+                    case "OnePageCheckout":
+                        //AMPLITUDE::Checkout_Page_Viewed
+                        var event = "Checkout_Page_Viewed";
+                        amplitude.getInstance().logEvent(event);
+                        break;
+                }
+            });
+        </script>
+    }
+}

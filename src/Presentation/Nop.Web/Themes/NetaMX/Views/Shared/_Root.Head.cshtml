@@ -22,6 +22,7 @@
 
     Html.AppendScriptParts(ResourceLocation.Footer, $"~/Themes/{themeName}/Content/js/owl.carousel.min.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
     Html.AppendScriptParts(ResourceLocation.Footer, $"~/js/public.countryselect.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
+    Html.AppendScriptParts(ResourceLocation.Footer, $"~/js/public.amplitude.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
     Html.AppendScriptParts(ResourceLocation.Footer, $"~/js/public.ajaxcart.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
     Html.AppendScriptParts(ResourceLocation.Footer, $"~/js/public.common.js?v={Nop.Web.NetaMaxHelper.CssJsVersion}");
     //when jQuery migrate script logging is active you will see the log in the browser console
@@ -105,7 +106,6 @@
     @Html.NopCssFiles(ResourceLocation.Footer)
     @Html.NopScripts(ResourceLocation.Footer)
     @Html.NopInlineScripts(ResourceLocation.Footer)
-
     <script>
         (function (h, o, t, j, a, r) {
             h.hj = h.hj || function () { (h.hj.q = h.hj.q || []).push(arguments) };

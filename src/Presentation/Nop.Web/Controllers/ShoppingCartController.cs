@@ -82,6 +82,7 @@ namespace Nop.Web.Controllers
         private readonly ShippingSettings _shippingSettings;
 
         private readonly IAddressService _addressService;
+        private readonly ICategoryService _categoryService;
 
         #endregion
 
@@ -121,7 +122,8 @@ namespace Nop.Web.Controllers
             OrderSettings orderSettings,
             ShoppingCartSettings shoppingCartSettings,
             ShippingSettings shippingSettings,
-            IAddressService addressService)
+            IAddressService addressService,
+            ICategoryService categoryService)
         {
             _captchaSettings = captchaSettings;
             _customerSettings = customerSettings;
@@ -158,6 +160,7 @@ namespace Nop.Web.Controllers
             _shoppingCartSettings = shoppingCartSettings;
             _shippingSettings = shippingSettings;
             _addressService = addressService;
+            _categoryService = categoryService;
         }
 
         #endregion
@@ -338,7 +341,7 @@ namespace Nop.Web.Controllers
 
         /// <returns>A task that represents the asynchronous operation</returns>
         protected virtual async Task<IActionResult> GetProductToCartDetailsAsync(List<string> addToCartWarnings, ShoppingCartType cartType,
-            Product product)
+            Product product, string category)
         {
             if (addToCartWarnings.Any())
             {
@@ -419,7 +422,9 @@ namespace Nop.Web.Controllers
                             message = string.Format(await _localizationService.GetResourceAsync("Products.ProductHasBeenAddedToTheCart.Link"),
                                 Url.RouteUrl("ShoppingCart")),
                             updatetopcartsectionhtml = updateTopCartSectionHtml,
-                            updateflyoutcartsectionhtml = updateFlyoutCartSectionHtml
+                            updateflyoutcartsectionhtml = updateFlyoutCartSectionHtml,
+                            product = product,
+                            category = category
                         });
                     }
             }
@@ -711,13 +716,19 @@ namespace Nop.Web.Controllers
                             ? await RenderViewComponentToStringAsync("FlyoutShoppingCart")
                             : string.Empty;
 
+
+                        var productCategory = await _categoryService.GetProductCategoriesByProductIdAsync(product.Id);
+                        var category = await _categoryService.GetCategoryByIdAsync(productCategory[0].CategoryId);
+
                         return Json(new
                         {
                             success = true,
                             message = string.Format(await _localizationService.GetResourceAsync("Products.ProductHasBeenAddedToTheCart.Link"), Url.RouteUrl("ShoppingCart")),
                             updatetopcartsectionhtml,
                             updateflyoutcartsectionhtml,
-                            newQuantity = quantityToValidate
+                            newQuantity = quantityToValidate,
+                            product = product,
+                            category = category.Name
                         });
                     }
             }
@@ -804,8 +815,12 @@ namespace Nop.Web.Controllers
 
             await SaveItemAsync(updatecartitem, addToCartWarnings, product, cartType, attributes, customerEnteredPriceConverted, rentalStartDate, rentalEndDate, quantity);
 
+
+            var productCategory = await _categoryService.GetProductCategoriesByProductIdAsync(product.Id);
+            var category = await _categoryService.GetCategoryByIdAsync(productCategory[0].CategoryId);
+
             //return result
-            return await GetProductToCartDetailsAsync(addToCartWarnings, cartType, product);
+            return await GetProductToCartDetailsAsync(addToCartWarnings, cartType, product, category.Name);
         }
 
         //handle product attribute selection event. this way we return new price, overridden gtin/sku/mpn

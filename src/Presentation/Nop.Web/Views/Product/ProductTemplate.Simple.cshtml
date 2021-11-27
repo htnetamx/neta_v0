@@ -1,6 +1,9 @@
-﻿@model ProductDetailsModel
+﻿@using Nop.Core
+@using Nop.Core.Infrastructure
+
+@model ProductDetailsModel
 @using Nop.Core.Domain.Seo;
-@inject Nop.Core.IWebHelper webHelper 
+@inject Nop.Core.IWebHelper webHelper
 @inject SeoSettings seoSettings
 @{
     Layout = "_ColumnsOne";
@@ -124,10 +127,10 @@
                         <div class="overview-buttons">
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsBefore, additionalData = Model })
                             @*@{
-                                var dataDictAddToWishlist = new ViewDataDictionary(ViewData);
-                                dataDictAddToWishlist.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
-                                @await Html.PartialAsync("_AddToWishlist", Model.AddToCart, dataDictAddToWishlist)
-                            }*@
+                                    var dataDictAddToWishlist = new ViewDataDictionary(ViewData);
+                                    dataDictAddToWishlist.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
+                                    @await Html.PartialAsync("_AddToWishlist", Model.AddToCart, dataDictAddToWishlist)
+                                }*@
                             @await Html.PartialAsync("_CompareProductsButton", Model)
                             @await Html.PartialAsync("_ProductEmailAFriendButton", Model)
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsAfter, additionalData = Model })
@@ -155,3 +158,23 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsBottom, additionalData = Model })
     </div>
 </div>
+
+@{
+    var storeContext = EngineContext.Current.Resolve<IStoreContext>();
+    var store = await storeContext.GetCurrentStoreAsync();
+}
+
+<script asp-location="Footer">
+    document.addEventListener("DOMContentLoaded", function (e) {
+        //AMPLITUDE::Product_Detail_Viewed
+        var event = "Product_Detail_Viewed";
+        var properties = {
+            StoreId: @store.Id,
+            ProductName: "@Model.Name",
+            ProductId: @Model.Id,
+            ProductSKU: "@Model.Sku",
+            ProductPrice: "@Model.ProductPrice.Price"
+        }
+        amplitude.getInstance().logEvent(event, properties);
+    });
+</script>
