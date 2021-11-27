@@ -38,7 +38,7 @@ namespace Nop.Services.Stores
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
             var stores = (await _storeService.GetAllStoresAsync())
-                .Where(s => s.DisplayOrder == 1);
+                .Where(s => s.DisplayOrder > 1);
 
             List<string> storesUnlokcingBonus = new List<string>();
             List<string> storesUnlokcingBonusGoalCustomer = new List<string>();
@@ -56,7 +56,7 @@ namespace Nop.Services.Stores
                     var firstOrderDate = ordersFromStore.Select(x => x.CreatedOnUtc).Min();
 
                     // Bonus cases 7 days after first order && x customer qty achived
-                    if (DateTime.UtcNow.DayOfYear - firstOrderDate.DayOfYear > 6)
+                    if ((DateTime.UtcNow.AddHours(-6) - firstOrderDate.AddHours(-6)).Days < 8)
                     {
 
                         ////evaluate if there are 8 or more distinct clients
