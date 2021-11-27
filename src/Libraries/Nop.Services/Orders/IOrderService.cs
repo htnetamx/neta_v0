@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
+using Nop.Services.Google;
 
 namespace Nop.Services.Orders
 {
@@ -28,6 +29,13 @@ namespace Nop.Services.Orders
 
         Task<List<Order>> GetAllOrdersAsync();
         Task<IList<Order>> GetOrdersByIdAsync(List<int> idArray);
+
+        Task<List<MonitoringSaleAnalysis>> GetErrorsGMProductsFromOrdersAsync();
+
+        Task<string> GetErrorFromGMVAsync();
+
+        Task<string> GetErrorNoSalesAsync();
+
         /// <summary>
         /// Gets an order
         /// </summary>

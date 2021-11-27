@@ -27,19 +27,9 @@ namespace Nop.Services.Catalog
 
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-            //if (DateTime.UtcNow.Hour != 5)
-            //    return;
-            var products = (await _productService.GetAllProductsDisplayedOnHomepageAsync())
-                .Where(p => p.MarkAsNew && 
-                            p.AvailableEndDateTimeUtc.Value.Date <= DateTime.UtcNow.Date)
-                .ToList();
+            var products = await (await _productService.GetAllProductsAsync()).ToListAsync();
             foreach (var product in products)
             {
-                product.MarkAsNew = false;
-                product.AvailableStartDateTimeUtc = null;
-                product.AvailableEndDateTimeUtc = null;
-                product.MarkAsNewStartDateTimeUtc = null;
-                product.MarkAsNewEndDateTimeUtc = null;
                 if (product.OldPrice != product.Price)
                 {
                     product.Price = product.OldPrice;

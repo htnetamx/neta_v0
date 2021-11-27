@@ -16,6 +16,7 @@ using Nop.Data;
 using Nop.Data.Extensions;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
+using Nop.Services.Google;
 using Nop.Services.Shipping;
 
 namespace Nop.Services.Orders
@@ -237,6 +238,78 @@ namespace Nop.Services.Orders
             return await _orderRepository.Table.ToListAsync();
         }
 
+
+        public virtual async Task<List<MonitoringSaleAnalysis>> GetErrorsGMProductsFromOrdersAsync()
+        {
+            var today = DateTime.UtcNow;
+            //today = new DateTime(2021, 11, 26, 17, 51, 22);
+            var date_end = today.Subtract(new TimeSpan(0, 0, 0, 0));
+            var date_start = date_end.Subtract(new TimeSpan(0, 0, 15, 0));
+            var query = await (from o in _orderRepository.Table
+                               where o.CreatedOnUtc >= date_start && o.CreatedOnUtc <= date_end
+                               join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
+                               join p in _productRepository.Table on oi.ProductId equals p.Id
+                               where oi.UnitPriceInclTax < oi.OriginalProductCost
+                               select new MonitoringSaleAnalysis { OrderId = o.Id, ProductId = p.Id, Name = p.Name, Sku = p.Sku, Cost = oi.OriginalProductCost, Price = oi.UnitPriceInclTax }).ToListAsync();
+            
+            return await query.GroupBy(q => new { q.ProductId, q.Name }).Select(q => q.First()).ToListAsync();
+        }
+
+        public virtual async Task<string> GetErrorFromGMVAsync()
+        {
+            var today = DateTime.UtcNow;
+            //today = new DateTime(2021, 11, 18, 17, 51, 22);
+            var timespan = new TimeSpan(7, today.Hour, today.Minute, today.Second);
+
+
+            var start_week_today = today.Subtract(new TimeSpan((int)today.DayOfWeek, 0, 0, 0));
+
+
+            var date_1_week_ago            =            today.Subtract(timespan);
+            var start_week_date_1_week_ago = start_week_today.Subtract(timespan);
+
+            var gmv_this_week = (await (from o in _orderRepository.Table
+                                            where o.CreatedOnUtc >= start_week_today && o.CreatedOnUtc <= today
+                                            select o.OrderTotal).ToListAsync()).Sum();
+            var gmv_previous_week = (await (from o in _orderRepository.Table
+                                            where o.CreatedOnUtc >= start_week_date_1_week_ago && o.CreatedOnUtc <= date_1_week_ago
+                                            select o.OrderTotal).ToListAsync()).Sum();
+
+            var porcentaje_abajo_gmv = 40.0;
+            var porcentaje_arriba_gmv = 40.0;
+
+            if (gmv_this_week<(gmv_previous_week * (decimal)((100 - porcentaje_abajo_gmv) / 100)))
+            {
+                return "Alerta: El GMV de esta semana está " + porcentaje_abajo_gmv + "%  por debajo del GMV de la semana pasada.\n" +
+                    "El de la semana pasada desde "+ start_week_date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " fue de "+ gmv_previous_week+"\n"+
+                    "El de esta semana desde " + start_week_today.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + today.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_this_week + "\n";
+            }
+            if (gmv_this_week >(gmv_previous_week * (decimal)((100 + porcentaje_arriba_gmv) / 100)))
+            {
+                return "Alerta: El GMV de esta semana está " + porcentaje_arriba_gmv + "% por encima del GMV de la semana pasada.\n" +
+                    "El de la semana pasada desde " + start_week_date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_previous_week + "\n" +
+                    "El de esta semana desde " + start_week_today.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + today.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_this_week + "\n";
+            }
+            return "OK";
+        }
+
+        public virtual async Task<string> GetErrorNoSalesAsync()
+        {
+            var today = DateTime.UtcNow;
+
+            var minutos = 10;
+
+            var timespan = new TimeSpan(0, 0, minutos, 0);
+
+            //today = new DateTime(2021, 11, 18, 17, 51, 22);
+            var time_start = today.Subtract(timespan);
+            
+            var orders = await (from o in _orderRepository.Table
+                                        where o.CreatedOnUtc >= time_start && o.CreatedOnUtc <= today
+                                        select o).ToListAsync();
+
+            return (orders.Count() == 0) ? "Alerta: No ha habido ninguna órden en los últimos "+minutos+" minutos." : "OK";
+        }
 
         /// <summary>
         /// Gets an order by order item identifier
