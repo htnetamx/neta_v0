@@ -8,6 +8,8 @@ using Nop.Services.Orders;
 using Nop.Services.Stores;
 using Nop.Services.Tasks;
 using Nop.Services.Catalog;
+using Nop.Services.Mailing;
+
 
 namespace Nop.Services.Monitoring
 {
@@ -46,16 +48,102 @@ namespace Nop.Services.Monitoring
             //Ventas totales arriba->Ir > 1.5X vs. timestamp t-1 debería soltar alerta.Uso este query
             //Ventas totales debajo, me falta data por minutos -> 10 minutos sin venta me hace sentido
 
-            var orders_products_cost = await _orderService.GetAllOrdersWithProductInfoLastDayAsync();
-            var hey = "mio";
+            var errors_GM_products = await _orderService.GetErrorsGMProductsFromOrdersAsync();
 
-            //var saleErrors = orders_products_cos.Where(p => (p.OldPrice < p.Price) && p.OldPrice!=0);
+            var email = new Email();
+            email.SetEmailOrigen("redash.server.netamx@gmail.com", "sht5$29.!");
+            
+            
 
-            //if(saleErrors.Count()>0)
-            //{
-            //    //Hay Errores en las promociones de los productos
-            //    var alerta = "Alerta";
-            //}
+            if (errors_GM_products.Count()>0)
+            {
+                // Samuel Wong
+                // Enrique 
+                // Migue
+                // Diana
+
+                string info = "Order Id,Product Id,Name,Sku,Cost,Price" + Environment.NewLine;
+
+                foreach (var error in errors_GM_products)
+                {
+                    info = info + error.OrderId + "," + error.ProductId + "," + error.Name + ","+ error.Sku + "," + error.Cost + "," + error.Price + Environment.NewLine;
+                }
+
+                List<string> correos = new List<string>() {
+                    "andres.posada@neta.mx",
+                    //"paulina@neta.mx",
+                    //"samuel.wong@neta.mx",
+                    //"enrique.roman@neta.mx",
+                    //"diana@neta.mx",
+                    "miguel.zamora@neta.mx"
+                };
+
+                email.SetSubject("Alerta: Productos Con GM Negativo");
+                email.SetBody(info);
+
+                foreach (var correo in correos)
+                {
+                    email.SetEmailDestino(correo);
+                    email.Send();
+                }
+            }
+
+
+            var errors_GMV = await _orderService.GetErrorFromGMVAsync();
+            if (errors_GMV!="OK")
+            {
+                // Samuel Wong
+                // Enrique 
+                // Migue
+                // Nico
+
+                List<string> correos = new List<string>() {
+                    "andres.posada@neta.mx",
+                    //"samuel.wong@neta.mx",
+                    //"enrique.roman@neta.mx",
+                    //"diana@neta.mx",
+                    //"nicolas@neta.mx",
+                    "miguel.zamora@neta.mx"
+                };
+
+                email.SetSubject("Alerta: Error This Week's GMV vs Last Week");
+                email.SetBody(errors_GMV);
+
+                foreach (var correo in correos)
+                {
+                    email.SetEmailDestino(correo);
+                    email.Send();
+                }
+
+                //alerta
+                email.Send();
+            }
+
+            var errors_missing_orders = await _orderService.GetErrorNoSalesAsync();
+            if (errors_missing_orders != "OK")
+            {
+                // Diana
+                // Nico
+                // Enrique
+                // Migue
+
+                List<string> correos = new List<string>() {
+                    "andres.posada@neta.mx",
+                    //"enrique.roman@neta.mx",
+                    //"diana@neta.mx",
+                    //"nicolas@neta.mx",
+                    "miguel.zamora@neta.mx"
+                };
+
+                email.SetSubject("Alerta: No Orders In Time Lapse");
+                email.SetBody(errors_missing_orders);
+
+                foreach (var correo in correos)
+                {
+                    email.SetEmailDestino(correo);
+                    email.Send();
+                }
+            }
         }
 
         #endregion

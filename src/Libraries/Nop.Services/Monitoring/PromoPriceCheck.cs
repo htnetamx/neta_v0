@@ -8,6 +8,7 @@ using Nop.Services.Orders;
 using Nop.Services.Stores;
 using Nop.Services.Tasks;
 using Nop.Services.Catalog;
+using Nop.Services.Mailing;
 
 namespace Nop.Services.Monitoring
 {
@@ -41,7 +42,7 @@ namespace Nop.Services.Monitoring
         /// </summary>
         public async System.Threading.Tasks.Task ExecuteAsync()
         {
-
+            
 
             var products = await _productService.GetAllProductsAsync();
 
@@ -49,8 +50,32 @@ namespace Nop.Services.Monitoring
 
             if(promoErrors.Count()>0)
             {
-                //Hay Errores en las promociones de los productos
-                var alerta = "Alerta";
+                string info = "Id,Name,Sku,Old Price,Price\n";
+
+                foreach(var p in promoErrors)
+                {
+                    info = info + p.Id + "," + p.Name + "," + p.Sku + "," + p.Price + "," + p.OldPrice + Environment.NewLine;
+                }
+
+
+                List<string> correos = new List<string>() {
+                    "andres.posada@neta.mx",
+                    //"paulina@neta.mx",
+                    //"samuel.wong@neta.mx",
+                    //"diana@neta.mx",
+                    "miguel.zamora@neta.mx"
+                };
+
+                var email = new Email();
+                email.SetEmailOrigen("redash.server.netamx@gmail.com", "sht5$29.!");
+                email.SetSubject("Alerta: Productos con errores en promociones");
+                email.SetBody(info);
+
+                foreach (var correo in correos)
+                {
+                    email.SetEmailDestino(correo);
+                    email.Send();
+                }
             }
         }
 

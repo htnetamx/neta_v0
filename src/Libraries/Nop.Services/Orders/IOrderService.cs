@@ -30,7 +30,12 @@ namespace Nop.Services.Orders
         Task<List<Order>> GetAllOrdersAsync();
         Task<IList<Order>> GetOrdersByIdAsync(List<int> idArray);
 
-        Task<List<MonitoringSaleAnalysis>> GetAllOrdersWithProductInfoLastDayAsync();
+        Task<List<MonitoringSaleAnalysis>> GetErrorsGMProductsFromOrdersAsync();
+
+        Task<string> GetErrorFromGMVAsync();
+
+        Task<string> GetErrorNoSalesAsync();
+
         /// <summary>
         /// Gets an order
         /// </summary>

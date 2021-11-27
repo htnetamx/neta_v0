@@ -9,6 +9,7 @@ using Nop.Services.Stores;
 using Nop.Services.Tasks;
 using Nop.Services.Catalog;
 using Nop.Core.Domain.Catalog;
+using Nop.Services.Mailing;
 
 namespace Nop.Services.Monitoring
 {
@@ -57,73 +58,89 @@ namespace Nop.Services.Monitoring
                                                     ||  p.BackorderModeId!=1
                                                     ||  p.BackorderMode != BackorderMode.AllowQtyBelow0
                                                );
-
+            List<string> errors = new List<string>();
             foreach (var product in publishErrors)
             {
-                List<string> errors = new List<string>();
+                if (product.Sku == null || product.Sku == "")
+                {
+                    errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Sku,"+ product.Sku +",No puede ser nulo ni vacío");
+                }
+
                 if (!product.ShowOnHomepage)
                 {
-                    errors.Add("Campo: 'Mostrar en la página de inicio' es: No y debe de ser: Si");
+                    errors.Add(product.Id+","+ product.Name+ "," + product.Sku + "," + "Mostrar en la página de inicio,No,Si");
                 }
 
                 if (product.MarkAsNew)
                 {
-                    errors.Add("Campo: 'Marcar como nuevo' es: Si y debe de ser: No");
+                    errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Marcar como nuevo,Si,No");
                 }
 
                 if (product.AvailableStartDateTimeUtc != null)
                 {
-                    errors.Add("Campo: 'Fecha de inicio disponible' es: "+product.AvailableStartDateTimeUtc+" y debe de ser: En Blanco (vacío/nulo)");
+                    errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Fecha de inicio disponible,"+ product.AvailableStartDateTimeUtc + ",En Blanco (vacío/nulo)");
                 }
 
                 if (product.AvailableEndDateTimeUtc != null)
                 {
-                    errors.Add("Campo: 'Fecha de finalización disponible' es: " + product.AvailableEndDateTimeUtc + " y debe de ser: En Blanco (vacío/nulo)");
+                    errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Fecha de finalización disponible," + product.AvailableEndDateTimeUtc + ",En Blanco (vacío/nulo)");
                 }
 
                 if (product.ManageInventoryMethodId != 1 || product.ManageInventoryMethod != ManageInventoryMethod.ManageStock)
                 {
                     if (product.ManageInventoryMethodId != 1 && product.ManageInventoryMethod != ManageInventoryMethod.ManageStock)
                     {
-                        errors.Add("Campo: 'Método de inventario' es: " + product.ManageInventoryMethod + " y debe de ser: Seguimiento Del Inventario (Manage Stock)");
+                        errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Método de inventario," + product.ManageInventoryMethod + ",Seguimiento Del Inventario (Manage Stock)");
                     }
                     else
                     {
-                        errors.Add("Campo: 'Método de inventario' es: " + product.ManageInventoryMethod + " y debe de ser: Seguimiento Del Inventario (Manage Stock). Además" +
-                            "el campo:'ManageInventoryMethodId' no tiene la relación correcta con el campo 'ManageInventoryMethod'");
+                        errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Método de inventario," + product.ManageInventoryMethod + ",Seguimiento Del Inventario (Manage Stock)," +
+                            "Además el campo:'ManageInventoryMethodId' no tiene la relación correcta con el campo 'ManageInventoryMethod'");
                     }
                 }
 
-                if (product.ManageInventoryMethodId != 1 || product.ManageInventoryMethod != ManageInventoryMethod.ManageStock)
-                {
-                    if (product.ManageInventoryMethodId != 1 && product.ManageInventoryMethod != ManageInventoryMethod.ManageStock)
-                    {
-                        errors.Add("Campo: 'Método de inventario' es: " + product.ManageInventoryMethod + " y debe de ser: Seguimiento Del Inventario (Manage Stock)");
-                    }
-                    else
-                    {
-                        errors.Add("Campo: 'Método de inventario' es: " + product.ManageInventoryMethod + " y debe de ser: Seguimiento Del Inventario (Manage Stock). Además" +
-                            "el campo:'ManageInventoryMethodId' no tiene la relación correcta con el campo 'ManageInventoryMethod'");
-                    }
-                }
 
                 if (product.BackorderModeId != 1 || product.BackorderMode != BackorderMode.AllowQtyBelow0)
                 {
                     if (product.BackorderModeId != 1 && product.BackorderMode != BackorderMode.AllowQtyBelow0)
                     {
-                        errors.Add("Campo: 'Pedidos pendientes' es: " + product.BackorderMode + " y debe de ser: Permitir QTY por Debajo de 0 (AllowQtyBelow0)");
+                        errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Pedidos pendientes," + product.BackorderMode + ",Permitir QTY por Debajo de 0 (AllowQtyBelow0)");
                     }
                     else
                     {
-                        errors.Add("Campo: 'Pedidos pendientes' es: " + product.BackorderMode + " y debe de ser: Permitir QTY por Debajo de 0 (AllowQtyBelow0). Además" +
-                            "el campo:'BackorderModeId' no tiene la relación correcta con el campo 'BackorderMode'");
+                        errors.Add(product.Id + "," + product.Name + "," + product.Sku + "," + "Pedidos pendientes," + product.BackorderMode + ",Permitir QTY por Debajo de 0 (AllowQtyBelow0)," +
+                            "Además el campo:'BackorderModeId' no tiene la relación correcta con el campo 'BackorderMode'");
                     }
                 }
+            }
+            if (errors.Count() > 0)
+            {
+                //Send Product Alert
+                string info = "Id,Name,Sku,Cammpo,Valor Actual,Valor Requerido" + Environment.NewLine;
 
-                if(errors.Count()>0)
+                foreach (var error in errors)
                 {
-                    //Send Product Alert
+                    info = info + error + Environment.NewLine;
                 }
+
+                List<string> correos = new List<string>() {
+                    "andres.posada@neta.mx",
+                    //"paulina@neta.mx",
+                    //"samuel.wong@neta.mx",
+                    "miguel.zamora@neta.mx"
+                    };
+
+                var email = new Email();
+                email.SetEmailOrigen("redash.server.netamx@gmail.com", "sht5$29.!");
+                email.SetSubject("Alerta: Productos con errores para mostrar en Home Page");
+                email.SetBody(info);
+
+                foreach (var correo in correos)
+                {
+                    email.SetEmailDestino(correo);
+                    email.Send();
+                }
+
             }
         }
 
