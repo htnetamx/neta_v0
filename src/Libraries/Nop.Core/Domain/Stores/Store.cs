@@ -83,6 +83,18 @@ namespace Nop.Core.Domain.Stores
         /// </summary>
         public string ZipCode { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the zipcode
+        /// </summary>
+        public string Colonia { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the zipcode
+        /// </summary>
+        public string Delegacion { get; set; }
+
         /// <summary>
         /// Gets or sets the bonus GMV flag
         /// </summary>

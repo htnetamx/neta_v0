@@ -51,9 +51,6 @@
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
     <None Remove="Themes\NetaMX\Views\Shared\_Root.Head.cshtml" />
 
-    <None Update="Areas\Admin\sitemap.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -87,7 +84,7 @@
       <!-- Get plugin description files to get plugin paths -->
       <PluginsDescription Include="$(MSBuildProjectDirectory)\Plugins\**\plugin.json;" />
       <!-- Get paths for all plugins -->
-      <PluginsFolders Include="@(PluginsDescription->'%(relativedir)')" />
+      <PluginsFolders Include="@(PluginsDescription-&gt;'%(relativedir)')" />
 
       <!-- Get all the libraries from the shadow copy folder to remove them,
         because depending on the settings, this may not happen when the application is starting,
