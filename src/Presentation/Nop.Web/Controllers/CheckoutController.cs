@@ -1643,7 +1643,7 @@ namespace Nop.Web.Controllers
                 string discountcouponcode = "";
 
                 //Cliente nuevo en tienda nueva
-                if (((customerCreatedOn - storeCreatedOn).Days < 8  //customer is created within 7 days of store creation
+                if (((customerCreatedOn - storeCreatedOn).Days < 8 && (customerCreatedOn - storeCreatedOn).Days > 0  //customer is created within 7 days of store creation
                     && (DateTime.UtcNow.AddHours(-6) - storeCreatedOn).Days < 8)  // store is created within 7 days of current day
                     || (customer.Username == "6181028033")) //testing user
                 {
