@@ -8,8 +8,8 @@
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksBefore })
     @if (Model.IsAuthenticated)
     {
-        @*<li><a href="@Url.RouteUrl("CustomerInfo")" class="ico-account">@T("Account.MyAccount")</a></li>
-            <li><a href="@Url.RouteUrl("Logout")" class="ico-logout">@T("Account.Logout")</a></li>*@
+    @*<li><a href="@Url.RouteUrl("CustomerInfo")" class="ico-account">@T("Account.MyAccount")</a></li>
+        <li><a href="@Url.RouteUrl("Logout")" class="ico-logout">@T("Account.Logout")</a></li>*@
     }
     else
     {
@@ -17,29 +17,29 @@
             ? url.ToString()
             : webHelper.GetRawUrl(Context.Request);
 
-        @if (Model.RegistrationType != UserRegistrationType.Disabled)
+    @if (Model.RegistrationType != UserRegistrationType.Disabled)
         {
-            @*<li><a href="@Url.RouteUrl("Register", new { returnUrl })" class="ico-register">@T("Account.Register")</a></li>*@
+    @*<li><a href="@Url.RouteUrl("Register", new { returnUrl })" class="ico-register">@T("Account.Register")</a></li>*@
         }
-        @*<li><a href="@Url.RouteUrl("Login", new { returnUrl })" class="ico-login">@T("Account.Login")</a></li>*@
+    @*<li><a href="@Url.RouteUrl("Login", new { returnUrl })" class="ico-login">@T("Account.Login")</a></li>*@
     }
     @if (Model.AllowPrivateMessages)
     {
-        @*<li>
-                <a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })" class="ico-inbox">
-                    <span class="inbox-label">@T("PrivateMessages.Inbox")</span>
-                    <span class="inbox-unread">@Model.UnreadPrivateMessages</span>
-                </a>
-            </li>*@
+    @*<li>
+            <a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })" class="ico-inbox">
+                <span class="inbox-label">@T("PrivateMessages.Inbox")</span>
+                <span class="inbox-unread">@Model.UnreadPrivateMessages</span>
+            </a>
+        </li>*@
     }
     @if (Model.WishlistEnabled)
     {
-        @*<li>
-                <a href="@Url.RouteUrl("Wishlist")" class="ico-wishlist">
-                    <span class="wishlist-label">@T("Wishlist")</span>
-                    <span class="wishlist-qty">@T("Wishlist.HeaderQuantity", Model.WishlistItems)</span>
-                </a>
-            </li>*@
+    @*<li>
+            <a href="@Url.RouteUrl("Wishlist")" class="ico-wishlist">
+                <span class="wishlist-label">@T("Wishlist")</span>
+                <span class="wishlist-qty">@T("Wishlist.HeaderQuantity", Model.WishlistItems)</span>
+            </a>
+        </li>*@
     }
 </ul>
 
@@ -49,78 +49,87 @@
     //if (!absoluteurl.Contains("cart") && !absoluteurl.Contains("checkout"))
     if (!absoluteurl.Contains("checkout") && !absoluteurl.Contains("zipcodeupdate"))
     {
-        <div id="headerV21" class="header-main">
-            <div class="container-header">
-                <a href="/">
-                    <img src="~/Themes/NetaMX/Content/images/logo.png" alt="" width="80" height="24" />
+<div id="headerV21" class="header-main">
+    <div class="container-header">
+        <a href="/">
+            <img src="~/Themes/NetaMX/Content/images/logo.png" alt="" width="80" height="24" />
+        </a>
+    </div>
+</div>
+<div class="new-header">
+    <div class="_flex">
+        <div class="store-name"><a href="/">@Model.Store.Name</a><span id="storeName" class="store-popup-open"></span></div>
+        <div class="store-popup">
+            <a class="loc">@Model.Store.CompanyAddress</a>
+        </div>
+        <div class="new_flex">
+            <div class="search-icon"></div>
+            <div id="CartProductQuantity" class="navbar-nav" style="position:relative">
+                <a href="@Url.RouteUrl("ShoppingCart")" style="height: 100%;width:100%">
+                    <img src="images/header2/Shopping-cart.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
                 </a>
+                <span style="background-color: #FE4C4B;width: 18px;height: 18px;border-radius: 50%;display:inline-block;position:absolute;left:20px;top:13px;text-align:center;color:white;align-items:center;justify-content:center;display:flex;font-size: 12px">@Model.ShoppingCartItems.ToString("N0")</span>
             </div>
         </div>
-        <div class="new-header">
-            <div class="_flex">
-                <div class="store-name"><a href="/">@Model.Store.Name</a><span id="storeName" class="store-popup-open"></span></div>
-                <div class="store-popup">
-                    <a class="loc">@Model.Store.CompanyAddress</a>
-                </div>
-                <div class="new_flex">
-                    <div class="search-icon"></div>
-                    <div id="CartProductQuantity" class="navbar-nav" style="position:relative">
-                        <a href="@Url.RouteUrl("ShoppingCart")" style="height: 100%;width:100%">
-                            <img src="images/header2/Shopping-cart.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
-                        </a>
-                        <span style="background-color: #FE4C4B;width: 18px;height: 18px;border-radius: 50%;display:inline-block;position:absolute;left:20px;top:13px;text-align:center;color:white;align-items:center;justify-content:center;display:flex;font-size: 12px">@Model.ShoppingCartItems.ToString("N0")</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="info-header" id="cartInfo">
-            @if (Context.Request.Path.Value != "/")
+    </div>
+</div>
+<div class="info-header" id="cartInfo">
+    @if (Context.Request.Path.Value != "/")
             {
-                <div class="_flex mobile-back" style="height:40px;">
-                    <a href="/" onclick="history.back()" style="text-decoration: none">
-                        <div class="cart-left-back">
-                            Regresar
-                        </div>
-                    </a>
-                </div>
+    <div class="_flex mobile-back" style="height:40px;">
+        <a href="/" onclick="history.back()" style="text-decoration: none">
+            <div class="cart-left-back">
+                Regresar
+            </div>
+        </a>
+    </div>
             }
-            <div class="_flex">
-                @if (Context.Request.Path.Value != "/")
+    <div class="_flex">
+        @if (Context.Request.Path.Value != "/")
                 {
-                    <div class="cart-left">
-                        <a class="desktop-back" href="/" onclick="history.back()" style="text-decoration: none">
-                            <div class="cart-left-back">
-                                Regresar
-                            </div>
-                        </a>
-                        @await Component.InvokeAsync("CustomerSaving")
-                        <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
-                    </div>
+        <div class="cart-left">
+            <a class="desktop-back" href="/" onclick="history.back()" style="text-decoration: none">
+                <div class="cart-left-back">
+                    Regresar
+                </div>
+            </a>
+            @await Component.InvokeAsync("CustomerSaving")
+            <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
+        </div>
 
                 }
                 else
                 {
-                    <div class="cart-left1">
-                        @await Component.InvokeAsync("CustomerSaving")
-                        <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
-                    </div>
-                }
-                <a class="cart-right" href="@Url.RouteUrl("ShoppingCart")">
-                    @T("Home.GotoCart")
-                </a>
-            </div>
+        <div class="cart-left1">
+            @await Component.InvokeAsync("CustomerSaving")
+            <span>Total: <strong id="CartTotalValue">$@Model.ShoppingCartTotal.ToString("N2")</strong></span>
         </div>
-        <div class="customer-banner">
-            @if ((DateTime.UtcNow.AddHours(-6) - Model.Store.CreatedOnUtc.AddHours(-6)).Days < 8)
+                }
+        <a class="cart-right" href="@Url.RouteUrl("ShoppingCart")">
+            @T("Home.GotoCart")
+        </a>
+    </div>
+</div>
+<div class="customer-banner">
+    @if ((DateTime.UtcNow.AddHours(-6) - Model.Store.CreatedOnUtc.AddHours(-6)).Days < 8)
             {
-                <span style="font-size: 13px"><img src="/Themes/NetaMX/Content/images/Icon.png" alt="icon">¡TIENDA NUEVA! Recibe un descuento de $30 en tu primera orden del día mayor a $100.</span>
+    <span style="font-size: 13px">
+        <img src="/Themes/NetaMX/Content/images/Icon.png" alt="icon">
+        ¡TIENDA NUEVA! Regístrate para recibir un descuento de $30 en tu primera orden del día mayor a $100.
+    </span>  <br />
+             <span style="font-size: 13px">
+                 ¡Tienes @( 8 - (DateTime.UtcNow.AddHours(-6) - Model.Store.CreatedOnUtc.AddHours(-6)).Days) días más!
+             </span>
             }
             else
             {
-                <span style="font-size: 13px"><img src="/Themes/NetaMX/Content/images/Icon.png" alt="icon">Recibe un descuento de $10 en tu primera orden del día mayor a $100.</span>
+    <span style="font-size: 13px">
+        <img src="/Themes/NetaMX/Content/images/Icon.png" alt="icon">
+        Recibe un descuento de $10 en tu primera orden del día mayor a $100.
+    </span>
 
             }
-        </div>
+</div>
     }
 }
 
@@ -128,11 +137,11 @@
 @if (Model.AllowPrivateMessages && !string.IsNullOrEmpty(Model.AlertMessage))
 {
     //new private message notification
-    <script asp-location="Footer">
+<script asp-location="Footer">
             $(document).ready(function () {
                 displayPopupNotification('@Html.Raw(JavaScriptEncoder.Default.Encode(Model.AlertMessage))', 'success', false);
             });
-    </script>
+</script>
 }
 
 <script asp-location="Footer">
@@ -149,7 +158,7 @@
 
 @if (Model.ShoppingCartEnabled)
 {
-    <script asp-location="Footer">
+<script asp-location="Footer">
                                                                                                         //$(document).ready(function () {
                                                                                                         //    $('.header').on('mouseenter', '#topcartlink', function () {
                                                                                                         //        $('#flyout-cart').addClass('active');
@@ -164,6 +173,6 @@
                                                                                                         //        $('#flyout-cart').removeClass('active');
                                                                                                         //    });
                                                                                                         //});
-    </script>
+</script>
 }
 
