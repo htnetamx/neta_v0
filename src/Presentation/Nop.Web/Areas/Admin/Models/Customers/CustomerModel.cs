@@ -254,7 +254,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         public CustomerAssociatedExternalAuthRecordsSearchModel CustomerAssociatedExternalAuthRecordsSearchModel { get; set; }
 
 
-        [DisplayName("DeprecateProducts")]
+        [DisplayName("Ocultar productos deprecados")]
         public bool DeprecateProducts { get; set; }
 
         #endregion
