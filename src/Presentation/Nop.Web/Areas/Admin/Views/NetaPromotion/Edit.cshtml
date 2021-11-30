@@ -7,7 +7,7 @@
     Html.SetActiveMenuItemSystemName("Categories");
 }
 
-<form asp-controller="NetaPromotion" asp-action="Edit" method="post" id="promotion-form">
+<form asp-controller="NetaPromotion" asp-action="Edit" method="post" id="promotion-form" enctype="multipart/form-data">
     <div class="content-header clearfix">
         <h1 class="float-left">
             @T("Admin.Promotion.EditPromotionDetails") - @Model.Name
