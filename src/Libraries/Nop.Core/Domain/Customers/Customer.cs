@@ -137,5 +137,7 @@ namespace Nop.Core.Domain.Customers
         /// Gets or sets the variable of deprecated for productos
         /// </summary>
         public bool DeprecateProducts { get; set; }
+
+        public bool ReceiveMessages { get; set; } = true;
     }
 }

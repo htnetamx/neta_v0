@@ -155,5 +155,8 @@ namespace Nop.Core.Domain.Stores
 
         public bool Comm20 { get; set; } = false;
         public decimal AmountComm20 { get; set; }
+
+        public bool ReceiveMessages { get; set; } = true;
+
     }
 }

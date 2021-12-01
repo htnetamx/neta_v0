@@ -488,6 +488,9 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 customer.DeprecateProducts = false;
                 model.DeprecateProducts = false;
+                customer.ReceiveMessages = true;
+                model.ReceiveMessages = true;
+
                 //activity log
                 await _customerActivityService.InsertActivityAsync("AddNewCustomer",
                     string.Format(await _localizationService.GetResourceAsync("ActivityLog.AddNewCustomer"), customer.Id), customer);
@@ -623,6 +626,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                     //vendor
                     customer.VendorId = model.VendorId;
                     customer.DeprecateProducts = model.DeprecateProducts;
+                    customer.ReceiveMessages = model.ReceiveMessages;
+
                     //form fields
                     if (_dateTimeSettings.AllowCustomersToSetTimeZone)
                         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.TimeZoneIdAttribute, model.TimeZoneId);

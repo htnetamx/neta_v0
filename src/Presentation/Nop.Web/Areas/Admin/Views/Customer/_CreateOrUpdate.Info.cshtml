@@ -99,9 +99,18 @@
         <div class="col-md-3">
             <nop-label asp-for="DeprecateProducts" />
         </div>
-        <div class="col-md-9" onclick="updateDeprecateProducts()">
+        <div class="col-md-9">
             <nop-editor asp-for="DeprecateProducts" />
             <span asp-validation-for="DeprecateProducts"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <nop-label asp-for="ReceiveMessages" />
+        </div>
+        <div class="col-md-9">
+            <nop-editor asp-for="ReceiveMessages" />
+            <span asp-validation-for="ReceiveMessages"></span>
         </div>
     </div>
     @if (Model.GenderEnabled)

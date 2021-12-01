@@ -257,6 +257,10 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         [DisplayName("Ocultar productos deprecados")]
         public bool DeprecateProducts { get; set; }
 
+
+        [DisplayName("Recibir Mensajería")]
+        public bool ReceiveMessages { get; set; }
+
         #endregion
 
         #region Nested classes
