@@ -1217,11 +1217,11 @@ namespace Nop.Web.Controllers
 
                     var name = "Netero";
                     var telusuario = "0";
+                    var customer = " ";
                     if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
                     {
-                        var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-                        //name = customer.FirstName;
-
+                        var address = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                        customer = address.FirstName;
 
                         //International users
                         if ((await _workContext.GetCurrentCustomerAsync()).Username.ToString().Length > 10)
@@ -1262,7 +1262,7 @@ namespace Nop.Web.Controllers
                     var responseResultToLog = await BotmakerMessaging.Send("525545439866",
                                             telusuario,
                                             "confirmacion_compra",
-                                            new Dictionary<string, object> { { "Nombre", (await _workContext.GetCurrentCustomerAsync()).Username },
+                                            new Dictionary<string, object> { { "Nombre", customer },
                                                          { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + placeOrderResult.PlacedOrder.Id.ToString()},
                                                          { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
                                                          { "Dia", buscar },
@@ -2176,12 +2176,12 @@ namespace Nop.Web.Controllers
 
                     //var name = "Netero";
                     var telusuario = "0";
+                    var customer = " ";
                     if ((await _workContext.GetCurrentCustomerAsync()).BillingAddressId.HasValue)
                     {
-                        var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
-                        //name = customer.FirstName;
+                        var address = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
+                        customer = address.FirstName;
 
-                        //International users
                         if ((await _workContext.GetCurrentCustomerAsync()).Username.ToString().Length > 10)
                         {
                             telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
@@ -2221,7 +2221,7 @@ namespace Nop.Web.Controllers
                     var responseResultToLog = await BotmakerMessaging.Send("525545439866",
                         telusuario,
                         "confirmacion_compra",
-                        new Dictionary<string, object> { { "Nombre", (await _workContext.GetCurrentCustomerAsync()).Username },
+                        new Dictionary<string, object> { { "Nombre", customer },
                                                          { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + placeOrderResult.PlacedOrder.Id.ToString()},
                                                          { "TotalOrden", placeOrderResult.PlacedOrder.OrderTotal.ToString()},
                                                          { "Dia", buscar },
