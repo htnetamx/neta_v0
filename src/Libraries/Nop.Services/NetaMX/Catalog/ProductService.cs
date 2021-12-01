@@ -41,6 +41,7 @@ namespace Nop.Services.Catalog
                                  orderby p.DisplayOrder, p.Id
                                  where p.Published &&
                                        !p.Deleted &&
+                                       !p.MarkAsNew &&
                                        p.ShowOnHomepage &&
                                       p.VisibleIndividually &&
                                       !p.IsPromotionProduct
