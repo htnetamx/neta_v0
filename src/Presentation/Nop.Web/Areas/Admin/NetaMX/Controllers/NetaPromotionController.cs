@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Promotion;
 using Nop.Services.Catalog;
 using Nop.Services.Localization;
@@ -296,6 +297,38 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             return View(new AddProductToCategorySearchModel());
         }
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("btnPromtionProductSave")]
+        public virtual async Task<IActionResult> ImportNetaPromotionProductExcel(IFormFile importexcelfile, IFormCollection form)
+        {
+            int.TryParse(form["promotionid"], out int promoId);
+            try
+            {               
+
+                if (importexcelfile != null && importexcelfile.Length > 0)
+                {
+                    await _netaPromotionService.ImportProductsFromXlsxAsync(importexcelfile.OpenReadStream(),promoId);
+                }
+                else
+                {
+                    _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Common.UploadFile"));
+
+                    return RedirectToAction("Edit", new { id = promoId });
+                }
+
+                _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Products.Imported"));
+
+                return RedirectToAction("Edit", new { id = promoId });
+            }
+            catch (Exception exc)
+            {
+                await _notificationService.ErrorNotificationAsync(exc);
+
+                return RedirectToAction("Edit", new { id = promoId });
+            }
+        }
+
 
         #endregion
     }

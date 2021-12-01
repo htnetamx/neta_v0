@@ -49,6 +49,7 @@
 
     <!-- We copy the \Logs directory -->
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
+    <None Remove="wwwroot\PromotionProduct\PromotionProductExcel.xlsx" />
     <None Remove="Themes\NetaMX\Views\Shared\_Root.Head.cshtml" />
 
     <None Update="Areas\Admin\sitemap.config">
@@ -74,6 +75,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\PromotionProduct\PromotionProductExcel.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="Themes\NetaMX\Views\Shared\_Root.Head.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

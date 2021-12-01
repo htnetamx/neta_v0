@@ -66,7 +66,7 @@
             <div class="search-icon"></div>
             <div id="CartProductQuantity" class="navbar-nav" style="position:relative">
                 <a href="@Url.RouteUrl("ShoppingCart")" style="height: 100%;width:100%">
-                    <img src="images/header2/Shopping-cart.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                    <img src="/images/header2/Shopping-cart.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
                 </a>
                 <span style="background-color: #FE4C4B;width: 18px;height: 18px;border-radius: 50%;display:inline-block;position:absolute;left:20px;top:13px;text-align:center;color:white;align-items:center;justify-content:center;display:flex;font-size: 12px">@Model.ShoppingCartItems.ToString("N0")</span>
             </div>
@@ -115,10 +115,10 @@
             {
     <span style="font-size: 13px">
         <img src="/Themes/NetaMX/Content/images/Icon.png" alt="icon">
-        ¡TIENDA NUEVA! Regístrate para recibir un descuento de $30 en tu primera orden del día mayor a $100.
+        ¡TIENDA NUEVA! Gana un descuento de $30 en tu primera orden del día mayor a $100.
     </span>  <br />
              <span style="font-size: 13px">
-                 ¡Tienes @( 7 - (DateTime.UtcNow.AddHours(-6) - Model.Store.CreatedOnUtc.AddHours(-6)).Days) días más!
+                 ¡Tienes @( 7 - (DateTime.UtcNow.AddHours(-6) - Model.Store.CreatedOnUtc.AddHours(-6)).Days) días más para disfrutar de este regalo!
              </span>
             }
             else

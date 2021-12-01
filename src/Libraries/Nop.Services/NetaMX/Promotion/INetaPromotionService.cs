@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Promotion;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Nop.Services.Promotion
@@ -24,5 +25,7 @@ namespace Nop.Services.Promotion
         Task<IPagedList<Neta_Promotion_ProductMapping>> GetPromotionsProductsByPromotionIdAsync(int promotionId,
             int pageIndex = 0, int pageSize = int.MaxValue);
         Neta_Promotion_ProductMapping FindProductPromotion(IList<Neta_Promotion_ProductMapping> source, int productId, int promotionId);
+
+        Task ImportProductsFromXlsxAsync(Stream stream, int promotionId);
     }
 }
