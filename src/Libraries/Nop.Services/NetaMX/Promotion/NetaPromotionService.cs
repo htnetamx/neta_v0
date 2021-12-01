@@ -2,7 +2,10 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Promotion;
 using Nop.Data;
+using Nop.Services.Catalog;
+using OfficeOpenXml;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,15 +17,17 @@ namespace Nop.Services.Promotion
         private readonly IRepository<Neta_Promotion> _netaPromotionRepository;
         private readonly IRepository<Neta_Promotion_ProductMapping> _netaPromotionProductMappingRepository;
         protected readonly IRepository<Product> _productRepository;
+        private readonly IProductService _productService;
         #endregion
 
         #region Ctor
         public NetaPromotionService(IRepository<Neta_Promotion> netaPromotionRepository, IRepository<Neta_Promotion_ProductMapping> netaPromotionProductMappingRepository,
-            IRepository<Product> productRepository)
+            IRepository<Product> productRepository, IProductService productService)
         {
             _netaPromotionRepository = netaPromotionRepository;
             _netaPromotionProductMappingRepository = netaPromotionProductMappingRepository;
             _productRepository = productRepository;
+            _productService = productService;
         }
         #endregion
 
@@ -197,6 +202,75 @@ namespace Nop.Services.Promotion
                     return productPromotion;
 
             return null;
+        }
+
+        /// <summary>
+        /// Import products from XLSX file
+        /// </summary>
+        /// <param name="stream">Stream</param>
+        /// <returns>A task that represents the asynchronous operation</returns>
+        public virtual async Task ImportProductsFromXlsxAsync(Stream stream, int promotionId)
+        {
+            using var xlPackage = new ExcelPackage(stream);
+            // get the first worksheet in the workbook
+            var worksheet = xlPackage.Workbook.Worksheets.FirstOrDefault();
+            if (worksheet == null)
+                throw new NopException("No worksheet found");
+
+            var rowCount = worksheet.Dimension.Rows;
+            var columnsCount = worksheet.Dimension.Columns;
+            bool checkValidHeader = true;
+
+            if (columnsCount > 0)
+            {
+                if (worksheet.Cells[1, 1].Value.ToString().ToLower().Trim() != "sku")
+                {
+                    checkValidHeader = false;
+                }
+            }
+            else
+                checkValidHeader = false;
+
+            if (checkValidHeader && rowCount > 1)
+            {
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    if (worksheet.Cells[row, 1].Value != null)
+                    {
+                        var sku = worksheet.Cells[row, 1].Value.ToString().Trim();
+
+                        if (!string.IsNullOrEmpty(sku))
+                        {
+                            var product = await _productService.GetProductBySkuAsync(sku);
+
+                            if (product != null)
+                            {
+                                var isSuccess = false;
+                                var IsExist = _netaPromotionProductMappingRepository.Table.Where(x => x.Neta_PromotionId == promotionId && x.ProductId == product.Id).Count();
+                                if (IsExist == 0)
+                                {
+                                    Neta_Promotion_ProductMapping netaPromotionProductMapping = new Neta_Promotion_ProductMapping();
+                                    netaPromotionProductMapping.Neta_PromotionId = promotionId;
+                                    netaPromotionProductMapping.ProductId = product.Id;
+                                    netaPromotionProductMapping.DisplayOrder = 1;
+                                    netaPromotionProductMapping.AllowToShowProductOnlyPromotion = true;
+
+                                    await _netaPromotionProductMappingRepository.InsertAsync(netaPromotionProductMapping);
+
+                                    if (netaPromotionProductMapping.Id > 0)
+                                        isSuccess = true;
+
+                                    if (isSuccess)
+                                    {
+                                        product.IsPromotionProduct = true;
+                                        await _productRepository.UpdateAsync(product);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         #endregion
     }
