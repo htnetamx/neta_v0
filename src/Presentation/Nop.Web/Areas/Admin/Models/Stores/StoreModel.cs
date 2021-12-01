@@ -102,6 +102,9 @@ namespace Nop.Web.Areas.Admin.Models.Stores
         [DisplayName("Monto Comisión 2.0")]
         public decimal AmountComm20 { get; set; }
 
+        [DisplayName("Recibir Mensajería")]
+        public bool ReceiveMessages { get; set; } = true;
+
         public IList<StoreLocalizedModel> Locales { get; set; }
 
         #endregion

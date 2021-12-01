@@ -662,6 +662,7 @@ namespace Nop.Web.Areas.Admin.Factories
 
                 model.Id = customer.Id;
                 model.DeprecateProducts = customer.DeprecateProducts;
+                model.ReceiveMessages = customer.ReceiveMessages;
                 model.DisplayVatNumber = _taxSettings.EuVatEnabled;
                 model.AllowSendingOfPrivateMessage = await _customerService.IsRegisteredAsync(customer) &&
                     _forumSettings.AllowPrivateMessages;
