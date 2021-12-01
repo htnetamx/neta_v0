@@ -538,6 +538,13 @@ namespace Nop.Services.Discounts
             //    return result;
             //}
 
+            var hasOrders = _orderRepository.Table.Where(v => v.CustomerId == customer.Id).Any();
+            if (!hasOrders)
+            {
+                result.Errors = new List<string> { await _localizationService.GetResourceAsync("ShoppingCart.Discount.NotNewCustomer") };
+                return result;
+            }
+
             //check coupon code
             if (discount.RequiresCouponCode)
             {

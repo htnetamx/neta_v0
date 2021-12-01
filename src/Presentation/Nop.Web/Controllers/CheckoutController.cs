@@ -1680,44 +1680,47 @@ namespace Nop.Web.Controllers
                 {
                     discountcouponcode = "NEW_CUSTOMER_NEW_STORE_30";
                 }
-
                 else
                 {
                     discountcouponcode = "BUEN_FIN_NETA_10";
                 }
 
-                await _customerService.RemoveDiscountCouponCodeAsync(
-                    await _workContext.GetCurrentCustomerAsync(),
-                    discountcouponcode);
-
-                var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
-                if (addr != null)
+                var cupones = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
+                if (!cupones.Any())
                 {
-                    if (addr.Email == addr.PhoneNumber || addr.Email.Contains("@"))
+                    await _customerService.RemoveDiscountCouponCodeAsync(
+                        await _workContext.GetCurrentCustomerAsync(),
+                        discountcouponcode);
+
+                    var addr = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
+                    if (addr != null)
                     {
-                        var usado = await _orderService.GetByDiscountCode(discountcouponcode, addr.PhoneNumber);
-                        if (!usado)
+                        if (addr.Email == addr.PhoneNumber || addr.Email.Contains("@"))
                         {
-                            var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
-                            if (total > 100)
+                            var usado = await _orderService.GetByDiscountCode(discountcouponcode, addr.PhoneNumber);
+                            if (!usado)
                             {
-                                var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
-                                    .Where(d => d.RequiresCouponCode)
-                                    .ToList();
-                                if (discounts.Any())
+                                var total = await cart.SumAwaitAsync(async v => v.Quantity * (await _productService.GetProductByIdAsync(v.ProductId)).Price);
+                                if (total > 100)
                                 {
-                                    var userErrors = new List<string>();
-                                    var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
+                                    var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
+                                        .Where(d => d.RequiresCouponCode)
+                                        .ToList();
+                                    if (discounts.Any())
                                     {
-                                        var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
-                                        userErrors.AddRange(validationResult.Errors);
+                                        var userErrors = new List<string>();
+                                        var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
+                                        {
+                                            var validationResult = await _discountService.ValidateDiscountAsync(discount, await _workContext.GetCurrentCustomerAsync(), new[] { discountcouponcode });
+                                            userErrors.AddRange(validationResult.Errors);
 
-                                        return validationResult.IsValid;
-                                    });
+                                            return validationResult.IsValid;
+                                        });
 
-                                    if (anyValidDiscount)
-                                    {
-                                        await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
+                                        if (anyValidDiscount)
+                                        {
+                                            await _customerService.ApplyDiscountCouponCodeAsync(await _workContext.GetCurrentCustomerAsync(), discountcouponcode);
+                                        }
                                     }
                                 }
                             }
