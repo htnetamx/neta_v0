@@ -539,7 +539,7 @@ namespace Nop.Services.Discounts
             //}
 
             var hasOrders = _orderRepository.Table.Where(v => v.CustomerId == customer.Id).Any();
-            if (!hasOrders)
+            if (hasOrders)
             {
                 result.Errors = new List<string> { await _localizationService.GetResourceAsync("ShoppingCart.Discount.NotNewCustomer") };
                 return result;
