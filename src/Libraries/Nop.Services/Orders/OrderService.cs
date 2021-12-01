@@ -259,36 +259,36 @@ namespace Nop.Services.Orders
         {
             var today = DateTime.UtcNow;
             //today = new DateTime(2021, 11, 18, 17, 51, 22);
-            var timespan = new TimeSpan(7, today.Hour, today.Minute, today.Second);
+            var timespan = new TimeSpan(7, 0, 0, 0);
 
 
-            var start_week_today = today.Subtract(new TimeSpan((int)today.DayOfWeek, 0, 0, 0));
+            var start_day_today = today.Subtract(new TimeSpan(0, today.Hour, today.Minute, today.Second));
 
 
             var date_1_week_ago            =            today.Subtract(timespan);
-            var start_week_date_1_week_ago = start_week_today.Subtract(timespan);
+            var start_date_1_week_ago = start_day_today.Subtract(timespan);
 
             var gmv_this_week = (await (from o in _orderRepository.Table
-                                            where o.CreatedOnUtc >= start_week_today && o.CreatedOnUtc <= today
+                                            where o.CreatedOnUtc >= start_day_today && o.CreatedOnUtc <= today
                                             select o.OrderTotal).ToListAsync()).Sum();
             var gmv_previous_week = (await (from o in _orderRepository.Table
-                                            where o.CreatedOnUtc >= start_week_date_1_week_ago && o.CreatedOnUtc <= date_1_week_ago
+                                            where o.CreatedOnUtc >= start_date_1_week_ago && o.CreatedOnUtc <= date_1_week_ago
                                             select o.OrderTotal).ToListAsync()).Sum();
 
-            var porcentaje_abajo_gmv = 40.0;
-            var porcentaje_arriba_gmv = 40.0;
+            var porcentaje_abajo_gmv = 50.0;
+            var porcentaje_arriba_gmv = 50.0;
 
             if (gmv_this_week<(gmv_previous_week * (decimal)((100 - porcentaje_abajo_gmv) / 100)))
             {
                 return "Alerta: El GMV de esta semana está " + porcentaje_abajo_gmv + "%  por debajo del GMV de la semana pasada.\n" +
-                    "El de la semana pasada desde "+ start_week_date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " fue de "+ gmv_previous_week+"\n"+
-                    "El de esta semana desde " + start_week_today.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + today.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_this_week + "\n";
+                    "El de la semana pasada desde "+ start_date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " fue de "+ gmv_previous_week+"\n"+
+                    "El de esta semana desde " + start_day_today.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + today.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_this_week + "\n";
             }
             if (gmv_this_week >(gmv_previous_week * (decimal)((100 + porcentaje_arriba_gmv) / 100)))
             {
                 return "Alerta: El GMV de esta semana está " + porcentaje_arriba_gmv + "% por encima del GMV de la semana pasada.\n" +
-                    "El de la semana pasada desde " + start_week_date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_previous_week + "\n" +
-                    "El de esta semana desde " + start_week_today.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + today.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_this_week + "\n";
+                    "El de la semana pasada desde " + start_date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + date_1_week_ago.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_previous_week + "\n" +
+                    "El de esta semana desde " + start_day_today.ToString("dd/MM/yyyy HH:mm:ss") + " hasta " + today.ToString("dd/MM/yyyy HH:mm:ss") + " fue de " + gmv_this_week + "\n";
             }
             return "OK";
         }
