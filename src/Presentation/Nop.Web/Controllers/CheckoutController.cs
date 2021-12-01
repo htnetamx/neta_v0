@@ -343,16 +343,36 @@ namespace Nop.Web.Controllers
             //var responseResultToLog = await NetaAuronixMessaging.Send_SMS(form["Password"],
             //    $"Hola! Tu código de confirmación de cuenta es {form["code_generated"]}, regresa a tu compra y confirma tu número para continuar", "15");
 
-            var responseResultToLog = await BotmakerMessaging.Send("525545439866",
-                            "521" + form["Password"],
-                            "codigo_verificacion_usuario",
-                            new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
+            //International users
+            if (form["Password"].ToString().Length > 10)
+            {
+                var responseResultToLog = await BotmakerMessaging.Send("525545439866",
+                form["Password"],
+                "codigo_verificacion_usuario",
+                new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
 
-            await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
-                "BotmakerOTP", responseResultToLog + form["code_generated"],
-                await _customerService.GetCustomerByUsernameAsync((string)form["Password"]));
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "BotmakerOTP", responseResultToLog + form["code_generated"],
+                    await _customerService.GetCustomerByUsernameAsync((string)form["Password"]));
 
-            return Content("{'rta': true }", "application/json");
+                return Content("{'rta': true }", "application/json");
+            }
+
+            //Mexican users who are not type country code
+            else
+            {
+                var responseResultToLog = await BotmakerMessaging.Send("525545439866",
+                                "521" + form["Password"],
+                                "codigo_verificacion_usuario",
+                                new Dictionary<string, object> { { "Codigo", Int32.Parse(form["code_generated"]) } });
+
+                await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                    "BotmakerOTP", responseResultToLog + form["code_generated"],
+                    await _customerService.GetCustomerByUsernameAsync((string)form["Password"]));
+
+                return Content("{'rta': true }", "application/json");
+            }
+
         }
 
         /// <summary>
@@ -1201,7 +1221,18 @@ namespace Nop.Web.Controllers
                     {
                         var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
                         //name = customer.FirstName;
-                        telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
+
+
+                        //International users
+                        if ((await _workContext.GetCurrentCustomerAsync()).Username.ToString().Length > 10)
+                        {
+                            telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
+                        }
+
+                        else
+                        {
+                            telusuario = "521" + (await _workContext.GetCurrentCustomerAsync()).Username;
+                        }
                     }
 
 
@@ -1229,7 +1260,7 @@ namespace Nop.Web.Controllers
 
 
                     var responseResultToLog = await BotmakerMessaging.Send("525545439866",
-                                            "521" + telusuario,
+                                            telusuario,
                                             "confirmacion_compra",
                                             new Dictionary<string, object> { { "Nombre", (await _workContext.GetCurrentCustomerAsync()).Username },
                                                          { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + placeOrderResult.PlacedOrder.Id.ToString()},
@@ -1643,7 +1674,7 @@ namespace Nop.Web.Controllers
                 string discountcouponcode = "";
 
                 //Cliente nuevo en tienda nueva
-                if (((customerCreatedOn - storeCreatedOn).Days < 8 && (customerCreatedOn - storeCreatedOn).Days > 0  //customer is created within 7 days of store creation
+                if (((customerCreatedOn - storeCreatedOn).Days < 8 && (customerCreatedOn - storeCreatedOn).Days >= 0  //customer is created within 7 days of store creation
                     && (DateTime.UtcNow.AddHours(-6) - storeCreatedOn).Days < 8)  // store is created within 7 days of current day
                     || (customer.Username == "6181028033")) //testing user
                 {
@@ -2149,7 +2180,17 @@ namespace Nop.Web.Controllers
                     {
                         var customer = await _addressService.GetAddressByIdAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0);
                         //name = customer.FirstName;
-                        telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
+
+                        //International users
+                        if ((await _workContext.GetCurrentCustomerAsync()).Username.ToString().Length > 10)
+                        {
+                            telusuario = (await _workContext.GetCurrentCustomerAsync()).Username;
+                        }
+
+                        else
+                        {
+                            telusuario = "521" + (await _workContext.GetCurrentCustomerAsync()).Username;
+                        }
                     }
 
                     var buscar = "mañana,";
@@ -2178,7 +2219,7 @@ namespace Nop.Web.Controllers
                     //    $"Gracias {"*" + name + "*"} por comprar en NetaMx, tu orden es la siguiente, {"\r" + string.Join("\r", list.ToArray()) + "\r"} Tu total es de ${"*" + placeOrderResult.PlacedOrder.OrderTotal.ToString() + "*"};pasa mañana a {"*" + (await _storeContext.GetCurrentStoreAsync()).Name + "*"}, después de las {"5pm"}. Eres el cliente {(orders.Count + 1).ToString()} del pedido, recuerda que tenemos que llegar a 20 clientes para poder despachar. Comparte las promos y juntos lleguemos al mínimo de pedidos: {(await _storeContext.GetCurrentStoreAsync()).Url}");
 
                     var responseResultToLog = await BotmakerMessaging.Send("525545439866",
-                        "521" + telusuario,
+                        telusuario,
                         "confirmacion_compra",
                         new Dictionary<string, object> { { "Nombre", (await _workContext.GetCurrentCustomerAsync()).Username },
                                                          { "LinkDetalle",(await _storeContext.GetCurrentStoreAsync()).Url + "orderdetails/" + placeOrderResult.PlacedOrder.Id.ToString()},
@@ -2191,6 +2232,28 @@ namespace Nop.Web.Controllers
                     await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
                    "OrderConfirmationBotMaker", responseResultToLog,
                    await _workContext.GetCurrentCustomerAsync());
+
+
+
+                    //Additional virality message for NEW_CUSTOMER_NEW_STORE_30
+                    if (placeOrderResult.PlacedOrder.OrderDiscount == 30)
+                    {
+                
+                    var storeInfo = (await _storeContext.GetCurrentStoreAsync());
+                    var diffTodaytoStoreCreation = 7 - (DateTime.UtcNow.AddHours(-6) - store.CreatedOnUtc.AddHours(-6)).Days;
+                    var responseResultToLog2 = await BotmakerMessaging.Send("525545439866",
+                      telusuario,
+                      "mensaje_clientes_shops_nuevas",
+                      new Dictionary<string, object> { { "DIAS", diffTodaytoStoreCreation  },
+                          { "LINK",storeInfo.Url}
+                           });
+
+                    await _logger.InsertLogAsync(Core.Domain.Logging.LogLevel.Information,
+                   "ViralityMessage", responseResultToLog2,
+                   await _workContext.GetCurrentCustomerAsync());
+
+
+                    }
 
                     var paymentMethod = await _paymentPluginManager
                         .LoadPluginBySystemNameAsync(placeOrderResult.PlacedOrder.PaymentMethodSystemName, await _workContext.GetCurrentCustomerAsync(), (await _storeContext.GetCurrentStoreAsync()).Id);
