@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Discount requirements",
+  "FriendlyName": "Must be assigned to MinSubtotal",
+  "SystemName": "DiscountRequirement.MustBeAssignedToMinSubtotal",
+  "Version": "1.34",
+  "SupportedVersions": [ "4.40" ],
+  "Author": "tecnofin team DJCS",
+  "DisplayOrder": 1,
+  "FileName": "Tvt.Plugin.DiscountRules.MinSubtotal.dll",
+  "Description": "This plugin allows you to configure discounts for min Subtotal in the cart"
+}
