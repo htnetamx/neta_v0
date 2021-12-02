@@ -51,11 +51,14 @@ namespace Nop.Services.Monitoring
             if (errors_missing_orders != "OK")
             {
                 List<string> correos = new List<string>() {
-                    "andres.posada@neta.mx",
+                    //"andres.posada@neta.mx",
                     //"enrique.roman@neta.mx",
                     //"diana@neta.mx",
                     //"nicolas@neta.mx",
-                    "miguel.zamora@neta.mx"
+                    "miguel.zamora@neta.mx",
+                    "bicho@neta.mx",
+                    "david.gomes@neta.mx"
+
                 };
 
                 email.SetSubject("Alerta: No Orders In Time Lapse");
