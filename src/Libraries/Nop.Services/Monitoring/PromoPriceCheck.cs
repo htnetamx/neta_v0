@@ -59,11 +59,13 @@ namespace Nop.Services.Monitoring
 
 
                 List<string> correos = new List<string>() {
-                    "andres.posada@neta.mx",
+                    //"andres.posada@neta.mx",
                     //"paulina@neta.mx",
                     //"samuel.wong@neta.mx",
                     //"diana@neta.mx",
-                    "miguel.zamora@neta.mx"
+                    "miguel.zamora@neta.mx",
+                    "bicho@neta.mx",
+                    "david.gomes@neta.mx"
                 };
 
                 var email = new Email();

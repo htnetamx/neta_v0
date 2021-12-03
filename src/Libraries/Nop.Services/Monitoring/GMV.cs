@@ -52,12 +52,14 @@ namespace Nop.Services.Monitoring
             if (errors_GMV!="OK")
             {
                 List<string> correos = new List<string>() {
-                    "andres.posada@neta.mx",
+                    //"andres.posada@neta.mx",
                     //"samuel.wong@neta.mx",
                     //"enrique.roman@neta.mx",
                     //"diana@neta.mx",
                     //"nicolas@neta.mx",
-                    "miguel.zamora@neta.mx"
+                    "miguel.zamora@neta.mx",
+                    "bicho@neta.mx",
+                    "david.gomes@neta.mx"
                 };
 
                 email.SetSubject("Alerta: Error This Week's GMV vs Last Week");

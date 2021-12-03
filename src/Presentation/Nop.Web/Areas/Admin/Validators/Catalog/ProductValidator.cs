@@ -25,6 +25,23 @@ namespace Nop.Web.Areas.Admin.Validators.Catalog
                 .WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Products.Fields.RentalPriceLength.ShouldBeGreaterThanZero"))
                 .When(x => x.IsRental);
 
+            RuleFor(x => x.PerTaras)
+                .NotEmpty()
+                .GreaterThan(0)
+                .WithMessageAwait(localizationService.GetResourceAsync("PerTaras es obligatorio y debe de ser mayor que 0"));
+
+            RuleFor(x => x.Sku)
+                .NotEmpty()
+                .WithMessageAwait(localizationService.GetResourceAsync("Sku es obligatorio"));
+
+            RuleFor(x => x.SelectedCategoryIds)
+                .NotEmpty()
+                .WithMessageAwait(localizationService.GetResourceAsync("Las categorias son obligatorias"));
+
+            RuleFor(x => x.SelectedManufacturerIds)
+                .NotEmpty()
+                .WithMessageAwait(localizationService.GetResourceAsync("Los manufacturers (proveedores) son obligatorios"));
+
             SetDatabaseValidationRules<Product>(dataProvider);
         }
     }
