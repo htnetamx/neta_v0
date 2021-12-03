@@ -471,7 +471,7 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         public ProductAttributeCombinationSearchModel ProductAttributeCombinationSearchModel { get; set; }
 
         [DisplayName("PerTaras")]
-        public string PerTaras { get; set; }
+        public decimal PerTaras { get; set; }
 
         [DisplayName("Deprecated")]
         public bool Deprecated { get; set; }

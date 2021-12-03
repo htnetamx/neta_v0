@@ -1830,6 +1830,16 @@ namespace Nop.Services.ExportImport
                 if(product.Price <= 0 || product.OldPrice<=0)
                     throw new Exception("El precio no puede ser cero");
 
+                if (product.Name == "" || product.Name == null)
+                    throw new Exception("El campo Nombre es obligatorio");
+
+                if (product.Sku=="" || product.Sku==null)
+                    throw new Exception("El campo Sku es obligatorio");
+
+                if (product.PerTaras<= 0)
+                    throw new Exception("El campo PerTaras es obligatorio");
+
+
                 product.LimitedToStores = true;
 
                 if (isNew)
@@ -1901,6 +1911,10 @@ namespace Nop.Services.ExportImport
                             return rez.Value;
                         }).ToListAsync();
 
+                    if (importedCategories.Count()==0)
+                        throw new Exception("El campo Categorias es obligatorio");
+
+
                     foreach (var categoryId in importedCategories)
                     {
                         if (categories.Any(c => c == categoryId))
@@ -1933,6 +1947,11 @@ namespace Nop.Services.ExportImport
                     var manufacturers = isNew || !allProductsManufacturerIds.ContainsKey(product.Id) ? Array.Empty<int>() : allProductsManufacturerIds[product.Id];
                     var importedManufacturers = manufacturerList.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
                         .Select(x => allManufacturers.FirstOrDefault(m => m.Name == x.Trim())?.Id ?? int.Parse(x.Trim())).ToList();
+
+                    if (importedManufacturers.Count() == 0)
+                        throw new Exception("El campo Categorias es obligatorio");
+
+
                     foreach (var manufacturerId in importedManufacturers)
                     {
                         if (manufacturers.Any(c => c == manufacturerId))
