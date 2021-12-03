@@ -59,7 +59,15 @@ namespace Nop.Services.Monitoring
                     //"nicolas@neta.mx",
                     "miguel.zamora@neta.mx",
                     "bicho@neta.mx",
-                    "david.gomes@neta.mx"
+                    "david.gomes@neta.mx",
+                    "nicolas@neta.mx",
+                    "samuel@neta.mx",
+                    "jorge.garduno@neta.mx",
+                    "mateo.uribe@neta.mx",
+                    "aurea.lopez@neta.mx",
+                    "samuel.wong@neta.mx"
+
+
                 };
 
                 email.SetSubject("Alerta: Error This Week's GMV vs Last Week");
