@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Promotion;
 using Nop.Services.Catalog;
+using Nop.Services.Discounts;
 using Nop.Services.Promotion;
 using Nop.Web.Areas.Admin.Models.Promotion;
 using Nop.Web.Framework.Models.Extensions;
@@ -13,13 +14,16 @@ namespace Nop.Web.Areas.Admin.Factories
     public partial class NetaPromotionModelFactory : INetaPromotionModelFactory
     {
         private readonly INetaPromotionService _netaPromotionService;
-        private readonly IProductService _productService;
+        private readonly IProductService _productService; 
+        private readonly IDiscountService _discountService;
+
 
         public NetaPromotionModelFactory(INetaPromotionService netaPromotionService,
-            IProductService productService)
+            IProductService productService, IDiscountService discountService)
         {
             _netaPromotionService = netaPromotionService;
             _productService = productService;
+            _discountService = discountService;
         }
         public async Task<NetaPromotionModel> PrepareNetaPromotionModelAsync(NetaPromotionModel model, Neta_Promotion netaPromotion)
         {
@@ -32,6 +36,18 @@ namespace Nop.Web.Areas.Admin.Factories
                 model.EndDateUtc = netaPromotion.EndDateUtc;
                 model.PictureId = netaPromotion.PictureId;
                 model.PromotionProductSearchModel.PromotionId = netaPromotion.Id;
+                model.DiscountId = netaPromotion.DiscountId ?? 0;
+                if (model.DiscountId > 0)
+                {
+                    var discount = await _discountService.GetDiscountByIdAsync(model.DiscountId);
+                    if (discount != null)
+                    {
+                        model.UsePercentage = discount.UsePercentage;
+                        model.DiscountPercentage = discount.DiscountPercentage;
+                        model.DiscountAmount = discount.DiscountAmount;
+                        model.MaximumDiscountAmount = discount.MaximumDiscountAmount;
+                    }
+                }
             }
             return model;
         }

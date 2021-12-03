@@ -20,7 +20,7 @@ namespace Nop.Services.Promotion
         Task<IPagedList<Neta_Promotion_ProductMapping>> GetPromotionProductsByPromotionId(int promotionId, int pageIndex = 0, int pageSize = int.MaxValue - 1);
         Task<Neta_Promotion_ProductMapping> GetPromotionProductById(int id);
         Task UpdatePromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping);
-        Task InsertPromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping);
+        Task InsertPromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping,int? discountId);
         Task DeletePromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping);
         Task<IPagedList<Neta_Promotion_ProductMapping>> GetPromotionsProductsByPromotionIdAsync(int promotionId,
             int pageIndex = 0, int pageSize = int.MaxValue);

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Promotion;
 using Nop.Services.Catalog;
+using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
 using Nop.Services.Promotion;
@@ -29,6 +31,8 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly ICategoryModelFactory _categoryModelFactory;
         private readonly IProductService _productService;
         private readonly ILocalizationService _localizationService;
+        private readonly IDiscountService _discountService;
+
         #endregion
 
         #region Ctor
@@ -38,7 +42,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             INotificationService notificationService,
             ICategoryModelFactory categoryModelFactory,
             IProductService productService,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IDiscountService discountService)
         {
             _netaPromotionService = netaPromotionService;
             _netaPromotionModelFactory = netaPromotionModelFactory;
@@ -47,6 +52,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _categoryModelFactory = categoryModelFactory;
             _productService = productService;
             _localizationService = localizationService;
+            _discountService = discountService;
         }
         #endregion
 
@@ -105,6 +111,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             var netaPromotion = new Neta_Promotion();
+            var discount = new Discount();
             if (ModelState.IsValid)
             {
                 netaPromotion.Name = model.Name;
@@ -114,6 +121,26 @@ namespace Nop.Web.Areas.Admin.Controllers
                 netaPromotion.Deleted = false;
                 netaPromotion.Published = true;
 
+
+                discount.Name = model.Name;
+                discount.DiscountTypeId = (int)DiscountType.AssignedToSkus;
+                discount.UsePercentage = model.UsePercentage;
+                discount.DiscountPercentage = model.DiscountPercentage;
+                discount.DiscountAmount = model.DiscountAmount;
+                discount.MaximumDiscountAmount = model.MaximumDiscountAmount;
+                discount.StartDateUtc = model.StartDateUtc;
+                discount.EndDateUtc = model.EndDateUtc;
+                discount.RequiresCouponCode = false;
+                discount.IsCumulative = false;
+                discount.DiscountLimitationId = 0;
+                discount.LimitationTimes = 1;
+                discount.AppliedToSubCategories =false;
+
+                await _discountService.InsertDiscountAsync(discount);
+
+                if (discount.Id > 0)
+                    netaPromotion.DiscountId = discount.Id;
+                
                 await _netaPromotionService.InsertNetaPromotionAsync(netaPromotion);
 
                 if (!continueEditing)
@@ -161,6 +188,23 @@ namespace Nop.Web.Areas.Admin.Controllers
                     netaPromotion.StartDateUtc = model.StartDateUtc;
                     netaPromotion.EndDateUtc = model.EndDateUtc;
                     netaPromotion.Published = true;
+
+                    if (model.DiscountId > 0)
+                    {
+                        var discount = await _discountService.GetDiscountByIdAsync(model.DiscountId);
+                        if (discount != null)
+                        {
+                            discount.Name = model.Name;
+                            discount.StartDateUtc = model.StartDateUtc;
+                            discount.EndDateUtc = model.EndDateUtc;
+                            discount.UsePercentage = model.UsePercentage;
+                            discount.DiscountPercentage = model.DiscountPercentage;
+                            discount.DiscountAmount = model.DiscountAmount;
+                            discount.MaximumDiscountAmount = model.MaximumDiscountAmount;
+
+                            await _discountService.UpdateDiscountAsync(discount);
+                        }
+                    }
 
                     await _netaPromotionService.UpdateNetaPromotionAsync(netaPromotion);
 
@@ -236,6 +280,20 @@ namespace Nop.Web.Areas.Admin.Controllers
             var promotionProduct = await _netaPromotionService.GetPromotionProductById(id)
                 ?? throw new ArgumentException("No promotion product mapping found with the specified id", nameof(id));
 
+            var promotion = await _netaPromotionService.GetNetaPromotionByIdAsync(promotionProduct.Neta_PromotionId);
+
+            if (promotion != null)
+            {
+                if (promotion.DiscountId != null)
+                {
+                    var discountproduct = await _productService.GetDiscountAppliedToProductAsync(promotionProduct.ProductId, promotion.DiscountId ?? 0);
+
+                    if (discountproduct != null)
+                    {
+                        await _productService.DeleteDiscountProductMappingAsync(discountproduct);
+                    }
+                }
+            }
             await _netaPromotionService.DeletePromotionProductAsync(promotionProduct);
 
             return new NullJsonResult();
@@ -275,6 +333,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var selectedProducts = await _productService.GetProductsByIdsAsync(model.SelectedProductIds.ToArray());
             if (selectedProducts.Any())
             {
+                var promotion = await _netaPromotionService.GetNetaPromotionByIdAsync(model.PromotionId);
                 var existingProductCategories = await _netaPromotionService.GetPromotionsProductsByPromotionIdAsync(model.PromotionId);
                 foreach (var product in selectedProducts)
                 {
@@ -289,7 +348,9 @@ namespace Nop.Web.Areas.Admin.Controllers
                         ProductId = product.Id,
                         DisplayOrder = 1,
                         AllowToShowProductOnlyPromotion = true
-                    });
+                    }, promotion.DiscountId);
+
+                    
                 }
             }
 

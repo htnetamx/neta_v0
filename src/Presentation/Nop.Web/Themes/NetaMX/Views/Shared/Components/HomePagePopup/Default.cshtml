@@ -1,0 +1,38 @@
+@model bool
+
+@if (Model)
+{
+    <div id="myModal" class="modal offer-modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-data">
+                @*<img src="../Themes/NetaMX/Content/images/HomepagePopupimg.png" />*@
+                <div class="text">
+                    <h2>GANA UN DESCUENTO DE</h2>
+                    <div class="sm-pic"><img src="../Themes/NetaMX/Content/images/30p.png" /></div>
+                    <h3>EN TU PRIMERA ORDER DEL DIA</h3>
+                    <h4>MAYORA A <span>$100</span></h4>
+                    <div class="dot"><span></span><span></span><span></span><span></span></div>
+                    <a class="md-btn popupclose">Corre a comprar</a>
+                </div>
+                <div class="close popupclose"></div>
+            </div>
+        </div>
+
+    </div>
+    <script asp-location="Footer">
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the <span> element that closes the modal
+        $(".popupclose").on('click', function (event) {
+            modal.style.display = "none";
+        });
+
+        $(document).ready(function () {
+            modal.style.display = "block";
+        });
+
+        </script>
+}

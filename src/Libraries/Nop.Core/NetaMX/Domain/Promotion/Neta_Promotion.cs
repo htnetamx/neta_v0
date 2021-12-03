@@ -11,5 +11,7 @@ namespace Nop.Core.Domain.Promotion
         public bool Deleted { get; set; }
 
         public bool Published { get; set; }
+
+        public int? DiscountId { get; set; }
     }
 }

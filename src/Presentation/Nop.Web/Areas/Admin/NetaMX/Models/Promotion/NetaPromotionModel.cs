@@ -26,8 +26,24 @@ namespace Nop.Web.Areas.Admin.Models.Promotion
         public DateTime EndDateUtc { get; set; }
         [NopResourceDisplayName("Admin.Catalog.Categories.Fields.SeName")]
         public string SeName { get; set; }
+
+        [NopResourceDisplayName("Admin.Promotions.Discounts.Fields.UsePercentage")]
+        public bool UsePercentage { get; set; }
+
+        [NopResourceDisplayName("Admin.Promotions.Discounts.Fields.DiscountPercentage")]
+        public decimal DiscountPercentage { get; set; }
+
+        [NopResourceDisplayName("Admin.Promotions.Discounts.Fields.DiscountAmount")]
+        public decimal DiscountAmount { get; set; }
+
+        [NopResourceDisplayName("Admin.Promotions.Discounts.Fields.MaximumDiscountAmount")]
+        [UIHint("DecimalNullable")]
+        public decimal? MaximumDiscountAmount { get; set; }
+        public string PrimaryStoreCurrencyCode { get; set; }
         public IList<NetaPromotionLocalizedModel> Locales { get; set; }
         public PromotionProductSearchModel PromotionProductSearchModel { get; set; }
+
+        public int DiscountId { get; set; }
     }
 
     public partial record NetaPromotionLocalizedModel : ILocalizedLocaleModel
