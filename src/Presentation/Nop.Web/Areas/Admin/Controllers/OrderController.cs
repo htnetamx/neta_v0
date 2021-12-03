@@ -14,6 +14,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Infrastructure;
+using Nop.Services;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -1166,6 +1167,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     file.Delete();
                 }
 
+                var sendInvoiceLink = false;
                 var storeList = orders.Select(v => v.StoreId).Distinct();
                 foreach (var store in storeList)
                 {
@@ -1176,8 +1178,22 @@ namespace Nop.Web.Areas.Admin.Controllers
                         {
                             await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                             SaveStreamAsFile(tempDirectory, stream, $"orders-{storeData.Name.Replace("\"", "")}.pdf");
+                            
                             await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
-                            SaveStreamAsFile(tempDirectory, stream, $"invoice-{storeData.Name.Replace("\"", "")}.pdf");
+                            SaveStreamAsFile(tempDirectory, stream, $"invoice-{storeData.Name.Replace("\"", "")}.pdf", transferFile: sendInvoiceLink);
+
+                            if (sendInvoiceLink)
+                            {
+                                var fileName = $"invoice-{storeData.Name.Replace("\"", "")}.pdf";
+                                _ = BotmakerMessaging.Send(
+                                    "525545439866",
+                                    storeData.CompanyPhoneNumber,
+                                    "IdMsgBotmaker",
+                                    new Dictionary<string, object> {
+                                    { "NOMBRE", storeData.Name },
+                                    { "FACTURA", $"https://downinvoice.netamx.app/invoices/{fileName}"}
+                                    });
+                            }
                         }
                     }
                 }
@@ -1299,7 +1315,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
         }
 
-        public void SaveStreamAsFile(string filePath, MemoryStream inputStream, string fileName)
+        public void SaveStreamAsFile(string filePath, MemoryStream inputStream, string fileName, bool transferFile = false)
         {
             DirectoryInfo info = new DirectoryInfo(filePath);
             if (!info.Exists)
@@ -1311,6 +1327,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             using (FileStream outputFileStream = new FileStream(path, FileMode.Create))
             {
                 inputStream.WriteTo(outputFileStream);
+            }
+
+            string destPath = Path.Combine(@"\\ip\invoices", fileName);
+            if (transferFile)
+            {
+                System.IO.File.Copy(path, destPath, true);
             }
         }
 
