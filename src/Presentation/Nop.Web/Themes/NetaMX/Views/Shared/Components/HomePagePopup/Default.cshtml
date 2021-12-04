@@ -1,6 +1,14 @@
 @model bool
 
-@if (Model)
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
+@using Nop.Core.Http.Extensions 
+@{
+    var isShowPopup = httpContextAccessor.HttpContext.Session.Get<bool>("IsShowPopup");
+    if (!isShowPopup)
+        httpContextAccessor.HttpContext.Session.Set("IsShowPopup", true);
+}
+
+@if (Model && !isShowPopup)
 {
     <div id="myModal" class="modal offer-modal">
 
@@ -34,5 +42,5 @@
             modal.style.display = "block";
         });
 
-        </script>
+    </script>
 }

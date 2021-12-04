@@ -885,7 +885,8 @@ namespace Nop.Services.Catalog
             IList<SpecificationAttributeOption> filteredSpecOptions = null,
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
-            bool? overridePublished = null)
+            bool? overridePublished = null,
+            string searchSKUString = "")
         {
             
             //some databases don't support int.MaxValue
@@ -894,7 +895,10 @@ namespace Nop.Services.Catalog
 
             //TODO: EU-106
             var productsQuery = _productRepository.Table; //.Where(p => p.IsPromotionProduct == false);
-
+            if (!string.IsNullOrEmpty(searchSKUString))
+            {
+                productsQuery = productsQuery.Where(p => p.Sku.Contains(searchSKUString));
+            }
             if (!showHidden)
                 productsQuery = productsQuery.Where(p => p.Published);
             else if (overridePublished.HasValue)

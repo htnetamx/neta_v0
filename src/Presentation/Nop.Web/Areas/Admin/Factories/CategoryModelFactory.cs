@@ -355,7 +355,8 @@ namespace Nop.Web.Areas.Admin.Factories
                 vendorId: searchModel.SearchVendorId,
                 productType: searchModel.SearchProductTypeId > 0 ? (ProductType?)searchModel.SearchProductTypeId : null,
                 keywords: searchModel.SearchProductName,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
+                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize,
+                searchSKUString: searchModel.SearchSKU);
 
             //prepare grid model
             var model = await new AddProductToCategoryListModel().PrepareToGridAsync(searchModel, products, () =>

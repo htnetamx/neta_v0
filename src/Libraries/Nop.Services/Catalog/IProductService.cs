@@ -200,7 +200,8 @@ namespace Nop.Services.Catalog
             IList<SpecificationAttributeOption> filteredSpecOptions = null,
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
-            bool? overridePublished = null);
+            bool? overridePublished = null,
+            string searchSKUString = "");
 
         /// <summary>
         /// Gets products by product attribute
