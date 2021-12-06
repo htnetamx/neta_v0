@@ -53,6 +53,8 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
 
         public IList<SelectListItem> AvailableProductTypes { get; set; }
 
+        public string SearchSKU { get; set; }
+
         #endregion
     }
 }

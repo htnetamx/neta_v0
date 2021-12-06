@@ -181,6 +181,8 @@ namespace Nop.Services.Promotion
 
             if (AllowToShowProductOnlyPromotion)
                 product.IsPromotionProduct = _netaPromotionProductMappingRepository.Table.Any(p => p.ProductId == product.Id);
+            else 
+                product.IsPromotionProduct = false;
 
             product.HasDiscountsApplied = _discountProductMappingRepository.Table.Any(dpm => dpm.EntityId == product.Id);
             await _productService.UpdateProductAsync(product);

@@ -87,6 +87,14 @@ else
                                                 <nop-select asp-for="SearchManufacturerId" asp-items="Model.AvailableManufacturers" />
                                             </div>
                                         </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-5">
+                                                <nop-label asp-for="SearchSKU" />
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <nop-editor asp-for="SearchSKU" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -116,7 +124,8 @@ else
                                         new FilterParameter(nameof(Model.SearchManufacturerId)),
                                         new FilterParameter(nameof(Model.SearchStoreId)),
                                         new FilterParameter(nameof(Model.SearchVendorId)),
-                                        new FilterParameter(nameof(Model.SearchProductTypeId))
+                                        new FilterParameter(nameof(Model.SearchProductTypeId)),
+                                        new FilterParameter(nameof(Model.SearchSKU))
                                     },
                                     ColumnCollection = new List<ColumnProperty>
                                     {
@@ -130,6 +139,10 @@ else
                                         new ColumnProperty(nameof(ProductModel.Name))
                                         {
                                             Title = T("Admin.Catalog.Products.Fields.Name").Text
+                                        },
+                                        new ColumnProperty(nameof(ProductModel.Sku))
+                                        {
+                                            Title = T("Admin.Catalog.Products.Fields.Sku").Text
                                         },
                                         new ColumnProperty(nameof(ProductModel.Published))
                                         {

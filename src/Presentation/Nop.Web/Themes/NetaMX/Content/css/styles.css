@@ -4661,19 +4661,19 @@ label, label + * {
   margin: 0 0 50px;
 }
 
-.cart-collaterals .button-2 {
-  display: inline-block;
-  border: none;
-  background-color: forestgreen;
-  padding: 10px 15px;
-  color: #fff;
-  text-transform: uppercase;
-}
+  .cart-collaterals .button-2 {
+    display: inline-block;
+    border: none;
+    background-color: #EAF7EE;
+    padding: 10px 15px;
+    color: #111;
+    text-transform: uppercase;
+  }
 
-.cart-collaterals .button-2:hover,
-.cart-collaterals .button-2:focus {
-  background-color: green;
-}
+    .cart-collaterals .button-2:hover,
+    .cart-collaterals .button-2:focus {
+      background-color: #EAF7EE;
+    }
 
 .cart-collaterals .title {
   margin: 0 0 5px;
@@ -9434,9 +9434,26 @@ pre {
  .term-popup .content-data{padding:15px;text-align:left;}
  .term-popup .content-data p{font-size:15px;line-height:20px;}
 
+  #myProgress {
+    width: 100%;
+    background-color: #B1C7FF;
+    border-radius: 100px;
+  }
+
+  #myBar {
+    width: 100%;
+    height: 4px;
+    background-color: #3870FF;
+    border-radius: 100px;
+  }
+
+ .optSecount{font-size:14px !important; font-weight:700;}
+ .optInfo{font-size:13px !important; font-weight:500;}
+ .wrongotp{border-color:#F04D4B !important;}
+
  .verification-popup{position:fixed;left:0;top:0;width:100%;height:100%;background:#fff;z-index:101010;overflow:auto;display:none;}
  .verification-popup.active{display:block;}
- .verification-popup .ver-content{padding:15px;padding-bottom:100px;}
+ .verification-popup .ver-content{padding:36px 15px 15px 15px;padding-bottom:100px;}
  .verification-popup .code{margin:40px 0;}
  .verification-popup .code input{height:50px;width:40px;border:1px solid #ddd;border-radius:8px;display:inline-block;margin:0 10px;text-align:center;font-size:18px;color:#538EFF;}
  .verification-popup .code input:focus{border-color:#333;outline:0;}

@@ -16,9 +16,16 @@
 
     //register URL with return URL (if specified)
     var registerUrl = Url.RouteUrl("Register", new { returnUrl = this.Context.Request.Query["returnUrl"] }, webHelper.GetCurrentRequestProtocol());
-
-    Random random = new Random();
-    var codeRandom = random.Next(1000, 9000);
+    var codeRandom = string.Empty;
+    if (Model.IsCodeVerif)
+    {
+        codeRandom = Model.ExistingCode;
+    }
+    else
+    {
+        Random random = new Random();
+        codeRandom = random.Next(1000, 9000).ToString();
+    }
 }
 @if (Model.IsCodeVerif)
 {
@@ -286,25 +293,37 @@
                         <h2>Verificación</h2><a class="close-popup">X</a>
                     </div>
                     <div class="ver-content">
-                        <div asp-validation-summary="ModelOnly" class="message-error"></div>
-                        @*<div class="code">
-            <input />
-            <input />
-            <input />
-            <input />
-        </div>*@
+
+                        <p>
+                            Ingresa el codigo de verificación que <br />
+                            enviamos a tu <b>whatsapp</b>.
+                        </p>
+                        <div class="code">
+                            <input class="otpInput @(Model.IsCodeVerif?"wrongotp" : "")" maxlength="1" />
+                            <input class="otpInput @(Model.IsCodeVerif?"wrongotp" : "")" maxlength="1" />
+                            <input class="otpInput @(Model.IsCodeVerif?"wrongotp" : "")" maxlength="1" />
+                            <input class="otpInput @(Model.IsCodeVerif?"wrongotp" : "") otplastinput" maxlength="1" />
+                        </div>
                         <div class="code-verfication-input">
-                            <input id="codeVerif" name="codeVerif" type="text" class="text" required />
+                            @*<input id="codeVerif" name="codeVerif" type="text" class="text" required />*@
+                            <input type="hidden" id="codeVerif" name="codeVerif" />
                             <input type="hidden" id="code_generated" name="code_generated" value="@codeRandom" />
                             <input type="hidden" id="hidUsername" name="Username" />
                             <input type="hidden" id="hidPassword" name="Password" />
                         </div>
-                        <p>Ingresa el código de verificación que te <br /> enviamos por WhatsApp@*<b id="inputMobile"></b>*@</p>
-                        <p>Puede tardar hasta 2 minutos</p>
-                        <a class="link" id="resendCodeVerif" onclick="$('#btnCodeVerif').click()" style="text-decoration: underline">Haz click aquí para enviar de nuevo</a>
-                        <a id="placeholder">Haz click aquí para enviar de nuevo</a>
-                        <p></p>
-                        <p id="countdown"></p>
+                        <p class="optInfo">Cuando termine el tiempo podrá solicitar otro código</p>
+                        <div id="myProgress" style="display:none;">
+                            <div id="myBar"></div>
+                        </div>
+                        <br>
+                        <!--<p>Ingresa el código de verificación que te <br /> enviamos por WhatsApp-->@*<b id="inputMobile"></b>*@
+                        <!--</p>
+                        <p>Puede tardar hasta 2 minutos</p>-->
+                        <a  class="link" id="resendCodeVerif" onclick="$('#btnCodeVerif').click()" style="text-decoration: underline; display:none;">Enviar de nuevo</a>
+                        @*<a id="placeholder">Haz click aquí para enviar de nuevo</a>
+                            <p></p>*@
+                        <p class="optSecount" id="countdown"></p>
+                        <div asp-validation-summary="ModelOnly" class="message-error"></div>
                     </div>
                     <div class="buttons button-fix">
                         <button id="btnLogin" type="submit" class="button-1 login-button btn-black">@T("Account.Login.LoginButton")</button>
@@ -337,6 +356,32 @@
     <div class="confirm-overlayer"></div>
 
     <script asp-location="Footer">
+
+        $(".otpInput").keyup(function () {
+            var key = event.keyCode || event.charCode;
+            if (key == 8 || key == 46) {
+                $(this).prev(".otpInput").focus();
+            }
+            else {
+                if (this.value.length == this.maxLength) {
+                    $(this).next('.otpInput').focus();
+                }
+            }
+            var otpvalue = "";
+            var isSubmit = true;
+            $(".otpInput").each(function () {
+                otpvalue = otpvalue + $(this).val();
+                if ($(this).val() == "") {
+                    isSubmit = false;
+                    return false;
+                }
+            });
+            $("#codeVerif").val(otpvalue);
+            if (isSubmit) {
+                $("#btnLogin").click();
+            }
+        });
+
         $(document).ready(function () {
             $("#formVerifData").validate({
                 rules: {
@@ -378,18 +423,23 @@
             $("#tandc").removeClass("active");
             $(".confirm-overlayer").removeClass("active");
         }
-
         function enableTimer() {
+            $("#myProgress").show();
             var timeleft = 45;
+            var elem = document.getElementById("myBar");
+            var width = 100;
             var downloadTimer = setInterval(function () {
                 if (timeleft <= 0) {
                     clearInterval(downloadTimer);
                     document.getElementById("countdown").innerHTML = "";
                     $("#resendCodeVerif").show();
                     $("#placeholder").hide();
+                    $("#myProgress").hide();
 
                 } else {
-                    document.getElementById("countdown").innerHTML = "Envío disponible nuevamente en " + timeleft + " segundos";
+                        width = width - 2.22;
+                        elem.style.width = width + "%";
+                    document.getElementById("countdown").innerHTML = timeleft + " Segundos";
                     $("#resendCodeVerif").hide();
                     $("#placeholder").show();
                 }

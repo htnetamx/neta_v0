@@ -31,5 +31,6 @@ namespace Nop.Web.Models.Customer
         public bool DisplayCaptcha { get; set; }
 
         public bool IsCodeVerif { get; set; } = false;
+        public string ExistingCode { get; set; }
     }
 }
