@@ -72,6 +72,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="5.0.11" />
+    <PackageReference Include="SimpleImpersonation" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

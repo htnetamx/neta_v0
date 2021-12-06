@@ -36,6 +36,7 @@ using Nop.Web.Areas.Admin.Models.Reports;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using SimpleImpersonation;
 
 namespace Nop.Web.Areas.Admin.Controllers
 {
@@ -1329,11 +1330,17 @@ namespace Nop.Web.Areas.Admin.Controllers
                 inputStream.WriteTo(outputFileStream);
             }
 
-            string destPath = Path.Combine(@"\\ip\invoices", fileName);
-            if (transferFile)
+            string nas_domain = "172.31.9.161";
+            string nas_username = "FileTransfer";
+            string nas_password = "Neta.Facturas.2021!";
+            Impersonation.RunAsUser(new UserCredentials(nas_username, nas_password), LogonType.NewCredentials, () =>
             {
-                System.IO.File.Copy(path, destPath, true);
-            }
+                string destPath = Path.Combine(@"\\172.31.9.161\Facturas$", fileName);
+                if (transferFile)
+                {
+                    System.IO.File.Copy(path, destPath, true);
+                }
+            });
         }
 
         [HttpPost]
