@@ -1180,10 +1180,10 @@ namespace Nop.Web.Areas.Admin.Controllers
                             await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                             SaveStreamAsFile(tempDirectory, stream, $"orders-{storeData.Name.Replace("\"", "")}.pdf");
                             
-                            await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
+                            var total = await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                             SaveStreamAsFile(tempDirectory, stream, $"invoice-{storeData.Name.Replace("\"", "")}.pdf", transferFile: sendInvoiceLink);
 
-                            if (sendInvoiceLink)
+                            if (sendInvoiceLink && total >= 300)
                             {
                                 var fileName = $"invoice-{storeData.Name.Replace("\"", "")}.pdf";
                                 _ = BotmakerMessaging.Send(

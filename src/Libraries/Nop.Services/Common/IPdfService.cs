@@ -35,7 +35,7 @@ namespace Nop.Services.Common
         /// <param name="vendorId">Vendor identifier to limit products; 0 to print all products. If specified, then totals won't be printed</param>
         /// <returns>A task that represents the asynchronous operation</returns>
         Task PrintOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
-        Task PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
+        Task<decimal> PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0);
         Task PrintAcumOrdersToPdfAsyncSinglePdf(Document doc2, Stream stream2, PdfWriter pdfWriter2, IList<Order> orders, int languageId = 0, int vendorId = 0);
 
         /// <summary>
