@@ -1168,7 +1168,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     file.Delete();
                 }
 
-                var sendInvoiceLink = false;
+                var sendInvoiceLink = true;
                 var storeList = orders.Select(v => v.StoreId).Distinct();
                 foreach (var store in storeList)
                 {
@@ -1189,7 +1189,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                                 _ = BotmakerMessaging.Send(
                                     "525545439866",
                                     storeData.CompanyPhoneNumber,
-                                    "IdMsgBotmaker",
+                                    "factura_shops",
                                     new Dictionary<string, object> {
                                     { "NOMBRE", storeData.Name },
                                     { "FACTURA", $"https://downinvoice.netamx.app/invoices/{fileName}"}
