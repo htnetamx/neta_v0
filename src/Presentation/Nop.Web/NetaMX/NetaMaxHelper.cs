@@ -2,6 +2,6 @@
 {
     public static class NetaMaxHelper
     {
-        public static string CssJsVersion => "041220211927";
+        public static string CssJsVersion => "061220211814";
     }
 }

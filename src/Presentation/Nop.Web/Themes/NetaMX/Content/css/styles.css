@@ -4661,19 +4661,19 @@ label, label + * {
   margin: 0 0 50px;
 }
 
-.cart-collaterals .button-2 {
-  display: inline-block;
-  border: none;
-  background-color: forestgreen;
-  padding: 10px 15px;
-  color: #fff;
-  text-transform: uppercase;
-}
+  .cart-collaterals .button-2 {
+    display: inline-block;
+    border: none;
+    background-color: #EAF7EE;
+    padding: 10px 15px;
+    color: #111;
+    text-transform: uppercase;
+  }
 
-.cart-collaterals .button-2:hover,
-.cart-collaterals .button-2:focus {
-  background-color: green;
-}
+    .cart-collaterals .button-2:hover,
+    .cart-collaterals .button-2:focus {
+      background-color: #EAF7EE;
+    }
 
 .cart-collaterals .title {
   margin: 0 0 5px;

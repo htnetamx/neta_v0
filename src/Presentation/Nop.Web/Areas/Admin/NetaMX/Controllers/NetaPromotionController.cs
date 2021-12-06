@@ -347,7 +347,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                         Neta_PromotionId = model.PromotionId,
                         ProductId = product.Id,
                         DisplayOrder = 1,
-                        AllowToShowProductOnlyPromotion = true
+                        AllowToShowProductOnlyPromotion = false
                     }, promotion.DiscountId);
 
                     
