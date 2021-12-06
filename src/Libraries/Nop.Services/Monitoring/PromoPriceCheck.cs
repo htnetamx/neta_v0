@@ -65,7 +65,13 @@ namespace Nop.Services.Monitoring
                     //"diana@neta.mx",
                     "miguel.zamora@neta.mx",
                     "bicho@neta.mx",
-                    "david.gomes@neta.mx"
+                    "david.gomes@neta.mx",
+                    "nicolas@neta.mx",
+                    "samuel@neta.mx",
+                    "jorge.garduno@neta.mx",
+                    "mateo.uribe@neta.mx",
+                    "aurea.lopez@neta.mx",
+                    "samuel.wong@neta.mx"
                 };
 
                 var email = new Email();
