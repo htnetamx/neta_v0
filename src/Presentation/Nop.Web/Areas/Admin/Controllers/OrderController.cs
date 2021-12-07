@@ -1188,7 +1188,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                                 var fileName = $"invoice-{storeData.Name.Replace("\"", "")}.pdf";
                                 _ = BotmakerMessaging.Send(
                                     "525545439866",
-                                    storeData.CompanyPhoneNumber,
+                                    storeData.CompanyPhoneNumber.StartsWith("52") ? storeData.CompanyPhoneNumber : string.Concat("52", storeData.CompanyPhoneNumber),
                                     "factura_shops",
                                     new Dictionary<string, object> {
                                     { "NOMBRE", storeData.Name },
@@ -1333,7 +1333,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             string nas_domain = "172.31.9.161";
             string nas_username = "FileTransfer";
             string nas_password = "Neta.Facturas.2021!";
-            Impersonation.RunAsUser(new UserCredentials(nas_username, nas_password), LogonType.NewCredentials, () =>
+            Impersonation.RunAsUser(new UserCredentials(nas_domain, nas_username, nas_password), LogonType.NewCredentials, () =>
             {
                 string destPath = Path.Combine(@"\\172.31.9.161\Facturas$", fileName);
                 if (transferFile)
