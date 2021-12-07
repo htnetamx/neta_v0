@@ -1,7 +1,11 @@
-﻿using Nop.Core.Domain.Promotion;
+﻿using Nop.Core.Domain.Catalog;
+using Nop.Core.Domain.Promotion;
 using Nop.Services.Catalog;
 using Nop.Services.Discounts;
 using Nop.Services.Promotion;
+using Nop.Services.Seo;
+using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
+using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Areas.Admin.Models.Promotion;
 using Nop.Web.Framework.Models.Extensions;
 using System;
@@ -16,14 +20,15 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly INetaPromotionService _netaPromotionService;
         private readonly IProductService _productService; 
         private readonly IDiscountService _discountService;
-
+        private readonly IUrlRecordService _urlRecordService;
 
         public NetaPromotionModelFactory(INetaPromotionService netaPromotionService,
-            IProductService productService, IDiscountService discountService)
+            IProductService productService, IDiscountService discountService,IUrlRecordService urlRecordService)
         {
             _netaPromotionService = netaPromotionService;
             _productService = productService;
             _discountService = discountService;
+            _urlRecordService = urlRecordService;
         }
         public async Task<NetaPromotionModel> PrepareNetaPromotionModelAsync(NetaPromotionModel model, Neta_Promotion netaPromotion)
         {
@@ -81,6 +86,38 @@ namespace Nop.Web.Areas.Admin.Factories
                     promotionProductModel.ProductName = (await _productService.GetProductByIdAsync(promotionProduct.ProductId))?.Name;
 
                     return promotionProductModel;
+                });
+            });
+
+            return model;
+        }
+
+        public virtual async Task<AddProductToCategoryListModel> PrepareAddProductToCategoryListModelAsync(AddProductToCategorySearchModel searchModel)
+        {
+            if (searchModel == null)
+                throw new ArgumentNullException(nameof(searchModel));
+
+            //get products
+            var products = await _productService.SearchProductsAsync(showHidden: true,
+                categoryIds: new List<int> { searchModel.SearchCategoryId },
+                manufacturerIds: new List<int> { searchModel.SearchManufacturerId },
+                storeId: searchModel.SearchStoreId,
+                vendorId: searchModel.SearchVendorId,
+                productType: searchModel.SearchProductTypeId > 0 ? (ProductType?)searchModel.SearchProductTypeId : null,
+                keywords: searchModel.SearchProductName,
+                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize,
+                searchSKUString: searchModel.SearchSKU,IsPromotionProductExist:true);
+
+            //prepare grid model
+            var model = await new AddProductToCategoryListModel().PrepareToGridAsync(searchModel, products, () =>
+            {
+                return products.SelectAwait(async product =>
+                {
+                    var productModel = product.ToModel<ProductModel>();
+
+                    productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
+
+                    return productModel;
                 });
             });
 

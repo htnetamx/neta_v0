@@ -22,10 +22,8 @@ namespace Nop.Services.Promotion
         Task UpdatePromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping);
         Task InsertPromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping,int? discountId);
         Task DeletePromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping);
-        Task<IPagedList<Neta_Promotion_ProductMapping>> GetPromotionsProductsByPromotionIdAsync(int promotionId,
-            int pageIndex = 0, int pageSize = int.MaxValue);
+        Task<IList<Neta_Promotion_ProductMapping>> GetPromotionsProductsByPromotionAsync();
         Neta_Promotion_ProductMapping FindProductPromotion(IList<Neta_Promotion_ProductMapping> source, int productId, int promotionId);
-
-        Task ImportProductsFromXlsxAsync(Stream stream, int promotionId);
+        Task<string> ImportProductsFromXlsxAsync(Stream stream, int promotionId);
     }
 }

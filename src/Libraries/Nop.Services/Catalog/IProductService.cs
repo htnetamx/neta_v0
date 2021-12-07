@@ -201,7 +201,8 @@ namespace Nop.Services.Catalog
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
             bool? overridePublished = null,
-            string searchSKUString = "");
+            string searchSKUString = "",
+            bool IsPromotionProductExist = false);
 
         /// <summary>
         /// Gets products by product attribute

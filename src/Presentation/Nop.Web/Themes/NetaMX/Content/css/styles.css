@@ -6978,14 +6978,43 @@ pre {
 .extraDdiscount{display:block;}
 .notextraDdiscount{display:none;}
 
-.cate-title{margin:0 0 15px;}
-.cate-title h2{font-size: 20px;font-weight: 700; color: #212121; margin:0;padding:0;text-align:left;}
+.clr{clear:both;margin:0;padding:0;}
 
-.home-page-category-grid .category-item{text-align:center;width:100px;}
+.cate-title
+{
+ margin: 0 0 15px;
+}
+.cate-title h2{float:left; font-size: 20px;font-weight: 700; color: #212121; margin:0;padding:0;text-align:left;}
+ .cate-title a
+ {
+  float: right;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #3870FF !important;
+ }
+  .cate-title a i
+  {
+   width: 33px;
+   height: 33px;
+   background: url('../images/arrow.svg')no-repeat center center;
+   display: inline-block;
+   animation: mymove 1s infinite;
+   animation-timing-function: linear;
+   position:relative;
+  }
+  @keyframes mymove {
+  from {left: 0px;}
+  to {left: 10px;}
+}
+.home-page-category-grid .owl-carousel .owl-stage{margin:0 0 3px;}
+.home-page-category-grid .category-item{border-radius:7px; text-align:center;width:118px;display:flex;justify-content:space-between;align-items:center;background:#FDF4DD;box-shadow: 0px 1px 3px rgba(115, 115, 115, 0.25);height:53px;padding:0 10px;margin-bottom:10px;}
 .home-page-category-grid .cus-picture a{display:block;}
-.home-page-category-grid .cus-picture a img{width:40px;height:40px;border-radius:180px;margin:0 auto;}
-.home-page-category-grid .title{margin:0;padding:0;}
-.home-page-category-grid .title a{text-decoration:none; font-size: 16px; color: #3A3A3A; font-weight:400;display:inline-block;margin:0;padding:0;}
+.home-page-category-grid .cus-picture a img{width:30px;height:30px;border-radius:180px;margin:0 auto;}
+.home-page-category-grid .title{margin:0;padding:0;word-break: break-all;}
+.home-page-category-grid .title a{text-decoration:none; font-size: 16px; color: #3A3A3A; font-weight:400;display:inline-block;margin:0;padding:0;text-align:left;padding-right:5px;}
+
+
 
 .offer-banner{margin:0 0 30px;}
 .offer-banner h2{font-size: 20px;color: #212121;font-weight:700;margin:0 0 25px;padding:0;text-align:left;}
