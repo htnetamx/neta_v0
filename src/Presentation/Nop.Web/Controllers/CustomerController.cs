@@ -489,6 +489,29 @@ namespace Nop.Web.Controllers
                 return View(model);
             }
             var customer = await _customerService.GetCustomerByTelephoneAsync(model.Password);
+
+
+            var currStore = _storeContext.GetCurrentStore();
+            var rta = await AmplitudHelper.PostEvent(new AmplitudHelper.AmplitudEvent
+            {
+                api_key = "f5232ee25585b5bb455a9a3710c685e6",
+                events = new List<AmplitudHelper.Event>
+                    {
+                        new AmplitudHelper.Event
+                        {
+                            user_id = customer.Id.ToString(),
+                            event_type = "Login_completed",
+                            event_properties = new Dictionary<string, object>
+                            {
+                                { "StoreId", currStore.Id.ToString() },
+                                { "StoreName", currStore.Name },
+                                { "Phone", customer.Username }
+                            }
+                        },
+                    }
+            });
+
+
             var zipCode = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.ZipPostalCodeAttribute);
             if (!string.IsNullOrEmpty(zipCode) && zipCode != "")
                 returnUrl = "/cart";

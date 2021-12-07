@@ -15,8 +15,7 @@ namespace Nop.Web.Infrastructure
         {
             using (var client = new HttpClient())
             {
-                var url = "https://api.eu.amplitude.com/2/httpapi";
-
+                var url = "https://api.amplitude.com/2/httpapi";
                 var response = await client.PostAsJsonAsync(url, data);
                 string result = await response.Content.ReadAsStringAsync();
                 return result;
@@ -119,7 +118,7 @@ namespace Nop.Web.Infrastructure
 
             var response = await httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
 
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
 
             return response;
         }
