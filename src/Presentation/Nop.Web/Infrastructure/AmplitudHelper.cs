@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -15,7 +17,7 @@ namespace Nop.Web.Infrastructure
             {
                 var url = "https://api.eu.amplitude.com/2/httpapi";
 
-                var response = await client.PostAsJsonAsync<AmplitudEvent>(url, data);
+                var response = await client.PostAsJsonAsync(url, data);
                 string result = await response.Content.ReadAsStringAsync();
                 return result;
             }

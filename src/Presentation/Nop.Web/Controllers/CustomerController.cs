@@ -569,12 +569,9 @@ namespace Nop.Web.Controllers
             {
                 var customer = await _workContext.GetCurrentCustomerAsync();
                 await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ZipPostalCodeAttribute, zipCode);
-                
-                if (!string.IsNullOrEmpty(returnUrl))
-                    return new RedirectResult(returnUrl);
 
                 var currStore = _storeContext.GetCurrentStore();
-                _ = AmplitudHelper.PostEvent(new AmplitudHelper.AmplitudEvent
+                var rta = await AmplitudHelper.PostEvent(new AmplitudHelper.AmplitudEvent
                 {
                     api_key = "f5232ee25585b5bb455a9a3710c685e6",
                     events = new List<AmplitudHelper.Event>
@@ -592,6 +589,10 @@ namespace Nop.Web.Controllers
                         },
                     }
                 });
+
+                if (!string.IsNullOrEmpty(returnUrl))
+                    return new RedirectResult(returnUrl);
+
                 return new RedirectToRouteResult("ShoppingCart", null);
             }
         }
