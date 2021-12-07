@@ -1185,7 +1185,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                             if (sendInvoiceLink && total >= 300)
                             {
-                                var fileName = $"invoice-{storeData.Name.Replace("\"", "")}.pdf";
+                                var fileName = $"invoice-{storeData.Name.Replace("\"", "")}.pdf".Replace(" ", "");
                                 _ = BotmakerMessaging.Send(
                                     "525545439866",
                                     storeData.CompanyPhoneNumber.StartsWith("52") ? storeData.CompanyPhoneNumber : string.Concat("52", storeData.CompanyPhoneNumber),
@@ -1335,7 +1335,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             string nas_password = "Neta.Facturas.2021!";
             Impersonation.RunAsUser(new UserCredentials(nas_domain, nas_username, nas_password), LogonType.NewCredentials, () =>
             {
-                string destPath = Path.Combine(@"\\172.31.9.161\Facturas$", fileName);
+                string destPath = Path.Combine(@"\\172.31.9.161\Facturas$", fileName.Replace(" ", ""));
                 if (transferFile)
                 {
                     System.IO.File.Copy(path, destPath, true);
