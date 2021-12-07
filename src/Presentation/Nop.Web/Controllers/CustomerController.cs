@@ -42,6 +42,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Validators;
+using Nop.Web.Infrastructure;
 using Nop.Web.Models.Customer;
 
 namespace Nop.Web.Controllers
@@ -572,6 +573,25 @@ namespace Nop.Web.Controllers
                 if (!string.IsNullOrEmpty(returnUrl))
                     return new RedirectResult(returnUrl);
 
+                var currStore = _storeContext.GetCurrentStore();
+                _ = AmplitudHelper.PostEvent(new AmplitudHelper.AmplitudEvent
+                {
+                    api_key = "f5232ee25585b5bb455a9a3710c685e6",
+                    events = new List<AmplitudHelper.Event>
+                    {
+                        new AmplitudHelper.Event
+                        {
+                            user_id = (await _workContext.GetCurrentCustomerAsync()).Id.ToString(),
+                            event_type = "Zipcode_verified",
+                            event_properties = new Dictionary<string, object>
+                            {
+                                { "StoreId", currStore.Id.ToString() },
+                                { "StoreName", currStore.Name },
+                                { "ZipCode", zipCode }
+                            }
+                        },
+                    }
+                });
                 return new RedirectToRouteResult("ShoppingCart", null);
             }
         }

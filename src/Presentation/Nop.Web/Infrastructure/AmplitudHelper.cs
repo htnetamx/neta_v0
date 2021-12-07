@@ -47,8 +47,8 @@ namespace Nop.Web.Infrastructure
             public string device_id { get; set; }
             public string event_type { get; set; }
             public long time { get; set; }
-            public EventProperties event_properties { get; set; }
-            public UserProperties user_properties { get; set; }
+            public Dictionary<string, object> event_properties { get; set; }
+            public Dictionary<string, object> user_properties { get; set; }
             public Groups groups { get; set; }
             public string app_version { get; set; }
             public string platform { get; set; }
