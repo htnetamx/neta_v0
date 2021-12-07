@@ -1664,7 +1664,7 @@ namespace Nop.Services.Common
             doc.Close();
         }
 
-        public virtual async Task PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
+        public virtual async Task<decimal> PrintAcumOrdersToPdfAsync(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
@@ -1778,6 +1778,8 @@ namespace Nop.Services.Common
             //footer
             PrintFooter(pdfSettingsByStore, pdfWriter, pageSize, lang, font);
             doc.Close();
+
+            return sumTotal;
         }
 
         public virtual async Task PrintAcumOrdersToPdfAsyncSinglePdf(Document doc2, Stream stream2, PdfWriter pdfWriter2, IList<Order> orders, int languageId = 0, int vendorId = 0)

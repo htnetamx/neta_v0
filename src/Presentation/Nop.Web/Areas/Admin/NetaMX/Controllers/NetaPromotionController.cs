@@ -317,7 +317,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return await AccessDeniedDataTablesJson();
 
             //prepare model
-            var model = await _categoryModelFactory.PrepareAddProductToCategoryListModelAsync(searchModel);
+            var model = await _netaPromotionModelFactory.PrepareAddProductToCategoryListModelAsync(searchModel);
 
             return Json(model);
         }
@@ -330,16 +330,21 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             //get selected products
+            IList<string> skuexistlist = new List<string>();
             var selectedProducts = await _productService.GetProductsByIdsAsync(model.SelectedProductIds.ToArray());
             if (selectedProducts.Any())
             {
                 var promotion = await _netaPromotionService.GetNetaPromotionByIdAsync(model.PromotionId);
-                var existingProductCategories = await _netaPromotionService.GetPromotionsProductsByPromotionIdAsync(model.PromotionId);
+                var existingProductCategories = await _netaPromotionService.GetPromotionsProductsByPromotionAsync();
                 foreach (var product in selectedProducts)
                 {
                     //whether product category with such parameters already exists
                     if (_netaPromotionService.FindProductPromotion(existingProductCategories, product.Id, model.PromotionId) != null)
+                    {
+                        skuexistlist.Add(product.Sku);
                         continue;
+                    }
+                        
 
                     //insert the new product category mapping
                     await _netaPromotionService.InsertPromotionProductAsync(new Neta_Promotion_ProductMapping
@@ -355,7 +360,13 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
 
             ViewBag.RefreshPage = true;
-
+            if (skuexistlist != null && skuexistlist.Count > 0)
+            {
+                string existSku = string.Empty;
+                existSku = await _localizationService.GetResourceAsync("Admin.Promotion.ExistSKUMessage") + string.Join(",", skuexistlist);
+                _notificationService.WarningNotification(existSku);
+            }
+            
             return View(new AddProductToCategorySearchModel());
         }
 
@@ -365,12 +376,10 @@ namespace Nop.Web.Areas.Admin.Controllers
         {
             int.TryParse(form["promotionid"], out int promoId);
             try
-            {               
-
+            {
+                var existSKU = string.Empty;
                 if (importexcelfile != null && importexcelfile.Length > 0)
-                {
-                    await _netaPromotionService.ImportProductsFromXlsxAsync(importexcelfile.OpenReadStream(),promoId);
-                }
+                    existSKU = await _netaPromotionService.ImportProductsFromXlsxAsync(importexcelfile.OpenReadStream(),promoId); 
                 else
                 {
                     _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Common.UploadFile"));
@@ -380,6 +389,9 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Products.Imported"));
 
+                if (!string.IsNullOrEmpty(existSKU))
+                    _notificationService.WarningNotification(await _localizationService.GetResourceAsync("Admin.Promotion.ExistSKUMessage") + existSKU);
+                
                 return RedirectToAction("Edit", new { id = promoId });
             }
             catch (Exception exc)

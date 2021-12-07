@@ -1168,7 +1168,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     file.Delete();
                 }
 
-                var sendInvoiceLink = false;
+                var sendInvoiceLink = true;
                 var storeList = orders.Select(v => v.StoreId).Distinct();
                 foreach (var store in storeList)
                 {
@@ -1180,16 +1180,16 @@ namespace Nop.Web.Areas.Admin.Controllers
                             await _pdfService.PrintOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                             SaveStreamAsFile(tempDirectory, stream, $"orders-{storeData.Name.Replace("\"", "")}.pdf");
                             
-                            await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
+                            var total = await _pdfService.PrintAcumOrdersToPdfAsync(stream, orders.Where(v => v.StoreId == store).ToList(), _orderSettings.GeneratePdfInvoiceInCustomerLanguage ? 0 : (await _workContext.GetWorkingLanguageAsync()).Id, model.VendorId);
                             SaveStreamAsFile(tempDirectory, stream, $"invoice-{storeData.Name.Replace("\"", "")}.pdf", transferFile: sendInvoiceLink);
 
-                            if (sendInvoiceLink)
+                            if (sendInvoiceLink && total >= 300)
                             {
-                                var fileName = $"invoice-{storeData.Name.Replace("\"", "")}.pdf";
+                                var fileName = $"invoice-{storeData.Name.Replace("\"", "")}.pdf".Replace(" ", "");
                                 _ = BotmakerMessaging.Send(
                                     "525545439866",
-                                    storeData.CompanyPhoneNumber,
-                                    "IdMsgBotmaker",
+                                    storeData.CompanyPhoneNumber.StartsWith("52") ? storeData.CompanyPhoneNumber : string.Concat("52", storeData.CompanyPhoneNumber),
+                                    "factura_shops",
                                     new Dictionary<string, object> {
                                     { "NOMBRE", storeData.Name },
                                     { "FACTURA", $"https://downinvoice.netamx.app/invoices/{fileName}"}
@@ -1333,9 +1333,9 @@ namespace Nop.Web.Areas.Admin.Controllers
             string nas_domain = "172.31.9.161";
             string nas_username = "FileTransfer";
             string nas_password = "Neta.Facturas.2021!";
-            Impersonation.RunAsUser(new UserCredentials(nas_username, nas_password), LogonType.NewCredentials, () =>
+            Impersonation.RunAsUser(new UserCredentials(nas_domain, nas_username, nas_password), LogonType.NewCredentials, () =>
             {
-                string destPath = Path.Combine(@"\\172.31.9.161\Facturas$", fileName);
+                string destPath = Path.Combine(@"\\172.31.9.161\Facturas$", fileName.Replace(" ", ""));
                 if (transferFile)
                 {
                     System.IO.File.Copy(path, destPath, true);

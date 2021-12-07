@@ -10,6 +10,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.Promotion;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Infrastructure;
 using Nop.Data;
@@ -64,6 +65,7 @@ namespace Nop.Services.Catalog
         protected readonly IWorkContext _workContext;
         protected readonly ICategoryService _categoryservice;
         protected readonly LocalizationSettings _localizationSettings;
+        private readonly IRepository<Neta_Promotion_ProductMapping> _netaPromotionProductMappingRepository;
 
         #endregion
 
@@ -104,7 +106,8 @@ namespace Nop.Services.Catalog
             IStoreMappingService storeMappingService,
             IWorkContext workContext,
             LocalizationSettings localizationSettings,
-            ICategoryService categoryservice)
+            ICategoryService categoryservice,
+            IRepository<Neta_Promotion_ProductMapping> netaPromotionProductMappingRepository)
         {
             _catalogSettings = catalogSettings;
             _commonSettings = commonSettings;
@@ -142,6 +145,7 @@ namespace Nop.Services.Catalog
             _workContext = workContext;
             _localizationSettings = localizationSettings;
             _categoryservice = categoryservice;
+            _netaPromotionProductMappingRepository = netaPromotionProductMappingRepository;
         }
 
         #endregion
@@ -886,7 +890,8 @@ namespace Nop.Services.Catalog
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
             bool? overridePublished = null,
-            string searchSKUString = "")
+            string searchSKUString = "",
+            bool IsPromotionProductExist = false)
         {
             
             //some databases don't support int.MaxValue
@@ -895,6 +900,14 @@ namespace Nop.Services.Catalog
 
             //TODO: EU-106
             var productsQuery = _productRepository.Table; //.Where(p => p.IsPromotionProduct == false);
+            if (IsPromotionProductExist)
+            {
+                var promotionproduct = _netaPromotionProductMappingRepository.Table.Select(x => x.ProductId).ToList();
+                if (promotionproduct.Count > 0)
+                {
+                    productsQuery = productsQuery.Where(p => !promotionproduct.Contains(p.Id));
+                }
+            }
             if (!string.IsNullOrEmpty(searchSKUString))
             {
                 productsQuery = productsQuery.Where(p => p.Sku.Contains(searchSKUString));

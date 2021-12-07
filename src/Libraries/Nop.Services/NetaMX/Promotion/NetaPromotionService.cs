@@ -162,7 +162,7 @@ namespace Nop.Services.Promotion
             }
 
             var product = _productRepository.Table.FirstOrDefault(x => x.Id == neta_Promotion_ProductMapping.ProductId);
-            await UpdateIsPromotionProductApplyAsync(product,neta_Promotion_ProductMapping.AllowToShowProductOnlyPromotion);
+            await UpdateIsPromotionProductApplyAsync(product, neta_Promotion_ProductMapping.AllowToShowProductOnlyPromotion);
         }
 
         public async Task DeletePromotionProductAsync(Neta_Promotion_ProductMapping neta_Promotion_ProductMapping)
@@ -174,39 +174,36 @@ namespace Nop.Services.Promotion
             await UpdateIsPromotionProductApplyAsync(product, true);
         }
 
-        public virtual async Task UpdateIsPromotionProductApplyAsync(Product product,bool AllowToShowProductOnlyPromotion)
+        public virtual async Task UpdateIsPromotionProductApplyAsync(Product product, bool AllowToShowProductOnlyPromotion)
         {
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
 
             if (AllowToShowProductOnlyPromotion)
                 product.IsPromotionProduct = _netaPromotionProductMappingRepository.Table.Any(p => p.ProductId == product.Id);
-            else 
+            else
                 product.IsPromotionProduct = false;
 
             product.HasDiscountsApplied = _discountProductMappingRepository.Table.Any(dpm => dpm.EntityId == product.Id);
             await _productService.UpdateProductAsync(product);
         }
 
-        public virtual async Task<IPagedList<Neta_Promotion_ProductMapping>> GetPromotionsProductsByPromotionIdAsync(int promotionId,
-            int pageIndex = 0, int pageSize = int.MaxValue)
+        public virtual async Task<IList<Neta_Promotion_ProductMapping>> GetPromotionsProductsByPromotionAsync()
         {
-            if (promotionId == 0)
-                return new PagedList<Neta_Promotion_ProductMapping>(new List<Neta_Promotion_ProductMapping>(), pageIndex, pageSize);
-
             var query = from pc in _netaPromotionProductMappingRepository.Table
                         join p in _productRepository.Table on pc.ProductId equals p.Id
-                        where pc.Neta_PromotionId == promotionId
+                       // where pc.Neta_PromotionId == promotionId
                         orderby pc.DisplayOrder, pc.Id
                         select pc;
 
-            return await query.ToPagedListAsync(pageIndex, pageSize);
+            return query.ToList();
         }
 
         public virtual Neta_Promotion_ProductMapping FindProductPromotion(IList<Neta_Promotion_ProductMapping> source, int productId, int promotionId)
         {
             foreach (var productPromotion in source)
-                if (productPromotion.ProductId == productId && productPromotion.Neta_PromotionId == promotionId)
+                //if (productPromotion.ProductId == productId && productPromotion.Neta_PromotionId == promotionId)
+                if (productPromotion.ProductId == productId)
                     return productPromotion;
 
             return null;
@@ -217,8 +214,10 @@ namespace Nop.Services.Promotion
         /// </summary>
         /// <param name="stream">Stream</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        public virtual async Task ImportProductsFromXlsxAsync(Stream stream, int promotionId)
+        public virtual async Task<string> ImportProductsFromXlsxAsync(Stream stream, int promotionId)
         {
+            string existSku = string.Empty;
+            IList<string> skuexistlist = new List<string>();
             using var xlPackage = new ExcelPackage(stream);
             // get the first worksheet in the workbook
             var worksheet = xlPackage.Workbook.Worksheets.FirstOrDefault();
@@ -254,7 +253,7 @@ namespace Nop.Services.Promotion
                             if (product != null && promotion != null)
                             {
                                 var isSuccess = false;
-                                var IsExist = _netaPromotionProductMappingRepository.Table.Where(x => x.Neta_PromotionId == promotionId && x.ProductId == product.Id).Count();
+                                var IsExist = _netaPromotionProductMappingRepository.Table.Where(x => x.ProductId == product.Id).Count();
                                 if (IsExist == 0)
                                 {
                                     Neta_Promotion_ProductMapping netaPromotionProductMapping = new Neta_Promotion_ProductMapping();
@@ -266,11 +265,18 @@ namespace Nop.Services.Promotion
                                     await InsertPromotionProductAsync(netaPromotionProductMapping, promotion.DiscountId);
                                     isSuccess = true;
                                 }
+                                else
+                                    skuexistlist.Add(sku);                                
                             }
                         }
                     }
                 }
+                if (skuexistlist != null && skuexistlist.Count > 0)
+                    existSku = string.Join(",", skuexistlist);
+                
             }
+
+            return existSku;
         }
         #endregion
     }
