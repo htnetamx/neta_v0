@@ -42,6 +42,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Validators;
+using Nop.Web.Infrastructure;
 using Nop.Web.Models.Customer;
 
 namespace Nop.Web.Controllers
@@ -488,6 +489,29 @@ namespace Nop.Web.Controllers
                 return View(model);
             }
             var customer = await _customerService.GetCustomerByTelephoneAsync(model.Password);
+
+
+            var currStore = _storeContext.GetCurrentStore();
+            var rta = await AmplitudHelper.PostEvent(new AmplitudHelper.AmplitudEvent
+            {
+                api_key = "f5232ee25585b5bb455a9a3710c685e6",
+                events = new List<AmplitudHelper.Event>
+                    {
+                        new AmplitudHelper.Event
+                        {
+                            user_id = customer.Id.ToString(),
+                            event_type = "Login_completed",
+                            event_properties = new Dictionary<string, object>
+                            {
+                                { "StoreId", currStore.Id.ToString() },
+                                { "StoreName", currStore.Name },
+                                { "Phone", customer.Username }
+                            }
+                        },
+                    }
+            });
+
+
             var zipCode = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.ZipPostalCodeAttribute);
             if (!string.IsNullOrEmpty(zipCode) && zipCode != "")
                 returnUrl = "/cart";
@@ -568,7 +592,27 @@ namespace Nop.Web.Controllers
             {
                 var customer = await _workContext.GetCurrentCustomerAsync();
                 await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ZipPostalCodeAttribute, zipCode);
-                
+
+                var currStore = _storeContext.GetCurrentStore();
+                var rta = await AmplitudHelper.PostEvent(new AmplitudHelper.AmplitudEvent
+                {
+                    api_key = "f5232ee25585b5bb455a9a3710c685e6",
+                    events = new List<AmplitudHelper.Event>
+                    {
+                        new AmplitudHelper.Event
+                        {
+                            user_id = (await _workContext.GetCurrentCustomerAsync()).Id.ToString(),
+                            event_type = "Zipcode_verified",
+                            event_properties = new Dictionary<string, object>
+                            {
+                                { "StoreId", currStore.Id.ToString() },
+                                { "StoreName", currStore.Name },
+                                { "ZipCode", zipCode }
+                            }
+                        },
+                    }
+                });
+
                 if (!string.IsNullOrEmpty(returnUrl))
                     return new RedirectResult(returnUrl);
 

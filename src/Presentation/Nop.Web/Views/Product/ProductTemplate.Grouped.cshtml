@@ -1,4 +1,7 @@
-﻿@model ProductDetailsModel
+﻿@using Nop.Core
+@using Nop.Core.Infrastructure
+
+@model ProductDetailsModel
 @using Nop.Core.Domain.Seo
 @inject Nop.Core.IWebHelper webHelper
 @inject SeoSettings seoSettings
@@ -197,3 +200,23 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsBottom, additionalData = Model })
     </div>
 </div>
+
+@{
+    var storeContext = EngineContext.Current.Resolve<IStoreContext>();
+    var store = await storeContext.GetCurrentStoreAsync();
+}
+
+<script asp-location="Footer">
+    document.addEventListener("DOMContentLoaded", function (e) {
+        //AMPLITUDE::Product_Detail_Viewed
+        var event = "Product_Detail_Viewed";
+        var properties = {
+            StoreId: @store.Id,
+            ProductName: "@Model.Name",
+            ProductId: @Model.Id,
+            ProductSKU: "@Model.Sku",
+            ProductPrice: "@Model.ProductPrice.Price"
+        }
+        amplitude.getInstance().logEvent(event, properties);
+    });
+</script>

@@ -80,6 +80,22 @@ var AjaxCart = {
 
     success_process: function (response) {
         GetSavingTotal();
+      console.log(response);
+
+
+      //AMPLITUDE::Product_Added
+      var event = "Product_Added";
+      if (response.success) {
+        var event_properties = {
+          ProductName: response.product.Name,
+          ProductId: response.product.Id,
+          Quantity: response.newQuantity,
+          ProductSKU: response.product.Sku,
+          ProductPrice: response.product.Price,
+          Category: response.category
+        }
+        amplitude.getInstance().logEvent(event, event_properties);
+      }
 
         if (response.updatetopcartsectionhtml) {
             $("#CartProductQuantity").load(" #CartProductQuantity");

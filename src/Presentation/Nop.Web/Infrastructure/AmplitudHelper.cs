@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -13,9 +15,8 @@ namespace Nop.Web.Infrastructure
         {
             using (var client = new HttpClient())
             {
-                var url = "https://api.eu.amplitude.com/2/httpapi";
-
-                var response = await client.PostAsJsonAsync<AmplitudEvent>(url, data);
+                var url = "https://api.amplitude.com/2/httpapi";
+                var response = await client.PostAsJsonAsync(url, data);
                 string result = await response.Content.ReadAsStringAsync();
                 return result;
             }
@@ -47,8 +48,8 @@ namespace Nop.Web.Infrastructure
             public string device_id { get; set; }
             public string event_type { get; set; }
             public long time { get; set; }
-            public EventProperties event_properties { get; set; }
-            public UserProperties user_properties { get; set; }
+            public Dictionary<string, object> event_properties { get; set; }
+            public Dictionary<string, object> user_properties { get; set; }
             public Groups groups { get; set; }
             public string app_version { get; set; }
             public string platform { get; set; }
@@ -117,7 +118,7 @@ namespace Nop.Web.Infrastructure
 
             var response = await httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
 
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
 
             return response;
         }

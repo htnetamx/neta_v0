@@ -16,6 +16,7 @@
 @inject Nop.Services.Localization.ILanguageService languageService
 @{
     Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.countryselect.js?" + Guid.NewGuid());
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.amplitude.js?" + Guid.NewGuid());
     Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.ajaxcart.js?" + Guid.NewGuid());
     Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.common.js?" + Guid.NewGuid());
     //when jQuery migrate script logging is active you will see the log in the browser console
@@ -31,7 +32,7 @@
     Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js?" + Guid.NewGuid());
     Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation/jquery.validate.min.js?" + Guid.NewGuid());
     Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery/jquery.min.js?" + Guid.NewGuid());
-    
+
     //custom tag(s);
     if (!string.IsNullOrEmpty(seoSettings.CustomHeadTags))
     {
